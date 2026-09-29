@@ -1,0 +1,948 @@
+<!doctype html><html lang="bs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>
+<title>Krojna linija 3+1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#E9EDEF; --surface:#FFFFFF; --surface-2:#F3F5F6; --ink:#131A21; --muted:#56636E; --line:#D3D9DE;
+  --accent:#C8232C; --accent-ink:#FFFFFF; --yellow:#E5B400;
+  --ok:#23804F; --ok-bg:#DDF1E6; --warn:#A86200; --warn-bg:#FBEBD2; --info:#2A659C; --info-bg:#DCE8F4;
+  --idle:#5E6A74; --idle-bg:#E6EAED; --cut:#B81F28; --cut-bg:#F8DEDF;
+  --floor:#D6DCE0; --floor-line:#C9D0D5; --canvas-ink:#1E262D;
+  --sans:"Barlow","PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  --cond:"Barlow Condensed","PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F1317; --surface:#171D22; --surface-2:#1E252B; --ink:#E3E9ED; --muted:#8D9AA5; --line:#2A333B;
+    --accent:#E5484D; --ok:#43B97D; --ok-bg:#16301F; --warn:#E3A63A; --warn-bg:#35270F; --info:#6AA6DD; --info-bg:#14283A;
+    --idle:#95A2AC; --idle-bg:#232B32; --cut:#F06A6F; --cut-bg:#3A1A1C;
+    --floor:#1A2026; --floor-line:#222A31; --canvas-ink:#DCE3E8;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1317; --surface:#171D22; --surface-2:#1E252B; --ink:#E3E9ED; --muted:#8D9AA5; --line:#2A333B;
+  --accent:#E5484D; --ok:#43B97D; --ok-bg:#16301F; --warn:#E3A63A; --warn-bg:#35270F; --info:#6AA6DD; --info-bg:#14283A;
+  --idle:#95A2AC; --idle-bg:#232B32; --cut:#F06A6F; --cut-bg:#3A1A1C;
+  --floor:#1A2026; --floor-line:#222A31; --canvas-ink:#DCE3E8;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+.wrap{max-width:1480px;margin:0 auto;padding-inline:20px;padding-block:18px 48px}
+@media (max-width:600px){.wrap{padding-inline:16px}}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 24px;margin-bottom:14px}
+.brand .eyebrow{font-family:var(--cond);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-size:13px}
+.brand h1{font-family:var(--cond);font-weight:700;font-size:clamp(26px,3.2vw,36px);line-height:1.05;margin:2px 0 4px;text-wrap:balance}
+.brand p{margin:0;color:var(--muted);max-width:70ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px var(--cond);letter-spacing:.04em;padding:8px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--cond);letter-spacing:.04em;padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.speed{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font:600 14px var(--cond)}
+.speed input{width:110px;accent-color:var(--accent)}
+.speed output{font-family:var(--mono);font-size:13px;min-width:3ch;text-align:right}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+
+main.sim{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:16px;align-items:start}
+@media (max-width:1020px){main.sim{grid-template-columns:1fr}}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px}
+canvas#cv{display:block;width:100%;aspect-ratio:9500/11200;max-width:100%;border-radius:6px;background:var(--floor)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:10px 4px 2px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px}
+.legend i.round{border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.hint{margin:8px 4px 0;font-size:13px;color:var(--muted)}
+
+
+aside.panels{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card h2,.card h3{font-family:var(--cond);font-weight:700;margin:0;letter-spacing:.02em}
+.card h2{font-size:19px}.card h3{font-size:18px}
+.chead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chead .grow{flex:1}
+.pill{font:600 12.5px var(--cond);letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.st-idle{color:var(--idle);background:var(--idle-bg)}
+.st-work{color:var(--info);background:var(--info-bg)}
+.st-wait{color:var(--warn);background:var(--warn-bg)}
+.st-ready{color:var(--ok);background:var(--ok-bg)}
+.st-cut{color:var(--cut);background:var(--cut-bg)}
+.sw{width:14px;height:14px;border-radius:3px;flex:none}
+.job{color:var(--muted);font-size:13.5px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(68px,1fr));gap:8px;margin-top:10px}
+.cspd{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;margin-top:12px}
+.cspd input{width:100%;accent-color:var(--accent);min-width:0}
+.cspd output{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.btn.sm{padding:5px 10px;font-size:13px}
+.note{margin:6px 0 0;font-size:12.5px;color:var(--muted)}
+.stat{background:var(--surface-2);border-radius:7px;padding:6px 8px}
+.stat .lbl,.lbl{display:block;font:600 11.5px var(--cond);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat b{font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums}
+.queue{margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+.queue .q{font-family:var(--mono);font-size:13px;background:var(--ok-bg);color:var(--ok);padding:2px 8px;border-radius:6px}
+.cstate{margin-top:8px;font-size:14px}
+.tgrid{display:grid;grid-template-columns:1fr 1fr 1.2fr .7fr;gap:8px;margin-top:10px;align-items:end}
+@media (max-width:420px){.tgrid{grid-template-columns:1fr 1fr}}
+.tgrid input,.tgrid select{width:100%;font:500 14px var(--sans);padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--ink)}
+.tgrid .cnt,.tgrid .team{font-family:var(--mono);font-size:18px;font-variant-numeric:tabular-nums;line-height:1.5}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+@media (max-width:420px){.btns{grid-template-columns:1fr 1fr}}
+.hmi{font:700 13px var(--cond);letter-spacing:.05em;text-transform:uppercase;padding:9px 4px;border-radius:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer;transition:transform .08s, background .15s}
+.hmi:disabled{opacity:.38;cursor:not-allowed}
+.hmi.go{background:#1F7A45;border-color:#1F7A45;color:#fff}
+.hmi.pedal{background:#2B3238;border-color:#2B3238;color:#FFD84D}
+.hmi.rdy{background:var(--yellow);border-color:var(--yellow);color:#1A1A1A}
+.hmi.clr{background:var(--surface);}
+.hmi.confirm{width:100%;margin-top:10px;background:var(--accent);border-color:var(--accent);color:#fff;padding:11px}
+.hmi.pressed{transform:scale(.94);box-shadow:0 0 0 3px var(--info)}
+.hmi.await:not(:disabled){animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(229,180,0,.0)}50%{box-shadow:0 0 0 4px rgba(229,180,0,.75)}}
+@media (prefers-reduced-motion:reduce){.hmi.await:not(:disabled){animation:none;box-shadow:0 0 0 3px rgba(229,180,0,.75)}}
+.logcard{margin-top:12px}
+.log{list-style:none;margin:8px 0 0;padding:0;max-height:210px;overflow:auto;font-size:13px}
+.log li{display:grid;grid-template-columns:5ch 1fr;gap:8px;padding:4px 0;border-top:1px solid var(--line)}
+.log li:first-child{border-top:0}
+.log .t{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+section.desc{margin-top:28px}
+section.desc > h2{font-family:var(--cond);font-size:26px;margin:0 0 4px}
+section.desc > p.sub{color:var(--muted);margin:0 0 14px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;margin-bottom:18px}
+.flow .st{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13.5px;line-height:1.3}
+.flow .st b{display:block;font-family:var(--cond);font-size:15px}
+.flow .st small{color:var(--muted);font-size:13px}
+.flow .ar{align-self:center;color:var(--muted);font-family:var(--mono)}
+.flow .st.act{border-color:var(--yellow);background:var(--warn-bg)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:880px){.cols{grid-template-columns:1fr}}
+.cols article{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 22px}
+.cols article .langtag{font:700 12px var(--cond);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.cols h3{font-family:var(--cond);font-size:20px;margin:16px 0 6px}
+.cols h3:first-of-type{margin-top:6px}
+.cols p,.cols li{max-width:68ch}
+.cols ol,.cols ul{padding-left:1.3em;margin:6px 0}
+.cols li{margin:3px 0}
+.cols .dim{font-family:var(--mono);font-size:13px;color:var(--muted)}
+@media (min-width:1021px) and (min-height:560px){
+  .wrap{padding-block:10px 40px}
+  header.top{margin-bottom:10px;align-items:center}
+  .brand .eyebrow,.brand p{display:none}
+  .brand h1{font-size:26px;margin:0}
+  main.sim{grid-template-columns:minmax(0,1fr) 390px}
+  .stage{display:flex;gap:14px;height:100%;overflow:hidden}
+  .stage canvas#cv{flex:none;width:auto;height:100%}
+  .side{flex:1;min-width:150px;display:flex;flex-direction:column;overflow:auto}
+  .legend{flex-direction:column;gap:8px;padding:4px 0}
+  aside.panels{height:100%;overflow:auto;gap:8px;padding-right:2px}
+  aside.panels .card{padding:9px 12px}
+  #tables{gap:8px!important}
+  .tgrid{margin-top:6px;gap:6px}.btns{margin-top:7px}.hmi{padding:7px 4px}
+  .stats{margin-top:8px}.cspd{margin-top:8px}.note{display:none}
+  .side{gap:0}
+  .logcard{flex:1;min-height:0;display:flex;flex-direction:column;padding:9px 12px}
+  .logcard .log{flex:1;min-height:0;max-height:none}
+  .card h2{font-size:17px}.card h3{font-size:16px}
+  .cstate{margin-top:4px;font-size:13.5px}.queue{margin-top:4px;font-size:13px}
+  .hmi.confirm{margin-top:7px;padding:8px}
+  .stats{grid-template-columns:repeat(5,1fr);gap:5px}
+  .stat{padding:4px 6px}.stat .lbl{font-size:10px;letter-spacing:.04em;line-height:1.15}.stat b{font-size:13.5px}
+  .tgrid .lbl{font-size:10.5px}
+  .tgrid input,.tgrid select{padding:3px 5px;font-size:13px}
+  .tgrid .cnt,.tgrid .team{font-size:16px;line-height:1.3}
+  .job{font-size:12.5px}
+  .pill{font-size:11.5px;padding:2px 8px}
+  #tables .chead{flex-wrap:nowrap}
+  #tables .chead h3{white-space:nowrap}
+  #tables .job{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  #tables .chead .grow{display:none}
+  #tables .pill{margin-left:auto}
+  .hmi{white-space:nowrap;font-size:12px;letter-spacing:.03em}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow" data-i18n="eyebrow">Simulacija · 5 operatera</div>
+      <h1 data-i18n="title">Krojna linija: 3 stola, 1 rezač</h1>
+      <p data-i18n="subtitle">1 operater na rezaču, 2 tima po 2 operatera na nalagačima.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Language">
+        <button id="lang-bs" aria-pressed="true">BS</button>
+        <button id="lang-zh" aria-pressed="false">中文</button>
+      </div>
+      <div class="seg" role="group" aria-label="Mode">
+        <button id="mode-auto" aria-pressed="true" data-i18n="auto">Automatski</button>
+        <button id="mode-man" aria-pressed="false" data-i18n="manual">Ručno</button>
+      </div>
+      <button class="btn primary" id="play" data-i18n="pause">Pauza</button>
+      <label class="speed"><span data-i18n="speed">Brzina</span><input type="range" id="spd" min="1" max="30" value="8"><output id="spdo">8×</output></label>
+      <button class="btn" id="reset" data-i18n="reset">Ispočetka</button>
+    </div>
+  </header>
+
+  <main class="sim">
+    <div class="stage">
+      <canvas id="cv" aria-label="Top view simulation"></canvas>
+      <div class="side">
+      <div class="legend">
+        <span><i style="background:#E5B400"></i><span data-i18n="lg_spr">Nalagač</span></span>
+        <span><i style="background:#F2F4F5;border:1px solid #9aa"></i><span data-i18n="lg_cut">Rezač + portal</span></span>
+        <span><i style="background:#3A4148"></i><span data-i18n="lg_rail">Šine</span></span>
+        <span><i class="round" style="background:#0E7C86"></i><span data-i18n="lg_a">Tim A</span></span>
+        <span><i class="round" style="background:#8A3FC7"></i><span data-i18n="lg_b">Tim B</span></span>
+        <span><i class="round" style="background:#C8232C"></i><span data-i18n="lg_c">Operater rezača</span></span>
+        <span><i class="round" style="background:transparent;border-color:#C8232C"></i><span data-i18n="lg_o">Origin (0,0)</span></span>
+        <span><i style="background:#2F8FD8"></i><span data-i18n="lg_vac">Vakuum pumpa (na kolicima)</span></span>
+      </div>
+      <p class="hint" id="hint"></p>
+      <section class="card logcard">
+        <h2 data-i18n="log">Dnevnik događaja</h2>
+        <ul class="log" id="log"></ul>
+      </section>
+      </div>
+    </div>
+
+    <aside class="panels">
+      <section class="card" id="cutcard">
+        <div class="chead"><h2 data-i18n="cutter">Rezač (CNC)</h2><span class="grow"></span><span class="pill st-idle" id="cpill">—</span></div>
+        <div class="cstate" id="cstate">—</div>
+        <div class="queue"><span class="lbl" data-i18n="queue">Red čekanja</span><span id="queue">—</span></div>
+        <button class="hmi confirm" id="bconfirm" data-i18n="confirm">Rezanje završeno</button>
+        <div class="cspd">
+          <label for="cspd"><span class="lbl" data-i18n="cspd">Brzina rezanja</span></label>
+          <input type="range" id="cspd" min="150" max="1500" step="10" value="320">
+          <output id="cspdo">320 mm/s</output>
+          <button class="btn sm" id="bsync" data-i18n="sync">Sinhronizuj</button>
+        </div>
+        <p class="note" data-i18n="sync_note"></p>
+        <div class="stats">
+          <div class="stat"><span class="lbl" data-i18n="s_clock">Vrijeme</span><b id="s-clock">00:00</b></div>
+          <div class="stat"><span class="lbl" data-i18n="s_util">Rezač radi</span><b id="s-util">0%</b></div>
+          <div class="stat"><span class="lbl" data-i18n="s_tidle">Timovi čekaju</span><b id="s-tidle">0%</b></div>
+          <div class="stat"><span class="lbl" data-i18n="s_done">Stolova</span><b id="s-done">0</b></div>
+          <div class="stat"><span class="lbl" data-i18n="s_pcs">Komada</span><b id="s-pcs">0</b></div>
+        </div>
+      </section>
+      <div id="tables" style="display:flex;flex-direction:column;gap:12px"></div>
+    </aside>
+  </main>
+
+  <section class="desc">
+    <h2>Opis logike rada · 工作逻辑说明</h2>
+    <p class="sub">Ciklus jednog stola · 单个台面的循环</p>
+    <div class="flow">
+      <div class="st"><b>Prazan stol</b><small>空台</small></div><span class="ar">→</span>
+      <div class="st act"><b>Unos broja + START</b><small>输入层数 + 启动</small></div><span class="ar">→</span>
+      <div class="st"><b>Izbacivanje i odsijecanje</b><small>送布 + 切断</small></div><span class="ar">→</span>
+      <div class="st"><b>Poravnavanje</b><small>人工对齐</small></div><span class="ar">→</span>
+      <div class="st act"><b>Papučica (brojač +1)</b><small>脚踏开关（计数 +1）</small></div><span class="ar">↺ ×N →</span>
+      <div class="st act"><b>OP READY</b><small>确认就绪</small></div><span class="ar">→</span>
+      <div class="st"><b>Red čekanja</b><small>排队等待裁剪</small></div><span class="ar">→</span>
+      <div class="st"><b>Rezanje od origina</b><small>从原点开始裁剪</small></div><span class="ar">→</span>
+      <div class="st act"><b>Rezanje završeno</b><small>确认裁剪完成</small></div><span class="ar">→</span>
+      <div class="st"><b>Skidanje komada</b><small>取走裁片</small></div>
+    </div>
+    <div class="cols">
+      <article lang="bs">
+        <div class="langtag">Bosanski</div>
+        <h3>Princip rada</h3>
+        <p>Linija ima tri stola. Uz lijevu stranu svakog stola stoji nalagač platna sa nožem i papučicom. Jedan rezač (CNC) vozi po šinama na desnoj strani linije i prelazi sa stola na stol. Mašina ima <b>samo jednu vakuum pumpu</b>, koja je na kolicima rezača i vozi zajedno s njima. Stol se vakumira tek kada kolica dođu do njega i spoje se na njegov priključak, a vakuum se isključuje kada rezač napusti stol. Na svakom stolu može biti drugi posao: drugi komadi, druga dužina sloja i drugi origin (nulta tačka).</p>
+        <h3>Raspored ljudi: 5 operatera</h3>
+        <ul>
+          <li><b>1 operater na rezaču</b> prati rezanje i potvrđuje kraj rezanja.</li>
+          <li><b>Tim A i tim B</b> (po 2 operatera) rade na nalagačima.</li>
+          <li>Timovi su uvijek na dva stola na kojima rezač trenutno ne radi. Kada rezač pređe na novi stol, slobodan tim ide na stol koji je rezač upravo napustio.</li>
+        </ul>
+        <h3>Nalaganje na jednom stolu</h3>
+        <ol>
+          <li>Operater na nalagaču unese broj slojeva i pritisne START.</li>
+          <li>Nalagač izbaci platno zadate dužine i nožem ga odsiječe.</li>
+          <li>Dva operatera poravnaju sloj na stolu.</li>
+          <li>Operater pritisne papučicu: brojač +1, nalagač se vraća po novi sloj.</li>
+          <li>Kada brojač dostigne zadati broj, operater pritisne OP READY. Stol ulazi u red čekanja za rezanje.</li>
+        </ol>
+        <h3>Ciklus rezača</h3>
+        <ol>
+          <li>Rezač uzima stol koji je prvi potvrđen sa OP READY (redoslijed potvrde).</li>
+          <li>Vozi po šinama do stola i spaja pumpu na stol. Tek tada se stol vakumira.</li>
+          <li>Kada je vakuum pun, portal ide na origin tog stola.</li>
+          <li>Reže komade po planu krojenja koji pripada tom stolu.</li>
+          <li>Portal se vraća. Operater rezača provjeri i pritisne „Rezanje završeno”.</li>
+          <li>Vakuum se isključuje, a rezač prelazi na sljedeći spreman stol. Tim skida komade sa izrezanog stola i počinje novo nalaganje.</li>
+        </ol>
+        <h3>Zahtjevi prema proizvođaču</h3>
+        <ul>
+          <li>Svaki stol ima svoj posao (datoteku), svoj origin i svoj brojač.</li>
+          <li>Rezač ne smije krenuti na stol bez signala OP READY sa tog stola.</li>
+          <li>Rezač prelazi na drugi stol tek nakon potvrde „Rezanje završeno”.</li>
+          <li>Ako je spremno više stolova, reže se onaj koji je ranije potvrđen.</li>
+          <li>Nalagači rade neovisno od rezača, i dok rezač reže drugi stol.</li>
+          <li>Pumpa je samo jedna i vozi s kolicima: rezanje na stolu smije početi tek kada je vakuum na tom stolu dostigao radni nivo.</li>
+          <li>Status svakog stola (nalaganje / spreman / rezanje / izrezano) vidljiv je na nalagaču i na rezaču.</li>
+        </ul>
+        <p class="dim">Mjere po skici: stolovi 1 i 2 = 4 × 1225 = 4900 mm, stol 3 = 5 × 1225 = 6125 mm, širina stola 1930 mm, razmak 1700 mm, dužina šina 9190 mm, dio rezača 1200 mm.</p>
+      </article>
+      <article lang="zh-CN">
+        <div class="langtag">中文</div>
+        <h3>工作原理</h3>
+        <p>本生产线有三个台面。每个台面的左侧配有一台铺布机（带切刀和脚踏开关）。一台裁床（CNC）在生产线右侧的导轨上移动，在各台面之间切换。设备<b>只有一台真空泵</b>，安装在裁床小车上，随小车一起移动。只有当小车到达台面并与该台面的接口连接后，该台面才开始抽真空；裁床离开时真空关闭。每个台面可以有不同的任务：不同的裁片、不同的铺布长度和不同的原点。</p>
+        <h3>人员安排：共 5 名操作员</h3>
+        <ul>
+          <li><b>裁床 1 名操作员</b>：监控裁剪并确认裁剪完成。</li>
+          <li><b>A 组和 B 组</b>（每组 2 人）：负责铺布机。</li>
+          <li>两组人员始终在裁床当前不在的两个台面上工作。裁床移到新台面后，空闲的小组去裁床刚离开的台面。</li>
+        </ul>
+        <h3>单个台面的铺布流程</h3>
+        <ol>
+          <li>操作员在铺布机上输入层数，按“启动”。</li>
+          <li>铺布机送出设定长度的布料，并用切刀切断。</li>
+          <li>两名操作员在台面上把这一层对齐。</li>
+          <li>操作员踩脚踏开关：计数 +1，铺布机返回送下一层。</li>
+          <li>计数达到设定值后，操作员按 OP READY。该台面进入裁剪等待队列。</li>
+        </ol>
+        <h3>裁床循环</h3>
+        <ol>
+          <li>裁床选择最先按下 OP READY 的台面（按确认顺序）。</li>
+          <li>裁床沿导轨移动到该台面，并把真空泵连接到该台面，此时才开始抽真空。</li>
+          <li>真空达到后，横梁移动到该台面的原点。</li>
+          <li>按照该台面自己的排版文件进行裁剪。</li>
+          <li>横梁返回。裁床操作员检查后按“确认裁剪完成”。</li>
+          <li>真空关闭，裁床移动到下一个就绪的台面。小组取走已裁台面上的裁片，并开始新的铺布。</li>
+        </ol>
+        <h3>对设备厂家的要求</h3>
+        <ul>
+          <li>每个台面有独立的任务（文件）、独立的原点和独立的计数器。</li>
+          <li>没有该台面的 OP READY 信号，裁床不得移动到该台面。</li>
+          <li>只有按下“确认裁剪完成”后，裁床才移动到其他台面。</li>
+          <li>如果多个台面同时就绪，先裁最早确认的台面。</li>
+          <li>铺布机独立于裁床工作，裁床裁其他台面时也可以铺布。</li>
+          <li>只有一台真空泵并随小车移动：该台面真空达到工作值后才可以开始裁剪。</li>
+          <li>每个台面的状态（铺布 / 就绪 / 裁剪中 / 已裁完）在铺布机和裁床上都能看到。</li>
+        </ul>
+        <p class="dim">按图纸尺寸：1 号和 2 号台 = 4 × 1225 = 4900 mm，3 号台 = 5 × 1225 = 6125 mm，台面宽 1930 mm，间距 1700 mm，导轨长 9190 mm，裁床部分 1200 mm。</p>
+      </article>
+    </div>
+  </section>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+/* ---------------- i18n ---------------- */
+const I={
+bs:{eyebrow:"Simulacija · 5 operatera",title:"Krojna linija: 3 stola, 1 rezač",subtitle:"1 operater na rezaču, 2 tima po 2 operatera na nalagačima. Rezač vozi po šinama i reže stol koji je prvi potvrđen.",
+auto:"Automatski",manual:"Ručno",play:"Pokreni",pause:"Pauza",reset:"Ispočetka",speed:"Brzina",
+lg_spr:"Nalagač",lg_cut:"Rezač + portal",lg_rail:"Šine",lg_a:"Tim A",lg_b:"Tim B",lg_c:"Operater rezača",lg_o:"Origin (0,0)",
+hint_auto:"Automatski mod: virtuelni operateri sami pritišću dugmad. Možete prebaciti na Ručno i pritiskati START, papučicu, OP READY i potvrdu rezanja.",
+hint_man:"Ručni mod: vi ste operateri. Dugme koje treba pritisnuti trepće žuto. Timovi sami prelaze između stolova.",
+cutter:"Rezač (CNC)",queue:"Red čekanja",confirm:"Rezanje završeno",log:"Dnevnik događaja",
+s_clock:"Vrijeme",s_util:"Rezač radi",s_done:"Stolova",s_pcs:"Komada",
+tname:"Stol {n}",layers:"Slojeva",counter:"Brojač",origin:"Origin",team:"Tim",
+b_start:"START",b_pedal:"Papučica",b_ready:"OP READY",b_clear:"Očišćeno",
+job_shirt:"Majica, 10 kom/sloj",job_pillow:"Jastučnica, 10 kom/sloj",job_flag:"Zastava + trokut, 8 kom/sloj",
+o_TL:"Gore lijevo",o_TR:"Gore desno",o_BL:"Dolje lijevo",o_BR:"Dolje desno",
+st_empty:"Prazan, čeka tim",st_setup:"Unesi broj + START",st_feed:"Izbacuje platno",st_knife:"Odsijeca",st_align:"Poravnati + papučica",st_return:"Nalagač se vraća",st_laid:"Pritisni OP READY",st_ready:"Spreman · red #{q}",st_cutting:"Rezanje",st_cut:"Izrezano, čeka tim",st_unload:"Skidanje komada",
+c_idle:"Čeka spreman stol",c_move:"Prelazi na stol {n}",c_travel:"Portal ide na origin stola {n}",c_cut:"Reže stol {n}",c_retract:"Portal se vraća",c_confirm:"Čeka potvrdu: Rezanje završeno",c_vac:"Pumpa spojena, vakumira stol {n}",
+cp_idle:"Čeka",cp_move:"Vožnja",cp_travel:"Origin",cp_cut:"Reže",cp_retract:"Povrat",cp_confirm:"Potvrda",cp_vac:"Vakuum",
+none:"nema spremnih stolova",
+cv_table:"STOL {n}",cv_spr:"NALAGAČ",cv_cut:"REZAČ",cv_rail:"ŠINE 9190",
+l_start:"Stol {n}: unesen broj slojeva {N}, START",l_pedal:"Stol {n}: papučica, sloj {k}/{N} poravnat",l_laid:"Stol {n}: nalaganje završeno, čeka OP READY",l_opready:"Stol {n}: OP READY, stol je u redu čekanja",l_cutgo:"Rezač prelazi na stol {n}",l_cutstart:"Rezač reže stol {n} od origina ({o})",l_cutend:"Rezač završio putanju na stolu {n}",l_confirm:"Operater rezača potvrdio: stol {n} izrezan",l_teamgo:"Tim {tm} ide na stol {n}",l_unload:"Stol {n}: tim {tm} skida komade",l_cleared:"Stol {n}: očišćen, spreman za novo nalaganje",l_idle:"Rezač čeka, nijedan stol nije spreman",l_reset:"Simulacija pokrenuta",l_zone:"Tim {tm} nema slobodan stol, ide u slobodnu zonu",l_vac:"Stol {n}: pumpa spojena, vakuum uključen",l_vacoff:"Stol {n}: vakuum isključen, pumpa odvojena",st_vacuum:"Vakumiranje",lg_vac:"Vakuum pumpa (na kolicima)",cv_vac:"VAKUUM",
+co_start:"START · {N} slojeva",co_pedal:"PAPUČICA · {k}/{N}",co_ready:"OP READY ✓",co_clear:"STOL OČIŠĆEN",co_confirm:"REZANJE ZAVRŠENO ✓",
+cv_zone:"SLOBODNA ZONA",cv_hmi:"HMI",cv_pedal:"PAPUČICA",cspd:"Brzina rezanja",sync:"Sinhronizuj",s_tidle:"Timovi čekaju",
+sync_note:"Sinhronizuj računa brzinu rezača tako da rezač završi stol prije nego tim završi nalaganje, pa tim uvijek ima stol."},
+zh:{eyebrow:"运行模拟 · 5 名操作员",title:"自动裁床生产线：3 个台面，1 台裁床",subtitle:"裁床 1 名操作员，铺布机 2 组各 2 名操作员。裁床沿导轨移动，先裁最早确认就绪的台面。",
+auto:"自动演示",manual:"手动操作",play:"开始",pause:"暂停",reset:"重置",speed:"速度",
+lg_spr:"铺布机",lg_cut:"裁床 + 横梁",lg_rail:"导轨",lg_a:"A 组",lg_b:"B 组",lg_c:"裁床操作员",lg_o:"原点 (0,0)",
+hint_auto:"自动演示：虚拟操作员自动按按钮。可切换到“手动操作”，自己按启动、脚踏开关、OP READY 和确认裁剪完成。",
+hint_man:"手动操作：您就是操作员。需要按的按钮会黄色闪烁。小组会自动在台面之间移动。",
+cutter:"裁床 (CNC)",queue:"等待队列",confirm:"确认裁剪完成",log:"事件记录",
+s_clock:"时间",s_util:"裁床利用率",s_done:"已裁台数",s_pcs:"已裁片数",
+tname:"{n} 号台",layers:"层数",counter:"计数",origin:"原点",team:"小组",
+b_start:"启动",b_pedal:"脚踏开关",b_ready:"OP READY",b_clear:"已清空",
+job_shirt:"T恤，每层 10 片",job_pillow:"枕套，每层 10 片",job_flag:"旗帜 + 三角旗，每层 8 片",
+o_TL:"左上",o_TR:"右上",o_BL:"左下",o_BR:"右下",
+st_empty:"空台，等待小组",st_setup:"输入层数 + 启动",st_feed:"铺布机送布",st_knife:"切断布料",st_align:"对齐 + 脚踏开关",st_return:"铺布机返回",st_laid:"请按 OP READY",st_ready:"就绪 · 队列第 {q} 位",st_cutting:"裁剪中",st_cut:"已裁完，等待小组",st_unload:"取走裁片",
+c_idle:"等待就绪的台面",c_move:"移动到 {n} 号台",c_travel:"横梁移动到 {n} 号台原点",c_cut:"正在裁剪 {n} 号台",c_retract:"横梁返回",c_confirm:"等待确认：裁剪完成",c_vac:"真空泵已连接，{n} 号台抽真空",
+cp_idle:"等待",cp_move:"移动",cp_travel:"原点",cp_cut:"裁剪",cp_retract:"返回",cp_confirm:"确认",cp_vac:"真空",
+none:"没有就绪的台面",
+cv_table:"{n} 号台",cv_spr:"铺布机",cv_cut:"裁床",cv_rail:"导轨 9190",
+l_start:"{n} 号台：输入层数 {N}，启动",l_pedal:"{n} 号台：踩脚踏，第 {k}/{N} 层已对齐",l_laid:"{n} 号台：铺布完成，等待 OP READY",l_opready:"{n} 号台：OP READY，进入裁剪队列",l_cutgo:"裁床移动到 {n} 号台",l_cutstart:"裁床从原点（{o}）开始裁剪 {n} 号台",l_cutend:"裁床完成 {n} 号台的裁剪路径",l_confirm:"裁床操作员确认：{n} 号台裁剪完成",l_teamgo:"{tm} 组前往 {n} 号台",l_unload:"{n} 号台：{tm} 组取走裁片",l_cleared:"{n} 号台：已清空，可以重新铺布",l_idle:"裁床等待，没有就绪的台面",l_reset:"模拟开始",l_zone:"{tm} 组没有可用台面，前往待命区",l_vac:"{n} 号台：真空泵已连接，开始抽真空",l_vacoff:"{n} 号台：真空关闭，真空泵断开",st_vacuum:"抽真空中",lg_vac:"真空泵（在小车上）",cv_vac:"真空",
+co_start:"启动 · {N} 层",co_pedal:"脚踏开关 · {k}/{N}",co_ready:"OP READY ✓",co_clear:"台面已清空",co_confirm:"确认裁剪完成 ✓",
+cv_zone:"待命区",cv_hmi:"HMI",cv_pedal:"脚踏",cspd:"裁剪速度",sync:"同步",s_tidle:"小组等待",
+sync_note:"“同步”会计算裁床速度，使裁床在小组铺完布之前裁完一个台面，小组始终有台面可做。"}
+};
+let lang='bs';
+const tr=(k,p={})=>{let s=I[lang][k]??k;return s.replace(/\{(\w+)\}/g,(m,a)=>{if(a==='o'&&p.o)return I[lang]['o_'+p.o];return p[a]!==undefined?p[a]:m;});};
+
+/* ---------------- geometry (mm) ---------------- */
+const WV={x:-1500,y:-1300,w:9500,h:11200};
+const FAB_W=1800, SPR=450, CAR_X0=6200, CAR_X1=7400, RAIL_A=6300, RAIL_B=7300, G_HOME=6320, AISLE=-1100;
+const V={vac:3.5,feed:600,knife:1.2,ret:3,rail:1000,travel:2000,cut:320,walk:1300,alignT:6,unloadT:25};
+const DELAY={start:2.2,pedal:.8,opready:1.6,clear:.8,confirm:2.4};
+const CFG=[
+ {x0:1225,x1:6125,y0:0,y1:1930,L:4600,job:'shirt',col:'#4A78A8',origin:'BR',N:4},
+ {x0:1225,x1:6125,y0:3630,y1:5560,L:4600,job:'pillow',col:'#6E9E72',origin:'TL',N:5},
+ {x0:0,x1:6125,y0:7260,y1:9190,L:5800,job:'flag',col:'#B8683E',origin:'BL',N:3},
+];
+const SHAPES={
+ shirt:{cw:740,ch:820,polys:[[[.35,0],[.42,.08],[.58,.08],[.65,0],[.9,.1],[1,.32],[.82,.38],[.82,1],[.18,1],[.18,.38],[0,.32],[.1,.1]]]},
+ pillow:{cw:820,ch:820,polys:[[[.06,0],[.94,0],[1,.06],[1,.94],[.94,1],[.06,1],[0,.94],[0,.06]]]},
+ flag:{cw:1380,ch:820,polys:[[[0,0],[1,0],[1,1],[0,1]],[[0,0],[1,.5],[0,1]]]},
+};
+const TEAMCOL={A:'#0E7C86',B:'#8A3FC7',C:'#C8232C'};
+
+let T,cutter,teams,persons,cop,logs,sim,stats,mode='auto',playing=true,speed=8;
+
+function genPieces(t){
+  const fx0=t.x0+60, fy0=(t.y0+t.y1)/2-FAB_W/2, fx1=fx0+t.L, fy1=fy0+FAB_W;
+  const R=t.origin.includes('R'), B=t.origin.includes('B');
+  const ox=R?fx1:fx0, oy=B?fy1:fy0, sx=R?-1:1, sy=B?-1:1;
+  const S=SHAPES[t.job], g=40, m=30;
+  const cols=Math.floor((t.L-2*m+g)/(S.cw+g)), rows=Math.floor((FAB_W-2*m+g)/(S.ch+g));
+  const pcs=[];
+  for(let c=0;c<cols;c++){
+    const rr=[...Array(rows).keys()]; if(c%2) rr.reverse();
+    for(const r of rr){
+      const poly=S.polys[(c+r)%S.polys.length], u0=m+c*(S.cw+g), v0=m+r*(S.ch+g);
+      pcs.push(poly.map(([a,b])=>[ox+sx*(u0+a*S.cw), oy+sy*(v0+b*S.ch)]));
+    }
+  }
+  t.fab={fx0,fy0,fx1,fy1}; t.originPt=[ox,oy]; t.sx=sx; t.sy=sy; t.pieces=pcs;
+}
+function mkPerson(team,k,x,y){return {team,k,x,y,path:[]};}
+const ZONE={x0:-950,x1:420,y0:2230,y1:3380};
+function reset(){
+  sim=0; stats={done:0,pcs:0,busy:0,teamIdle:0}; logs=[]; callouts=[];
+  T=CFG.map((c,i)=>{const t={...c,id:i,state:'empty',layers:0,feed:0,tt:0,skew:0,alignP:0,unload:0,cutSegs:[],pending:null,readyAt:0,waitSince:0,pedalFlash:0,readyFlash:0};genPieces(t);return t;});
+  T[0].state='setup'; T[1].state='setup';
+  teams=[{id:'A',idx:0,table:0,walking:false,members:[]},{id:'B',idx:1,table:1,walking:false,members:[]}];
+  persons=[];
+  teams.forEach(tm=>{for(let k=0;k<2;k++){const s=spot(tm.table,k);const p=mkPerson(tm.id,k,s[0],s[1]);tm.members.push(p);persons.push(p);}});
+  cutter={y:(T[1].y0+T[1].y1)/2,hx:G_HOME,hy:(T[1].y0+T[1].y1)/2,state:'idle',table:null,segs:[],si:0,sd:0,pause:0,pending:null,idleLogged:false};
+  cop=mkPerson('C',0,CAR_X1+380,cutter.y); persons.push(cop);
+  addLog('l_reset',{});
+  buildPanels(); syncSpeed(); applyI18n();
+}
+/* ---------------- people ---------------- */
+const pedalSpot=t=>[t.x0-260,t.y1+640];
+const hmiSpot=t=>[t.x0-230,t.y0-560];
+function spot(i,k){
+  const t=T[i]; const y=k===0?t.y0-560:t.y1+560; let x=t.x0+320;
+  const mid=t.fab.fx0+t.L*0.5;
+  if(t.state==='setup'&&k===0) return hmiSpot(t);
+  if(t.state==='laid'&&k===0) return hmiSpot(t);
+  if(t.state==='align'&&k===1&&t.alignP>=1) return pedalSpot(t);
+  if(['feed','knife','align','return'].includes(t.state)) x=mid;
+  if(t.state==='unload') x=t.fab.fx0+t.L*(0.25+0.5*(0.5+0.5*Math.sin(sim*0.55+k*2.2)));
+  return [x,y];
+}
+function zoneSpot(tm,k){return [ZONE.x0+330+k*560, ZONE.y0+330+tm.idx*500];}
+function teamSpot(tm,k){return tm.table==null?zoneSpot(tm,k):spot(tm.table,k);}
+function near(p,s,d=70){return Math.hypot(p.x-s[0],p.y-s[1])<d;}
+function teamAt(i){return teams.find(tm=>tm.table===i&&!tm.walking);}
+function teamFree(tm){if(tm.walking)return false;if(tm.table==null)return true;const s=T[tm.table].state;return s==='ready'||s==='cutting';}
+function sendTeam(tm,table){
+  tm.table=table; tm.walking=true;
+  tm.members.forEach(p=>{const s=teamSpot(tm,p.k);p.path=[[AISLE,p.y],[AISLE,s[1]],s];});
+}
+function assignTeams(){
+  for(const tm of teams){
+    if(!teamFree(tm)) continue;
+    const cands=T.filter(t=>(t.state==='empty'||t.state==='cut')&&!teams.some(o=>o!==tm&&o.table===t.id)).sort((a,b)=>a.waitSince-b.waitSince);
+    if(cands.length){sendTeam(tm,cands[0].id);addLog('l_teamgo',{tm:tm.id,n:cands[0].id+1});}
+    else if(tm.table!=null){sendTeam(tm,null);addLog('l_zone',{tm:tm.id});}
+  }
+}
+function movePerson(p,tx,ty,dt){
+  const dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy),st=V.walk*dt;
+  if(d<=st){p.x=tx;p.y=ty;return true;} p.x+=dx/d*st;p.y+=dy/d*st;return false;
+}
+function tickPeople(dt){
+  for(const tm of teams){
+    if(teamFree(tm)) stats.teamIdle+=dt;
+    if(tm.walking){
+      let done=true;
+      tm.members.forEach(p=>{
+        if(!p.path.length) return;
+        if(p.path.length===1) p.path[0]=teamSpot(tm,p.k);
+        if(movePerson(p,p.path[0][0],p.path[0][1],dt)) p.path.shift();
+        if(p.path.length) done=false;
+      });
+      if(done){tm.walking=false;arrive(tm);}
+    } else tm.members.forEach(p=>{const s=teamSpot(tm,p.k);movePerson(p,s[0],s[1],dt);});
+  }
+  movePerson(cop,CAR_X1+380,cutter.y+300,dt);
+}
+function arrive(tm){
+  if(tm.table==null) return;
+  const t=T[tm.table];
+  if(t.state==='cut'){t.state='unload';t.unload=0;addLog('l_unload',{n:t.id+1,tm:tm.id});}
+  else if(t.state==='empty'){t.state='setup';}
+}
+/* ---------------- callouts (real time, so visible at any speed) ---------------- */
+let callouts=[];
+function callout(x,y,key,p,col){callouts.push({x,y,key,p,col,born:performance.now()});}
+/* ---------------- actions ---------------- */
+function act(a,i,auto){
+  const t=i!=null?T[i]:null; let ok=false;
+  if(a==='start'&&t.state==='setup'&&teamAt(i)){
+    const inp=$('#n'+i); let N=parseInt(inp.value,10); if(!(N>=1))N=1; N=Math.min(30,N); inp.value=N;
+    t.N=N;t.layers=0;t.feed=0;t.state='feed';ok=true;addLog('l_start',{n:i+1,N});
+    callout(t.x0-230,t.y0-330,'co_start',{N},'#1F7A45');
+  } else if(a==='pedal'&&t.state==='align'){
+    t.layers++;t.pedalAt=performance.now();ok=true;addLog('l_pedal',{n:i+1,k:t.layers,N:t.N});
+    callout(t.x0-260,t.y1+230,'co_pedal',{k:t.layers,N:t.N},'#2B3238');
+    if(t.layers>=t.N){t.state='laid';addLog('l_laid',{n:i+1});} else {t.state='return';t.tt=0;}
+  } else if(a==='opready'&&t.state==='laid'){
+    t.state='ready';t.readyAt=sim;t.readyAt2=performance.now();ok=true;addLog('l_opready',{n:i+1});
+    callout(t.x0-230,t.y0-330,'co_ready',{},'#23804F');
+  } else if(a==='clear'&&t.state==='unload'){
+    t.state='setup';t.layers=0;t.cutSegs=[];t.unload=0;ok=true;addLog('l_cleared',{n:i+1});
+    callout(t.x0+2000,t.y0-330,'co_clear',{},'#2A659C');
+  } else if(a==='confirm'&&cutter.state==='confirm'){
+    const ct=T[cutter.table]; ct.state='cut';ct.waitSince=sim;ct.vac=0;addLog('l_vacoff',{n:ct.id+1});stats.done++;stats.pcs+=ct.pieces.length*ct.layers;
+    addLog('l_confirm',{n:ct.id+1}); cutter.state='idle';cutter.table=null;cutter.idleLogged=false;ok=true;
+    callout(CAR_X0+600,cutter.y-1250,'co_confirm',{},'#C8232C');
+  }
+  if(ok&&auto){const id={start:'bs',pedal:'bp',opready:'br',clear:'bc'}[a];flash(a==='confirm'?$('#bconfirm'):$('#'+id+i));}
+  if(ok) updateUI(true);
+}
+function flash(el){if(!el)return;el.classList.add('pressed');setTimeout(()=>el.classList.remove('pressed'),380);}
+function autoActors(){
+  if(mode!=='auto') return;
+  T.forEach((t,i)=>{
+    let want=null; const tm=teamAt(i);
+    if(t.state==='setup'&&tm&&near(tm.members[0],hmiSpot(t))) want='start';
+    else if(t.state==='align'&&t.alignP>=1&&tm&&near(tm.members[1],pedalSpot(t))) want='pedal';
+    else if(t.state==='laid'&&tm&&near(tm.members[0],hmiSpot(t))) want='opready';
+    else if(t.state==='unload'&&t.unload>=1) want='clear';
+    if(!want){t.pending=null;return;}
+    if(!t.pending||t.pending.a!==want) t.pending={a:want,at:sim+DELAY[want]*(0.8+Math.random()*0.4)};
+    else if(sim>=t.pending.at){t.pending=null;act(want,i,true);}
+  });
+  if(cutter.state==='confirm'){
+    if(!cutter.pending) cutter.pending=sim+DELAY.confirm;
+    else if(sim>=cutter.pending){cutter.pending=null;act('confirm',null,true);}
+  } else cutter.pending=null;
+}
+/* ---------------- speed sync ----------------
+   3 stola, 2 tima, 1 rezač: u ravnoteži je ciklus rezača po stolu = pola ciklusa tima po stolu.
+   Rezač se podešava malo brže (faktor 0.8) da tim nikad ne čeka. */
+let cutSpeed=320;
+function teamCycle(t,N){
+  const pedalWalk=(t.L*0.5+400)/V.walk;
+  const perLayer=t.L/V.feed+V.knife+V.alignT+pedalWalk+DELAY.pedal+V.ret;
+  const walkBetween=(3500+4600+3600)/V.walk;
+  return N*perLayer-V.ret+DELAY.start+2+DELAY.opready+V.unloadT+DELAY.clear+walkBetween;
+}
+function pathLens(t){
+  let cut=0,trav=0,p=[G_HOME,(t.y0+t.y1)/2];const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+  trav+=d(p,t.originPt);p=t.originPt;
+  t.pieces.forEach(poly=>{trav+=d(p,poly[0]);for(let k=1;k<=poly.length;k++)cut+=d(poly[k-1],poly[k%poly.length]);p=poly[0];});
+  trav+=d(p,[G_HOME,(t.y0+t.y1)/2]);return {cut,trav};
+}
+function syncSpeed(){
+  let ct=0,cl=0,tv=0;
+  T.forEach((t,i)=>{const N=parseInt($('#n'+i)?.value,10)||t.N;ct+=teamCycle(t,N);const L=pathLens(t);cl+=L.cut;tv+=L.trav;});
+  ct/=3;cl/=3;tv/=3;
+  const overhead=tv/V.travel+V.vac+1.2+DELAY.confirm+4600/V.rail;
+  const target=ct/2*0.8-overhead;
+  cutSpeed=Math.round(Math.max(150,Math.min(1500,cl/Math.max(5,target)))/10)*10;
+  const r=$('#cspd');if(r){r.value=cutSpeed;$('#cspdo').textContent=cutSpeed+' mm/s';}
+}
+/* ---------------- machines ---------------- */
+function tickTables(dt){
+  for(const t of T){
+    t.pedalFlash=Math.max(0,t.pedalFlash-dt);
+    if(t.state==='feed'){t.feed+=V.feed*dt/t.L;if(t.feed>=1){t.feed=1;t.state='knife';t.tt=0;}}
+    else if(t.state==='knife'){t.tt+=dt;if(t.tt>=V.knife){t.state='align';t.alignP=0;t.skew=(Math.random()<.5?-1:1)*(0.012+Math.random()*0.018);t.off=(Math.random()-.5)*160;}}
+    else if(t.state==='align'){t.alignP=Math.min(1,t.alignP+dt/V.alignT);}
+    else if(t.state==='return'){t.tt+=dt;if(t.tt>=V.ret){t.state='feed';t.feed=0;}}
+    else if(t.state==='unload'){t.unload=Math.min(1,t.unload+dt/V.unloadT);}
+  }
+}
+function buildPath(t){
+  const segs=[];let p=[cutter.hx,cutter.hy];
+  segs.push({a:p,b:t.originPt,cut:false,pause:1.2,kind:'travel'});p=t.originPt;
+  t.pieces.forEach(poly=>{
+    segs.push({a:p,b:poly[0],cut:false,kind:'cut'});
+    for(let k=1;k<=poly.length;k++) segs.push({a:poly[k-1],b:poly[k%poly.length],cut:true,kind:'cut'});
+    p=poly[0];
+  });
+  segs.push({a:p,b:[G_HOME,cutter.y],cut:false,kind:'retract'});
+  cutter.segs=segs;cutter.si=0;cutter.sd=0;cutter.pause=0;
+}
+function tickCutter(dt){
+  const c=cutter;
+  if(c.state==='idle'){
+    const rd=T.filter(t=>t.state==='ready').sort((a,b)=>a.readyAt-b.readyAt);
+    if(rd.length){
+      const t=rd[0];c.table=t.id;t.state='cutting';c.state='move';addLog('l_cutgo',{n:t.id+1});
+    } else if(!c.idleLogged){c.idleLogged=true;addLog('l_idle',{});}
+    return;
+  }
+  const t=T[c.table];
+  if(c.state==='move'){
+    const ty=(t.y0+t.y1)/2,d=ty-c.y,st=V.rail*dt;
+    if(Math.abs(d)<=st){c.y=ty;c.hy=ty;c.hx=G_HOME;t.cutSegs=[];t.vac=0;c.state='vac';addLog('l_vac',{n:t.id+1});}
+    else {c.y+=Math.sign(d)*st;c.hy=c.y;c.hx=G_HOME;}
+    return;
+  }
+  if(c.state==='vac'){
+    t.vac=Math.min(1,(t.vac||0)+dt/V.vac);
+    if(t.vac>=1){buildPath(t);c.state='travel';addLog('l_cutstart',{n:t.id+1,o:t.origin});}
+    return;
+  }
+  if(c.state==='travel'||c.state==='cut'||c.state==='retract'){
+    let rem=dt;
+    while(rem>0&&c.si<c.segs.length){
+      if(c.pause>0){const u=Math.min(c.pause,rem);c.pause-=u;rem-=u;if(c.pause>0)break;}
+      const s=c.segs[c.si];c.state=s.kind;
+      const len=Math.hypot(s.b[0]-s.a[0],s.b[1]-s.a[1]);const sp=s.cut?cutSpeed:V.travel;
+      const need=(len-c.sd)/sp;
+      if(need<=rem){rem-=need;c.sd=0;c.si++;if(s.cut)t.cutSegs.push([s.a,s.b]);c.hx=s.b[0];c.hy=s.b[1];if(s.pause)c.pause=s.pause;}
+      else {c.sd+=rem*sp;rem=0;const f=len?c.sd/len:1;c.hx=s.a[0]+(s.b[0]-s.a[0])*f;c.hy=s.a[1]+(s.b[1]-s.a[1])*f;}
+      if(s.cut||s.kind==='cut') stats.busy+=0;
+    }
+    if(c.state==='cut') stats.busy+=dt;
+    if(c.si>=c.segs.length){c.state='confirm';addLog('l_cutend',{n:t.id+1});}
+  }
+}
+function step(dt){sim+=dt;tickTables(dt);tickCutter(dt);assignTeams();tickPeople(dt);autoActors();}
+
+/* ---------------- log ---------------- */
+function addLog(key,p){logs.unshift({t:sim,key,p});if(logs.length>80)logs.pop();logDirty=true;}
+let logDirty=true;
+const fmt=s=>{s=Math.floor(s);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
+function renderLog(){if(!logDirty)return;logDirty=false;$('#log').innerHTML=logs.map(l=>`<li><span class="t">${fmt(l.t)}</span><span>${tr(l.key,l.p)}</span></li>`).join('');}
+
+/* ---------------- panels ---------------- */
+function buildPanels(){
+  const box=$('#tables');box.innerHTML='';
+  T.forEach((t,i)=>{
+    box.insertAdjacentHTML('beforeend',`
+<section class="card" id="tc${i}">
+  <div class="chead"><span class="sw" style="background:${t.col}"></span><h3 id="tn${i}"></h3><span class="job" id="tj${i}"></span><span class="grow"></span><span class="pill" id="tp${i}"></span></div>
+  <div class="tgrid">
+    <label><span class="lbl" data-i18n="layers"></span><input type="number" id="n${i}" min="1" max="30" value="${t.N}"></label>
+    <div><span class="lbl" data-i18n="counter"></span><b class="cnt" id="tc-c${i}">0 / ${t.N}</b></div>
+    <label><span class="lbl" data-i18n="origin"></span><select id="o${i}">${['TL','TR','BL','BR'].map(o=>`<option value="${o}" ${o===t.origin?'selected':''} data-i18n="o_${o}"></option>`).join('')}</select></label>
+    <div><span class="lbl" data-i18n="team"></span><b class="team" id="tt${i}">—</b></div>
+  </div>
+  <div class="btns">
+    <button class="hmi go" id="bs${i}" data-i18n="b_start"></button>
+    <button class="hmi pedal" id="bp${i}" data-i18n="b_pedal"></button>
+    <button class="hmi rdy" id="br${i}" data-i18n="b_ready"></button>
+    <button class="hmi clr" id="bc${i}" data-i18n="b_clear"></button>
+  </div>
+</section>`);
+    $('#bs'+i).onclick=()=>act('start',i);
+    $('#bp'+i).onclick=()=>act('pedal',i);
+    $('#br'+i).onclick=()=>act('opready',i);
+    $('#bc'+i).onclick=()=>act('clear',i);
+    $('#o'+i).onchange=e=>{t.origin=e.target.value;genPieces(t);};
+    $('#n'+i).onchange=()=>syncSpeed();
+  });
+}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=tr(el.dataset.i18n);});
+  $('#play').textContent=tr(playing?'pause':'play');
+  $('#hint').textContent=tr(mode==='auto'?'hint_auto':'hint_man');
+  document.documentElement.lang=lang==='zh'?'zh-CN':'bs';
+  logDirty=true;updateUI(true);
+}
+const PILL={empty:'st-idle',setup:'st-wait',feed:'st-work',knife:'st-work',align:'st-wait',return:'st-work',laid:'st-wait',ready:'st-ready',cutting:'st-cut',cut:'st-wait',unload:'st-work'};
+const CPILL={idle:'st-idle',move:'st-work',travel:'st-work',cut:'st-cut',retract:'st-work',confirm:'st-wait',vac:'st-work'};
+function queueList(){return T.filter(t=>t.state==='ready').sort((a,b)=>a.readyAt-b.readyAt);}
+function tableStateText(t){
+  if(t.state==='ready'){const q=queueList().indexOf(t)+1;return tr('st_ready',{q});}
+  if(t.state==='cutting'&&cutter.table===t.id&&cutter.state==='vac') return tr('st_vacuum')+' '+Math.round((t.vac||0)*100)+'%';
+  if(t.state==='align'&&mode==='auto'&&t.alignP<1) return tr('st_align');
+  return tr('st_'+t.state);
+}
+let lastUI=0;
+function updateUI(force){
+  const now=performance.now(); if(!force&&now-lastUI<120) return; lastUI=now;
+  const man=mode==='manual';
+  T.forEach((t,i)=>{
+    $('#tn'+i).textContent=tr('tname',{n:i+1});
+    $('#tj'+i).textContent=tr('job_'+t.job);
+    const p=$('#tp'+i);p.className='pill '+PILL[t.state];p.textContent=tableStateText(t);
+    $('#tc-c'+i).textContent=`${t.layers} / ${['setup','empty'].includes(t.state)?($('#n'+i).value||t.N):t.N}`;
+    const tm=teams.find(x=>x.table===i);$('#tt'+i).textContent=tm?(tm.walking?tm.id+' →':tm.id):'—';
+    const en={bs:t.state==='setup'&&!!teamAt(i),bp:t.state==='align',br:t.state==='laid',bc:t.state==='unload'};
+    for(const k in en){const b=$('#'+k+i);b.disabled=!en[k];b.classList.toggle('await',man&&en[k]&&(k!=='bp'||t.alignP>=1)&&(k!=='bc'||t.unload>=1));}
+    $('#n'+i).disabled=!['empty','setup','ready','cutting','cut','unload','laid'].includes(t.state)||t.state==='laid';
+    $('#o'+i).disabled=['cutting','cut','unload'].includes(t.state);
+  });
+  const c=cutter,n=c.table!=null?c.table+1:'';
+  const cp=$('#cpill');cp.className='pill '+CPILL[c.state];cp.textContent=tr('cp_'+c.state);
+  $('#cstate').textContent=tr('c_'+c.state,{n});
+  const q=queueList();$('#queue').innerHTML=q.length?q.map(t=>`<span class="q">${tr('tname',{n:t.id+1})}</span>`).join(' → '):`<span style="color:var(--muted)">${tr('none')}</span>`;
+  const bc=$('#bconfirm');bc.disabled=c.state!=='confirm';bc.classList.toggle('await',man&&c.state==='confirm');
+  $('#s-clock').textContent=fmt(sim);
+  $('#s-util').textContent=(sim>0?Math.round(stats.busy/sim*100):0)+'%';
+  $('#s-done').textContent=stats.done;$('#s-tidle').textContent=(sim>0?Math.round(stats.teamIdle/(2*sim)*100):0)+'%';$('#s-pcs').textContent=stats.pcs;
+  renderLog();
+}
+
+/* ---------------- drawing ---------------- */
+const cv=$('#cv'),ctx=cv.getContext('2d');let S=1,DPR=1,colors={};
+function readColors(){const cs=getComputedStyle(document.documentElement);['--floor','--floor-line','--canvas-ink','--ok','--warn','--info','--idle','--cut','--accent','--surface'].forEach(k=>colors[k]=cs.getPropertyValue(k).trim());}
+function layout(){
+  const main=$('main.sim'),st=$('.stage'),side=$('.side');
+  const desk=innerWidth>1020&&innerHeight>=560;
+  if(desk){
+    const top=main.getBoundingClientRect().top+scrollY;
+    main.style.height=Math.max(460,innerHeight-top-12)+'px';
+    const cs=getComputedStyle(st);const padW=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight),padH=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom);
+    const aw=st.clientWidth-padW-164,ah=st.clientHeight-padH,ar=WV.w/WV.h;
+    let w=aw,h=w/ar;if(h>ah){h=ah;w=h*ar;}
+    cv.style.width=Math.floor(w)+'px';cv.style.height=Math.floor(h)+'px';
+  } else {main.style.height='';cv.style.width='';cv.style.height='';}
+}
+addEventListener('resize',layout);
+function resize(){const r=cv.getBoundingClientRect();DPR=window.devicePixelRatio||1;cv.width=Math.round(r.width*DPR);cv.height=Math.round(r.height*DPR);S=cv.width/WV.w;}
+new ResizeObserver(resize).observe(cv);
+const mq=matchMedia('(prefers-color-scheme: dark)');mq.addEventListener?.('change',readColors);
+new MutationObserver(readColors).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);}
+function fs(px){return Math.max(px,11*DPR/S);}
+function text(s,x,y,px,col,align='left',weight=600,base='alphabetic'){ctx.font=`${weight} ${fs(px)}px ${getComputedStyle(document.body).getPropertyValue('--cond')||'sans-serif'}`;ctx.fillStyle=col;ctx.textAlign=align;ctx.textBaseline=base;ctx.fillText(s,x,y);}
+let condFont="'Barlow Condensed','PingFang SC','Noto Sans SC',sans-serif";
+function txt(s,x,y,px,col,align='left',weight=700,base='alphabetic'){ctx.font=`${weight} ${fs(px)}px ${condFont}`;ctx.fillStyle=col;ctx.textAlign=align;ctx.textBaseline=base;ctx.fillText(s,x,y);return ctx.measureText(s).width;}
+function stateColor(t){return {'st-idle':colors['--idle'],'st-wait':colors['--warn'],'st-work':colors['--info'],'st-ready':colors['--ok'],'st-cut':colors['--cut']}[PILL[t.state]];}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function polyPath(p){ctx.beginPath();ctx.moveTo(p[0][0],p[0][1]);for(let k=1;k<p.length;k++)ctx.lineTo(p[k][0],p[k][1]);ctx.closePath();}
+
+function draw(){
+  ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=colors['--floor'];ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.setTransform(S,0,0,S,-WV.x*S,-WV.y*S);
+  // floor tiles
+  ctx.strokeStyle=colors['--floor-line'];ctx.lineWidth=12;ctx.beginPath();
+  for(let x=-1000;x<=8000;x+=1000){ctx.moveTo(x,WV.y);ctx.lineTo(x,WV.y+WV.h);}
+  for(let y=0;y<=9900;y+=1000){ctx.moveTo(WV.x,y);ctx.lineTo(WV.x+WV.w,y);}ctx.stroke();
+  // free zone
+  ctx.save();ctx.fillStyle=hexA('#8A949B',.12);ctx.fillRect(ZONE.x0,ZONE.y0,ZONE.x1-ZONE.x0,ZONE.y1-ZONE.y0);
+  ctx.setLineDash([90,70]);ctx.strokeStyle=hexA('#8A949B',.8);ctx.lineWidth=20;ctx.strokeRect(ZONE.x0,ZONE.y0,ZONE.x1-ZONE.x0,ZONE.y1-ZONE.y0);ctx.setLineDash([]);
+  txt(tr('cv_zone'),ZONE.x0+60,ZONE.y1-70,150,colors['--canvas-ink'],'left',700);ctx.restore();
+  // aisle walkway
+  ctx.setLineDash([120,120]);ctx.strokeStyle=hexA('#E5B400',.55);ctx.lineWidth=30;ctx.beginPath();ctx.moveTo(AISLE,-600);ctx.lineTo(AISLE,9800);ctx.stroke();ctx.setLineDash([]);
+  // rails
+  ctx.fillStyle='#4A525A';for(let y=-600;y<9800;y+=600) ctx.fillRect(RAIL_A-80,y,RAIL_B-RAIL_A+160,60);
+  ctx.strokeStyle='#30363C';ctx.lineWidth=70;ctx.beginPath();ctx.moveTo(RAIL_A,-650);ctx.lineTo(RAIL_A,9850);ctx.moveTo(RAIL_B,-650);ctx.lineTo(RAIL_B,9850);ctx.stroke();
+  ctx.save();ctx.translate(RAIL_B+250,9500);ctx.rotate(-Math.PI/2);txt(tr('cv_rail'),0,0,190,colors['--canvas-ink'],'left',600);ctx.restore();
+  T.forEach(drawTable);
+  drawCutter();
+  T.forEach(drawLabel);
+  // walking paths
+  ctx.setLineDash([60,80]);ctx.lineWidth=22;
+  teams.forEach(tm=>tm.members.forEach(p=>{if(!p.path.length)return;ctx.strokeStyle=hexA(TEAMCOL[tm.id],.7);ctx.beginPath();ctx.moveTo(p.x,p.y);p.path.forEach(q=>ctx.lineTo(q[0],q[1]));ctx.stroke();}));
+  ctx.setLineDash([]);
+  persons.forEach(drawPerson);
+  drawCallouts();
+}
+function drawCallouts(){
+  const now=performance.now(),DUR=1700;
+  callouts=callouts.filter(c=>now-c.born<DUR);
+  for(const c of callouts){
+    const k=(now-c.born)/DUR,a=k<.75?1:1-(k-.75)/.25,rise=320*k;
+    const s=tr(c.key,c.p);ctx.font=`700 ${fs(220)}px ${condFont}`;const w=ctx.measureText(s).width;const h=fs(220)+120;
+    const x=c.x,y=c.y-rise-h-120;
+    ctx.globalAlpha=a;
+    ctx.fillStyle=c.col;rr(x-w/2-80,y,w+160,h,h/2);ctx.fill();
+    ctx.beginPath();ctx.moveTo(x-70,y+h-2);ctx.lineTo(x+70,y+h-2);ctx.lineTo(x,y+h+110);ctx.fill();
+    ctx.strokeStyle='#FFFFFF';ctx.lineWidth=18;rr(x-w/2-80,y,w+160,h,h/2);ctx.stroke();
+    txt(s,x,y+h/2+6,220,'#FFFFFF','center',700,'middle');
+    ctx.globalAlpha=1;
+  }
+}
+function drawTable(t){
+  const {x0,x1,y0,y1}=t;
+  // frame + body
+  ctx.fillStyle='#1B1F23';ctx.fillRect(x0-30,y0-30,x1-x0+60,y1-y0+60);
+  ctx.fillStyle='#AEB7BE';ctx.fillRect(x0-20,y0-20,x1-x0+40,y1-y0+40);
+  ctx.fillStyle='#23282D';ctx.fillRect(x0+20,y0+20,x1-x0-40,y1-y0-40);
+  ctx.fillStyle='#C8232C';ctx.fillRect(x0-20,y1+20,x1-x0+40,34);
+  // bristle grid texture
+  ctx.strokeStyle='#2C3238';ctx.lineWidth=8;ctx.beginPath();
+  for(let x=x0+60;x<x1;x+=120){ctx.moveTo(x,y0+20);ctx.lineTo(x,y1-20);} for(let y=y0+60;y<y1;y+=120){ctx.moveTo(x0+20,y);ctx.lineTo(x1-20,y);} ctx.stroke();
+  // section joints
+  ctx.strokeStyle='#5B646C';ctx.lineWidth=18;ctx.beginPath();for(let x=x0+1225;x<x1-10;x+=1225){ctx.moveTo(x,y0+20);ctx.lineTo(x,y1-20);}ctx.stroke();
+  // white edge teeth
+  ctx.fillStyle='#E7E2D4';for(let x=x0+60;x<x1-80;x+=170){ctx.fillRect(x,y0+26,90,44);ctx.fillRect(x,y1-70,90,44);}
+  // vacuum port on table end (connects to the single pump on the cutter carriage)
+  {const cy=(y0+y1)/2;ctx.fillStyle='#15191C';ctx.fillRect(x1+10,cy-230,70,460);ctx.fillStyle='#E7E2D4';ctx.beginPath();ctx.arc(x1+45,cy,150,0,7);ctx.fill();ctx.fillStyle='#3A4046';ctx.beginPath();ctx.arc(x1+45,cy,100,0,7);ctx.fill();}
+  if(t.vac>0){
+    const v=t.vac,nowV=performance.now()/1000;
+    ctx.fillStyle=`rgba(47,143,216,${0.10+0.12*v})`;ctx.fillRect(x0+20,y0+20,x1-x0-40,y1-y0-40);
+    ctx.strokeStyle=`rgba(90,180,255,${0.35+0.4*v})`;ctx.lineWidth=16;ctx.setLineDash([60,90]);ctx.lineDashOffset=-nowV*400;
+    for(let k=1;k<=3;k++){const yy=y0+(y1-y0)*k/4;ctx.beginPath();ctx.moveTo(x0+60,yy);ctx.lineTo(x1-60,yy);ctx.stroke();}
+    ctx.setLineDash([]);ctx.lineDashOffset=0;
+  }
+  // spreader
+  const sy0=y0-80,sy1=y1+80;
+  ctx.fillStyle='#E5B400';rr(x0-SPR-10,sy0,SPR,sy1-sy0,40);ctx.fill();
+  ctx.fillStyle='#8C6E00';ctx.fillRect(x0-SPR+40,sy0+60,40,sy1-sy0-120);
+  ctx.fillStyle=t.col;rr(x0-SPR+120,t.fab.fy0,170,FAB_W,70);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=14;ctx.stroke();
+  ctx.save();ctx.translate(x0-SPR+70,(y0+y1)/2);ctx.rotate(-Math.PI/2);txt(tr('cv_spr'),0,0,140,'#2A2300','center',700,'middle');ctx.restore();
+  // pedal
+  const nowR=performance.now(),pOn=nowR-(t.pedalAt||-1e9)<900;
+  const px=x0-SPR-10,py=y1+170;
+  if(pOn){ctx.fillStyle='rgba(255,216,77,.35)';ctx.beginPath();ctx.arc(px+180,py+120,300,0,7);ctx.fill();}
+  ctx.fillStyle=pOn?'#FFD84D':'#3A4046';rr(px+40,py+(pOn?40:0),280,200,40);ctx.fill();ctx.strokeStyle='#15191C';ctx.lineWidth=16;ctx.stroke();
+  ctx.strokeStyle=pOn?'#7A5E00':'#6B737A';ctx.lineWidth=14;ctx.beginPath();for(let k=0;k<3;k++){ctx.moveTo(px+90,py+60+k*50+(pOn?40:0));ctx.lineTo(px+270,py+60+k*50+(pOn?40:0));}ctx.stroke();
+  if(pOn){const pp=T.length&&teams.find(tm=>tm.table===t.id);const m=pp&&pp.members[1];if(m){ctx.strokeStyle='#15191C';ctx.lineWidth=40;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(m.x,m.y-150);ctx.lineTo(px+180,py+160);ctx.stroke();ctx.lineCap='butt';}}
+  // HMI screen with counter
+  const hx0=x0-SPR-10,hy0=y0-330;
+  ctx.fillStyle='#1A1F24';rr(hx0,hy0,SPR,230,30);ctx.fill();
+  ctx.fillStyle='#0E2A1C';ctx.fillRect(hx0+30,hy0+30,SPR-60,170);
+  txt(`${t.layers}/${t.N}`,hx0+SPR/2,hy0+118,150,'#5CFF9D','center',700,'middle');
+  // stack light (signal tower) on spreader
+  const lc={ready:'#2BD46B',cutting:'#FF3B3B',cut:'#FFB020',laid:'#FFB020',setup:'#FFB020'}[t.state];
+  const blink=['laid','setup','cut'].includes(t.state)?(Math.floor(nowR/400)%2===0):true;
+  const readyPulse=nowR-(t.readyAt2||-1e9)<1400;
+  ctx.fillStyle='#15191C';ctx.beginPath();ctx.arc(x0-SPR/2-10,y0+80,130,0,7);ctx.fill();
+  ctx.fillStyle=lc&&blink?lc:'#3A4046';ctx.beginPath();ctx.arc(x0-SPR/2-10,y0+80,95,0,7);ctx.fill();
+  if(lc&&blink){ctx.fillStyle=hexA(lc,.28);ctx.beginPath();ctx.arc(x0-SPR/2-10,y0+80,readyPulse?260+200*((nowR-t.readyAt2)/1400):190,0,7);ctx.fill();}
+  // fabric stack
+  const f=t.fab,hasStack=t.layers>0&&!['setup','empty'].includes(t.state);
+  if(hasStack){
+    const a=0.45+0.45*Math.min(1,t.layers/Math.max(1,t.N));
+    ctx.fillStyle=hexA(t.col,a);ctx.fillRect(f.fx0,f.fy0,t.L,FAB_W);
+    ctx.strokeStyle=hexA(t.col,1);ctx.lineWidth=16;ctx.strokeRect(f.fx0,f.fy0,t.L,FAB_W);
+    if(t.layers>1){ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=8;for(let k=1;k<Math.min(t.layers,8);k++)ctx.strokeRect(f.fx0-k*10,f.fy0-k*10,t.L,FAB_W);}
+  }
+  // unload holes
+  if(t.state==='unload'||t.state==='cut'){
+    const gone=t.state==='unload'?Math.floor(t.unload*t.pieces.length+0.0001):0;
+    t.pieces.forEach((p,k)=>{polyPath(p);if(k<gone){ctx.fillStyle='#23282D';ctx.fill();}else{ctx.fillStyle=hexA(t.col,.95);ctx.fill();ctx.strokeStyle='#FFFFFF';ctx.lineWidth=18;ctx.stroke();}});
+    if(t.state==='unload'&&t.unload>=1){ctx.fillStyle='#23282D';ctx.fillRect(f.fx0-80,f.fy0-80,t.L+100,FAB_W+100);}
+  }
+  // planned nest
+  if(hasStack&&['feed','knife','align','return','laid','ready','cutting'].includes(t.state)){
+    ctx.setLineDash([70,60]);ctx.strokeStyle='rgba(255,255,255,.38)';ctx.lineWidth=12;t.pieces.forEach(p=>{polyPath(p);ctx.stroke();});ctx.setLineDash([]);
+  }
+  // cut lines
+  if(t.state==='cutting'){
+    ctx.strokeStyle='#FFFFFF';ctx.lineWidth=20;ctx.lineCap='round';ctx.beginPath();
+    t.cutSegs.forEach(([a,b])=>{ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);});
+    if(cutter.table===t.id&&cutter.state==='cut'){const s=cutter.segs[cutter.si];if(s&&s.cut){ctx.moveTo(s.a[0],s.a[1]);ctx.lineTo(cutter.hx,cutter.hy);}}
+    ctx.stroke();ctx.lineCap='butt';
+  }
+  // moving sheet
+  if(['feed','knife','align'].includes(t.state)){
+    const len=t.L*t.feed;let sk=0,off=0;
+    if(t.state==='align'){const e=1-Math.pow(1-t.alignP,3);sk=t.skew*(1-e);off=(t.off||0)*(1-e);}
+    ctx.save();ctx.translate(f.fx0+len/2,(f.fy0+f.fy1)/2+off);ctx.rotate(sk);
+    ctx.fillStyle=hexA(t.col,.9);ctx.fillRect(-len/2,-FAB_W/2,len,FAB_W);
+    ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=16;ctx.strokeRect(-len/2,-FAB_W/2,len,FAB_W);
+    ctx.restore();
+  }
+  if(t.state==='knife'){const ky=f.fy0+FAB_W*Math.min(1,t.tt/V.knife);ctx.strokeStyle='#FF3B3B';ctx.lineWidth=26;ctx.beginPath();ctx.moveTo(x0+30,f.fy0);ctx.lineTo(x0+30,ky);ctx.stroke();ctx.fillStyle='#FF3B3B';ctx.beginPath();ctx.arc(x0+30,ky,70,0,7);ctx.fill();}
+  // pulling bridge (most) of the spreader: grips fabric edge, drives out to length, waits, returns after pedal
+  {
+    let bxp=null,grip=false;
+    if(t.state==='feed'){bxp=f.fx0+t.L*t.feed;grip=true;}
+    else if(t.state==='knife'){bxp=f.fx0+t.L;grip=true;}
+    else if(t.state==='align'){bxp=f.fx0+t.L;}
+    else if(t.state==='return'){const k=Math.min(1,t.tt/V.ret);bxp=f.fx0+t.L*(1-(k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2));}
+    else bxp=f.fx0;
+    // side guide tracks
+    ctx.strokeStyle='rgba(229,180,0,.35)';ctx.lineWidth=26;ctx.beginPath();ctx.moveTo(x0,y0-110);ctx.lineTo(f.fx0+t.L+60,y0-110);ctx.moveTo(x0,y1+110);ctx.lineTo(f.fx0+t.L+60,y1+110);ctx.stroke();
+    const moving=['feed','return'].includes(t.state);
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(bxp-60,y0-150,200,y1-y0+300);
+    ctx.fillStyle='#E5B400';ctx.fillRect(bxp-90,y0-130,180,y1-y0+260);
+    ctx.strokeStyle='#7A5E00';ctx.lineWidth=14;ctx.strokeRect(bxp-90,y0-130,180,y1-y0+260);
+    ctx.fillStyle='#2B3136';ctx.fillRect(bxp-140,y0-200,280,140);ctx.fillRect(bxp-140,y1+60,280,140);
+    ctx.fillStyle=grip?'#15191C':'rgba(21,25,28,.35)';ctx.fillRect(bxp-30,f.fy0-20,60,FAB_W+40);
+    if(moving){ctx.fillStyle='rgba(255,255,255,.9)';const dir=t.state==='feed'?1:-1;for(let k=0;k<2;k++){const ax=bxp+dir*(180+k*110),cy=(y0+y1)/2;ctx.beginPath();ctx.moveTo(ax,cy-120);ctx.lineTo(ax+dir*100,cy);ctx.lineTo(ax,cy+120);ctx.closePath();ctx.fill();}}
+  }
+  // origin marker
+  const [ox,oy]=t.originPt;const ocol=colors['--accent']||'#C8232C';
+  ctx.strokeStyle=ocol;ctx.lineWidth=22;ctx.beginPath();ctx.arc(ox,oy,110,0,7);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox+t.sx*600,oy);ctx.moveTo(ox,oy);ctx.lineTo(ox,oy+t.sy*420);ctx.stroke();
+  ctx.fillStyle=ocol;ctx.beginPath();ctx.moveTo(ox+t.sx*680,oy);ctx.lineTo(ox+t.sx*560,oy-60);ctx.lineTo(ox+t.sx*560,oy+60);ctx.fill();
+  ctx.beginPath();ctx.moveTo(ox,oy+t.sy*500);ctx.lineTo(ox-60,oy+t.sy*380);ctx.lineTo(ox+60,oy+t.sy*380);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ox,oy,40,0,7);ctx.fill();
+}
+function drawLabel(t){
+  const {x0,y0}=t;
+  const lbl=tr('cv_table',{n:t.id+1}),st=tableStateText(t);
+  const ly=y0-150,lx=x0+640;const w1=txt(lbl,lx,ly,210,colors['--canvas-ink'],'left',700);
+  const sc=stateColor(t);ctx.font=`600 ${fs(170)}px ${condFont}`;const w2=ctx.measureText(st).width;
+  const bx=lx+w1+80;rr(bx,ly-fs(170)-10,w2+60,fs(170)+50,40);ctx.fillStyle=hexA(sc.startsWith('#')?sc:'#888888',.2);ctx.fill();
+  txt(st,bx+30,ly,170,sc,'left',600);
+}
+function drawCutter(){
+  const c=cutter,cy=c.y;
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(CAR_X0+40,cy-1110,CAR_X1-CAR_X0,2300);
+  ctx.fillStyle='#262B30';rr(CAR_X0,cy-1150,CAR_X1-CAR_X0,2300,60);ctx.fill();
+  ctx.fillStyle='#3A4148';ctx.fillRect(CAR_X0+60,cy-1090,CAR_X1-CAR_X0-120,2180);
+  ctx.fillStyle='#F2F4F5';rr(CAR_X0+260,cy-520,700,1040,260);ctx.fill();ctx.strokeStyle='#9AA4AB';ctx.lineWidth=14;ctx.stroke();
+  ctx.save();ctx.translate(CAR_X0+610,cy);ctx.rotate(-Math.PI/2);txt(tr('cv_cut'),0,0,170,'#2A3035','center',700,'middle');ctx.restore();
+  // vacuum pump (one, travels with carriage) + coupling to table port
+  {
+    const dockT=c.table!=null?T[c.table]:null, on=dockT&&dockT.vac>0, nowP=performance.now()/1000;
+    const pcx=CAR_X0+610,pcy=cy+780;
+    ctx.fillStyle='#1F5E93';rr(pcx-300,pcy-230,600,440,60);ctx.fill();ctx.strokeStyle='#0E2F4D';ctx.lineWidth=16;ctx.stroke();
+    ctx.fillStyle='#0E2F4D';ctx.beginPath();ctx.arc(pcx,pcy,160,0,7);ctx.fill();
+    ctx.save();ctx.translate(pcx,pcy);ctx.rotate(on?nowP*14:0);ctx.fillStyle=on?'#8FD3FF':'#6B8BA6';
+    for(let k=0;k<4;k++){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.ellipse(0,-80,40,75,0,0,7);ctx.fill();}ctx.restore();
+    // hose to front of carriage
+    ctx.strokeStyle='#2B3136';ctx.lineWidth=90;ctx.beginPath();ctx.moveTo(pcx-300,pcy);ctx.lineTo(CAR_X0-20,pcy);ctx.lineTo(CAR_X0-20,cy);ctx.stroke();
+    const docked=dockT&&['vac','travel','cut','retract','confirm'].includes(c.state);
+    if(docked){ctx.fillStyle=on?'#2F8FD8':'#6B737A';ctx.fillRect(dockT.x1+70,cy-120,CAR_X0-dockT.x1-40,240);
+      if(on){ctx.fillStyle='rgba(47,143,216,.25)';ctx.beginPath();ctx.arc(dockT.x1+45,cy,230+60*Math.sin(nowP*6),0,7);ctx.fill();}}
+  }
+  // beam
+  const by0=cy-1120,by1=cy+1120,bx=c.hx;
+  ctx.fillStyle='#15191C';ctx.fillRect(Math.min(bx,G_HOME),by0-10,Math.abs(G_HOME-bx)+20,60);
+  ctx.fillStyle='#D5DBDF';ctx.fillRect(bx-110,by0,220,by1-by0);ctx.strokeStyle='#8A949B';ctx.lineWidth=14;ctx.strokeRect(bx-110,by0,220,by1-by0);
+  ctx.fillStyle='#2B3136';ctx.fillRect(bx-170,by0-120,340,160);ctx.fillRect(bx-170,by1-40,340,160);
+  // head
+  ctx.fillStyle='#FFFFFF';rr(c.hx-170,c.hy-140,340,280,70);ctx.fill();ctx.strokeStyle='#6B757C';ctx.lineWidth=16;ctx.stroke();
+  const cutting=c.state==='cut'&&c.segs[c.si]?.cut;
+  ctx.fillStyle=cutting?'#FF3B3B':'#7A858C';ctx.beginPath();ctx.arc(c.hx,c.hy,cutting?70:45,0,7);ctx.fill();
+  if(cutting){ctx.strokeStyle='rgba(255,59,59,.35)';ctx.lineWidth=30;ctx.beginPath();ctx.arc(c.hx,c.hy,150+40*Math.sin(sim*20),0,7);ctx.stroke();}
+  if(c.state==='travel'&&c.pause>0){const t=T[c.table];ctx.strokeStyle=colors['--accent'];ctx.lineWidth=26;ctx.beginPath();ctx.arc(t.originPt[0],t.originPt[1],220+120*Math.sin(sim*8),0,7);ctx.stroke();}
+}
+function drawPerson(p){
+  const col=TEAMCOL[p.team];
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.arc(p.x+30,p.y+40,200,0,7);ctx.fill();
+  ctx.fillStyle=col;ctx.beginPath();ctx.arc(p.x,p.y,190,0,7);ctx.fill();ctx.strokeStyle='#FFFFFF';ctx.lineWidth=36;ctx.stroke();
+  txt(p.team,p.x,p.y+8,210,'#FFFFFF','center',700,'middle');
+}
+
+/* ---------------- loop & controls ---------------- */
+let last=performance.now();
+function frame(now){
+  let rdt=Math.min(0.05,(now-last)/1000);last=now;
+  if(playing){let sdt=rdt*speed;while(sdt>0){const d=Math.min(0.05,sdt);step(d);sdt-=d;}}
+  draw();updateUI(false);requestAnimationFrame(frame);
+}
+function setLang(l){lang=l;$('#lang-bs').setAttribute('aria-pressed',l==='bs');$('#lang-zh').setAttribute('aria-pressed',l==='zh');applyI18n();}
+function setMode(m){mode=m;$('#mode-auto').setAttribute('aria-pressed',m==='auto');$('#mode-man').setAttribute('aria-pressed',m==='manual');T.forEach(t=>t.pending=null);applyI18n();}
+$('#lang-bs').onclick=()=>setLang('bs');$('#lang-zh').onclick=()=>setLang('zh');
+$('#mode-auto').onclick=()=>setMode('auto');$('#mode-man').onclick=()=>setMode('manual');
+$('#play').onclick=()=>{playing=!playing;applyI18n();};
+$('#spd').oninput=e=>{speed=+e.target.value;$('#spdo').textContent=speed+'×';};
+$('#reset').onclick=()=>{reset();};
+$('#bconfirm').onclick=()=>act('confirm',null);
+$('#cspd').oninput=e=>{cutSpeed=+e.target.value;$('#cspdo').textContent=cutSpeed+' mm/s';};
+$('#bsync').onclick=()=>syncSpeed();
+readColors();reset();layout();resize();document.fonts?.ready.then(layout);
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){speed=4;$('#spd').value=4;$('#spdo').textContent='4×';}
+requestAnimationFrame(frame);
+})();
+</script>
+</body></html>
