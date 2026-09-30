@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./suman-data.js"></script>
+<script src="./i18n-bs-hr.js"></script>
+<script src="./i18n-en-de.js"></script>
+<script src="./suman-cats.js"></script>
+<script src="./suman-details.js"></script>
+<style>
+html,body{margin:0;padding:0;background:#f3f0ea;color:#0f1a2c;font-family:"Schibsted Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0b2655;text-decoration:none}
+a:hover{color:#2c4f8c}
+button{font-family:inherit}
+input,textarea,select{font-family:inherit;font-size:15px}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+<header style="position:{{ hdr.pos }};top:0;left:0;right:0;z-index:50;height:72px;background:{{ hdr.bg }};backdrop-filter:{{ hdr.blur }};-webkit-backdrop-filter:{{ hdr.blur }};display:flex;align-items:center;gap:28px;padding:0 clamp(16px,3vw,40px)">
+  <a onClick="{{ goHome }}" aria-label="SUMAN" style="align-self:flex-start;display:flex;cursor:pointer;color:#0b2655;box-shadow:0 8px 24px rgba(4,14,34,0.28)">
+    <img src="https://suman.ba/assets/img/logo_suman_header.svg" alt="SUMAN" onError="{{ onLogoErr }}" style="height:{{ logoH }};width:auto;display:{{ logoImg }};transition:height .3s cubic-bezier(.2,.7,.2,1)">
+    <span style="font-weight:800;letter-spacing:0.16em;font-size:18px;display:{{ logoTxt }}">SUMAN</span>
+  </a>
+  <sc-if value="{{ ctxOn }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:0;color:#ffffff;opacity:{{ ctxOp }};transform:translateY({{ ctxY }});pointer-events:{{ ctxPe }}">
+      <span style="font-size:20px;font-weight:800;letter-spacing:-0.025em;line-height:1.1;white-space:nowrap">{{ catTitle }}</span>
+      <sc-if value="{{ ctxDescOn }}" hint-placeholder-val="{{ true }}">
+        <span style="padding-left:14px;font-size:13px;line-height:1.3;color:#a9b6cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:460px">{{ catDesc }}</span>
+      </sc-if>
+    </div>
+  </sc-if>
+  <sc-if value="{{ backOn }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ goBack }}" aria-label="{{ backLbl }}" style="height:44px;padding:0 16px 0 12px;border-radius:999px;border:1px solid {{ hdr.btnBd }};background:{{ hdr.btnBg }};backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:{{ hdr.barSh }};color:{{ hdr.fg }};font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .2s" style-hover="background:{{ hdr.hov }}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}"><span>{{ backLbl }}</span></sc-if>
+    </button>
+  </sc-if>
+  <sc-if value="{{ showNav }}" hint-placeholder-val="{{ false }}">
+    <nav style="display:flex;gap:24px;height:72px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+        <a onClick="{{ n.onClick }}" style="display:flex;align-items:center;height:72px;font-size:15px;font-weight:600;cursor:pointer;color:{{ hdr.fg }};border-bottom:2px solid {{ n.bd }}">{{ n.label }}</a>
+      </sc-for>
+    </nav>
+  </sc-if>
+  <div style="flex:1"></div>
+  <div style="display:flex;align-items:center;gap:2px;height:48px;padding:4px;border-radius:999px;border:1px solid {{ hdr.btnBd }};background:{{ hdr.btnBg }};color:{{ hdr.fg }};backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:{{ hdr.barSh }};transition:background .3s,box-shadow .3s">
+    <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+      <div style="position:relative;display:flex">
+        <button onClick="{{ toggleLang }}" title="{{ curLang.name }}" aria-label="{{ curLang.name }}" style="height:38px;padding:0 10px 0 7px;border:0;border-radius:999px;background:transparent;cursor:pointer;display:flex;align-items:center;gap:7px;color:inherit" style-hover="background:{{ hdr.hov }}">
+          <span style="width:24px;height:24px;flex:0 0 auto;border-radius:50%;background-image:url({{ curLang.flag }});background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(0,0,0,0.12)"></span>
+          <span style="font:500 13px 'IBM Plex Mono',monospace">{{ curLang.code }}</span>
+          <span style="font-size:9px;opacity:0.7;transform:rotate({{ langRot }});transition:transform .2s">▼</span>
+        </button>
+          <sc-if value="{{ langOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:50px;right:0;min-width:200px;background:#fbfaf7;border:1px solid #dcd6ca;border-radius:10px;box-shadow:0 16px 40px rgba(11,38,85,0.14);padding:6px;display:flex;flex-direction:column;gap:2px;z-index:60">
+            <sc-for list="{{ langs }}" as="l" hint-placeholder-count="4">
+              <button onClick="{{ l.onClick }}" style="height:44px;padding:0 10px;border:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;background:{{ l.rowBg }};color:#0f1a2c" style-hover="background:#ece8e0">
+                <span style="width:24px;height:24px;flex:0 0 auto;border-radius:50%;background-image:url({{ l.flag }});background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(0,0,0,0.1)"></span>
+                <span style="flex:1;font-size:14px;font-weight:{{ l.fw }}">{{ l.name }}</span>
+                <span style="font:500 11px 'IBM Plex Mono',monospace;color:#5b6272">{{ l.code }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+  
+      </div>
+      <span style="width:1px;height:22px;background:{{ hdr.btnBd }}"></span>
+      <button onClick="{{ goB2B }}" title="{{ b2bLabel }}" style="height:38px;padding:0 12px 0 10px;border:0;border-radius:999px;background:transparent;cursor:pointer;display:flex;align-items:center;gap:8px;color:inherit;font-size:14px;font-weight:600" style-hover="background:{{ hdr.hov }}">
+        <span style="position:relative;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span style="position:absolute;right:-1px;bottom:0;width:8px;height:8px;border-radius:50%;background:{{ b2bDot }};box-shadow:0 0 0 2px {{ hdr.dotRing }}"></span></span>
+        {{ b2bShort }}
+      </button>
+      <span style="width:1px;height:22px;background:{{ hdr.btnBd }}"></span>
+    </sc-if>
+    <button onClick="{{ goCart }}" title="{{ t.nav_cart }}" aria-label="{{ t.nav_cart }}" style="height:38px;padding:0 14px 0 10px;border:0;border-radius:999px;background:{{ hdr.cartBg }};color:{{ hdr.cartFg }};cursor:pointer;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700">
+      <span style="position:relative;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 8h14l-1 13H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg><span style="position:absolute;top:-6px;right:-8px;min-width:17px;height:17px;border-radius:9px;background:{{ hdr.badgeBg }};color:{{ hdr.badgeFg }};font:600 10px/17px 'IBM Plex Mono',monospace;text-align:center;padding:0 4px;display:{{ cartBadge }}">{{ cartCount }}</span></span>
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}"><span style="margin-left:4px">{{ t.nav_cart }}</span></sc-if>
+    </button>
+  </div>
+  <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ toggleMenu }}" aria-label="Meni" style="width:44px;height:44px;border:1px solid {{ hdr.btnBd }};background:transparent;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px">
+      <span style="width:16px;height:1.5px;background:{{ hdr.fg }}"></span><span style="width:16px;height:1.5px;background:{{ hdr.fg }}"></span>
+    </button>
+  </sc-if>
+</header>
+<sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;top:72px;left:0;right:0;bottom:0;z-index:49;background:#fbfaf7;padding:24px 20px;display:flex;flex-direction:column;gap:4px">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+      <a onClick="{{ n.onClick }}" style="font-size:28px;font-weight:700;padding:14px 0;border-bottom:1px solid #dcd6ca;cursor:pointer;color:#0f1a2c">{{ n.label }}</a>
+    </sc-for>
+    <a onClick="{{ goB2B }}" style="font-size:18px;font-weight:600;padding:18px 0;cursor:pointer;color:#0b2655">{{ b2bLabel }}</a>
+    <div style="display:flex;gap:8px;margin-top:auto">
+      <sc-for list="{{ langs }}" as="l" hint-placeholder-count="4">
+        <button onClick="{{ l.onClick }}" style="flex:1;height:56px;border:1.5px solid {{ l.bd }};border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:500 12px 'IBM Plex Mono',monospace;background:{{ l.rowBg }};color:#0f1a2c"><span style="width:22px;height:22px;border-radius:50%;background-image:url({{ l.flag }});background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(0,0,0,0.1)"></span>{{ l.code }}</button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<main style="flex:1;padding-top:{{ mainPad }}">
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="Početna" style="position:relative;height:{{ heroH }}px;overflow:hidden;background:#0b2655">
+    <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="3">
+      <div onClick="{{ s.onClick }}" onMouseEnter="{{ s.enter }}" onMouseLeave="{{ leave }}" style="position:absolute;inset:0;clip-path:{{ s.clip }};cursor:pointer;background:{{ s.base }}">
+        <div style="position:absolute;left:{{ s.il }};top:{{ s.it }};width:{{ s.iw }};height:{{ s.ih }};background-image:url({{ s.img }});background-size:cover;background-position:{{ s.pos }};transform:scale({{ s.scale }});transition:transform 0.9s cubic-bezier(.2,.7,.2,1)"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,22,50,0.55) 0%,rgba(7,22,50,0.85) 100%);opacity:{{ s.dim }};transition:opacity 0.4s"></div>
+        <div style="position:absolute;left:{{ s.l }};right:{{ s.r }};top:{{ s.t }};bottom:{{ s.b }};max-width:{{ s.mw }};display:flex;flex-direction:column;gap:12px;align-items:{{ s.ai }};text-align:{{ s.al }};color:#fff">
+          <h2 style="margin:0;font-size:clamp(24px,5.2vw,76px);line-height:0.95;font-weight:800;letter-spacing:-0.025em">{{ s.title }}</h2>
+          <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+            <p style="margin:0;font-size:16px;line-height:1.5;max-width:340px;color:#e8ecf4;text-wrap:pretty">{{ s.desc }}</p>
+          </sc-if>
+          <span style="display:inline-flex;gap:10px;align-items:center;font-weight:600;font-size:15px;padding-bottom:5px;border-bottom:2px solid #e2a33a">{{ s.cta }}<span>→</span></span>
+        </div>
+      </div>
+    </sc-for>
+    <svg width="100%" height="100%" viewBox="{{ seamBox }}" preserveAspectRatio="none" style="position:absolute;inset:0;pointer-events:none">
+      <sc-for list="{{ seams }}" as="ln" hint-placeholder-count="3">
+        <line x1="{{ ln.x1 }}" y1="{{ ln.y1 }}" x2="{{ ln.x2 }}" y2="{{ ln.y2 }}" stroke="#fbfaf7" stroke-width="2"></line>
+      </sc-for>
+    </svg>
+    <sc-if value="{{ hubCap }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ hubBadge }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:{{ hubX }}px;top:{{ hubY }}px;width:{{ hubD }}px;height:{{ hubD }}px;transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;background:#0b2655;box-shadow:0 0 0 3px #fbfaf7,0 18px 44px rgba(4,14,34,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+        <span style="font-weight:800;font-size:{{ hubFs }}px;line-height:1;letter-spacing:-0.02em;color:#f5c400">Suman</span>
+        <span style="width:{{ hubBar }}px;height:3px;background:#f5c400"></span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hubLogoOn }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:{{ hubX }}px;top:{{ hubY }}px;width:{{ hubD }}px;height:{{ hubD }}px;transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;background:#fbfaf7;box-shadow:0 18px 44px rgba(4,14,34,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center">
+        <img src="https://suman.ba/assets/img/logo_suman_header.svg" alt="SUMAN" style="width:{{ hubLogo }}px;height:auto">
+        <span style="font:500 10px/1.35 'IBM Plex Mono',monospace;color:#3a4152;letter-spacing:0.04em">{{ t.hub_1 }}<br>{{ t.hub_2 }}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hubDot }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:{{ hubX }}px;top:{{ hubY }}px;width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;background:#f5c400;box-shadow:0 0 0 3px #fbfaf7"></div>
+    </sc-if>
+    </sc-if>
+    <sc-if value="{{ hubLogoOn }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:{{ hubX }}px;top:{{ hubY }}px;width:{{ hubD }}px;height:{{ hubD }}px;transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;background:#fbfaf7;box-shadow:0 18px 44px rgba(4,14,34,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center">
+        <img src="https://suman.ba/assets/img/logo_suman_header.svg" alt="SUMAN" style="width:{{ hubLogo }}px;height:auto;display:{{ logoImg }}">
+        <span style="font:500 10px/1.35 'IBM Plex Mono',monospace;color:#3a4152;letter-spacing:0.04em">{{ t.hub_1 }}<br>{{ t.hub_2 }}</span>
+      </div>
+    </sc-if>
+  </section>
+
+
+</sc-if>
+<sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Kategorija" style="display:grid;grid-template-columns:{{ ixCols }};background:#0b2655;color:#ffffff">
+    <div style="position:{{ ixPos }};top:0;height:{{ ixH }};overflow:hidden;background:#1d3a6b">
+      <sc-for list="{{ ixSlides }}" as="sl" hint-placeholder-count="1">
+        <div role="img" aria-label="{{ ixAct.name }}" style="position:absolute;inset:0;background-color:#1d3a6b;background-image:{{ sl.bgi }};background-size:cover;background-position:center;opacity:{{ sl.op }};transform:scale({{ sl.sc }});transition:opacity .8s ease,transform 5s ease-out"></div>
+      </sc-for>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,14,34,0.55) 0%,rgba(4,14,34,0) 22%,rgba(4,14,34,0) 50%,rgba(4,14,34,0.88) 100%)"></div>
+      <div style="position:absolute;left:clamp(20px,3.4vw,56px);right:clamp(20px,3.4vw,56px);bottom:clamp(24px,4vw,56px);display:flex;flex-direction:column;gap:12px;max-width:560px">
+        <sc-if value="{{ ixAct.hot }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;display:flex;align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:999px;background:#f5c400;color:#0b2655;font-size:12px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span></sc-if>
+        <span style="font-size:clamp(48px,6.4vw,104px);font-weight:800;letter-spacing:-0.04em;line-height:0.86">{{ ixAct.name }}</span>
+        <span style="font-size:15px;line-height:1.55;color:#e8ecf4;max-width:440px;text-wrap:pretty">{{ ixAct.desc }}</span>
+      </div>
+      <sc-if value="{{ ixDotsOn }}" hint-placeholder-val="{{ false }}">
+        <div role="tablist" style="position:absolute;right:clamp(20px,3.4vw,56px);bottom:clamp(28px,4.2vw,60px);display:flex;align-items:center;gap:6px">
+          <sc-for list="{{ ixDots }}" as="dt" hint-placeholder-count="3">
+            <button role="tab" onClick="{{ dt.onClick }}" aria-label="{{ dt.n }}" aria-selected="{{ dt.on }}" style="width:{{ dt.w }};height:8px;padding:0;border:0;border-radius:4px;cursor:pointer;background:{{ dt.bg }};transition:width .3s,background .3s"></button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div style="padding:{{ ixPad }};display:flex;flex-direction:column;gap:clamp(28px,4vw,48px);min-width:0">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <h1 style="margin:0;font-size:clamp(56px,6.4vw,104px);line-height:0.86;font-weight:800;letter-spacing:-0.045em;opacity:{{ catH1Op }};transform:{{ catH1Tf }};transform-origin:left bottom;will-change:transform,opacity">{{ catTitle }}</h1>
+        <p style="margin:0;font-size:16px;line-height:1.6;color:#cfd7e6;max-width:480px;text-wrap:pretty;opacity:{{ catH1Op }};transform:{{ catH1Tf }};transform-origin:left top">{{ catDesc }}</p>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ ixItems }}" as="it" hint-placeholder-count="5">
+          <button onClick="{{ it.onClick }}" onMouseEnter="{{ it.enter }}" onFocus="{{ it.enter }}" style="display:grid;grid-template-columns:{{ ixRow }};align-items:center;gap:clamp(14px,2vw,24px);padding:{{ ixRowPad }};border:0;border-top:1px solid rgba(255,255,255,0.14);border-radius:0;background:transparent;color:#ffffff;text-align:left;cursor:pointer;width:100%">
+            <sc-if value="{{ ixThumb }}" hint-placeholder-val="{{ false }}">
+              <span style="width:76px;height:96px;background-color:#1d3a6b;background-image:{{ it.bgi }};background-size:cover;background-position:center"></span>
+            </sc-if>
+            <span style="display:flex;flex-direction:column;gap:8px;min-width:0">
+              <span style="font-size:clamp(28px,3vw,44px);font-weight:800;letter-spacing:-0.035em;line-height:0.95;color:{{ it.fg }};transition:color .25s">{{ it.name }}</span>
+              <span style="display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:#a9b6cf">
+                <sc-if value="{{ it.hot }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:5px;color:#f5c400;font-size:12.5px;font-weight:600"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span></sc-if>
+                <span>{{ it.seg }}</span>
+              </span>
+            </span>
+            <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right;white-space:nowrap">
+              <span style="font-size:12px;color:#a9b6cf">{{ it.fromLbl }}</span>
+              <span style="font-size:17px;font-weight:700">{{ it.price }}</span>
+            </span>
+            <span style="width:44px;height:44px;border-radius:50%;display:{{ ixArrow }};align-items:center;justify-content:center;font-size:18px;border:1px solid {{ it.abd }};background:{{ it.abg }};color:{{ it.afg }};transform:translateX({{ it.ax }});transition:all .3s cubic-bezier(.2,.7,.2,1)">→</span>
+          </button>
+        </sc-for>
+        <div style="border-top:1px solid rgba(255,255,255,0.14)"></div>
+      </div>
+    </div>
+  </section>
+</sc-if>
+<sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+  <section ref="{{ cfgRef }}" data-screen-label="Advance konfigurator" style="display:grid;grid-template-columns:{{ pCols }};background:#0b2655;color:#ffffff">
+    <div style="position:{{ pStagePos }};top:0;height:{{ pStageH }};overflow:hidden;background:radial-gradient(80% 70% at 50% 48%,#fdfcf9 0%,#f3efe8 48%,#e5dfd3 100%)">
+      <div style="position:absolute;left:0;right:0;top:{{ pStageTop }};bottom:0">
+        <sc-if value="{{ show3d }}" hint-placeholder-val="{{ true }}">
+          <x-import component-from-global-scope="umbrella-view" from="./umbrella-3d.js" shape="{{ u.shape }}" size="{{ u.size }}" canopy="{{ u.canopy }}" frame="{{ u.frame }}" vent="{{ u.vent }}" look="{{ u.look }}" brandtext="{{ u.brandtext }}" base="{{ u.base }}" mech="{{ u.mech }}" cam="{{ camMode }}" zoom="{{ camZoom }}" autorotate="{{ autoRot }}" env="{{ envMode }}" person="{{ personOn }}" furniture="{{ furnOn }}" focus="{{ focusMode }}" nudge="{{ nudgeVal }}" dims="{{ dimsOn }}" wlabel="{{ wLabel }}" hlabel="{{ hLabel }}" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
+        </sc-if>
+        <sc-if value="{{ showPhoto }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:-60px;background-image:url({{ photoSrc }});background-size:cover;background-position:center;filter:blur(44px) saturate(1.1);opacity:0.5"></div>
+          <div style="position:absolute;left:clamp(20px,3.4vw,56px);right:clamp(20px,3.4vw,56px);top:64px;bottom:96px;background-image:url({{ photoSrc }});background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 24px 48px rgba(11,38,85,0.25))"></div>
+        </sc-if>
+      </div>
+
+      <div role="tablist" aria-label="Prikaz" style="position:absolute;left:clamp(20px,3.4vw,56px);top:{{ pTabsTop }};display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(11,38,85,0.07);z-index:4">
+        <sc-for list="{{ modeTabs }}" as="mt" hint-placeholder-count="2">
+          <button role="tab" onClick="{{ mt.onClick }}" aria-selected="{{ mt.on }}" style="height:34px;padding:0 16px;border:0;border-radius:999px;background:{{ mt.pbg }};color:{{ mt.pfg }};cursor:pointer;font-size:13.5px;font-weight:600;transition:background .2s,color .2s">{{ mt.label }}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ resetOn }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ resetView }}" title="{{ resetLbl }}" aria-label="{{ resetLbl }}" style="position:absolute;right:clamp(20px,3.4vw,56px);bottom:clamp(20px,3vw,40px);width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.22);background:rgba(255,255,255,0.6);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:#0b2655"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+      </sc-if>
+      <sc-if value="{{ showPhoto }}" hint-placeholder-val="{{ false }}">
+        <div role="group" aria-label="{{ rvLblPh }}" style="position:absolute;left:50%;bottom:clamp(20px,3vw,40px);transform:translateX(-50%);display:flex;align-items:center;gap:10px">
+          <button onClick="{{ photoPrev }}" aria-label="‹" style="width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.22);background:rgba(255,255,255,0.6);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:#0b2655"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <sc-for list="{{ stripThumbs }}" as="st" hint-placeholder-count="3">
+            <button onClick="{{ st.onClick }}" aria-label="{{ st.n }}" aria-current="{{ st.on }}" style="width:{{ thW }};height:{{ thH }};padding:0;border:0;outline:none;border-radius:4px;cursor:pointer;background-color:rgba(11,38,85,0.1);background-image:url({{ st.src }});background-size:cover;background-position:center;box-shadow:{{ st.ring }};opacity:{{ st.op }};transition:opacity .2s,box-shadow .2s" style-hover="opacity:1"></button>
+          </sc-for>
+          <button onClick="{{ photoNext }}" aria-label="›" style="width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.22);background:rgba(255,255,255,0.6);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:#0b2655"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ capOn }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:clamp(20px,3.4vw,56px);bottom:clamp(20px,3vw,40px);width:min(360px,calc(100% - 110px));padding:16px 18px;display:flex;gap:12px;align-items:flex-start;background:#0b2655;color:#ffffff">
+          <span style="font:500 12px 'IBM Plex Mono',monospace;color:#f5c400;padding-top:2px">0{{ cap.n }}</span>
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0"><span style="font-size:15px;font-weight:700">{{ cap.title }}</span><span style="font-size:13px;line-height:1.5;color:#cfd7e6;text-wrap:pretty">{{ cap.text }}</span></div>
+          <button onClick="{{ detClose }}" aria-label="×" style="width:28px;height:28px;border:0;background:transparent;color:#a9b6cf;cursor:pointer;font-size:18px;line-height:1;flex:0 0 auto" style-hover="color:#ffffff">×</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <div ref="{{ pPanelRef }}" style="position:relative;min-width:0;display:flex;flex-direction:column;height:{{ pPanelH }};overflow-y:{{ pPanelOv }};scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent">
+      <div style="padding:{{ pPad }};display:flex;flex-direction:column;gap:clamp(28px,3.4vw,44px);flex:1 0 auto">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <span style="align-self:flex-start;display:flex;align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:999px;background:#f5c400;color:#0b2655;font-size:12px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span>
+          <h1 style="margin:0;font-size:{{ pH1 }};line-height:0.86;font-weight:800;letter-spacing:-0.045em">Advance</h1>
+          <div style="display:flex;flex-wrap:wrap;gap:12px 28px;padding-top:6px">
+            <span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;color:#a9b6cf">{{ modelLbl }}</span><span style="font:600 15px 'IBM Plex Mono',monospace;color:#f5c400">{{ modelTag }}</span></span>
+            <sc-for list="{{ pSpecs }}" as="sr" hint-placeholder-count="3">
+              <span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;color:#a9b6cf">{{ sr.k }}</span><span style="font-size:15px;font-weight:600">{{ sr.v }}</span></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ tiles }}" as="ti" hint-placeholder-count="4">
+            <div style="border-top:1px solid rgba(255,255,255,0.14)">
+              <button onClick="{{ ti.onClick }}" aria-expanded="{{ ti.on }}" style="width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 44px;align-items:center;gap:clamp(12px,1.8vw,22px);padding:{{ pRowPad }};border:0;border-radius:0;background:transparent;color:#ffffff;text-align:left;cursor:pointer">
+                <span style="display:flex;flex-direction:column;gap:8px;min-width:0">
+                  <span style="display:flex;align-items:baseline;gap:12px"><span style="font:500 12px 'IBM Plex Mono',monospace;color:#f5c400">0{{ ti.n }}</span><span style="font-size:{{ pRowFs }};font-weight:800;letter-spacing:-0.035em;line-height:0.95;color:{{ ti.nameFg }};transition:color .25s">{{ ti.label }}</span></span>
+                  <span style="font-size:13px;color:#a9b6cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:{{ pSubPl }}">{{ ti.sub }}</span>
+                </span>
+                <span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;white-space:nowrap;max-width:{{ pValMax }};overflow:hidden;text-overflow:ellipsis">
+                  <sc-if value="{{ ti.sw }}" hint-placeholder-val="{{ false }}"><span style="width:14px;height:14px;border-radius:50%;flex:0 0 auto;background:{{ ti.sw }};box-shadow:0 0 0 1.5px rgba(255,255,255,0.5)"></span></sc-if>{{ ti.value }}
+                </span>
+                <span style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid {{ ti.abd }};background:{{ ti.abg }};color:{{ ti.afg }};transform:rotate({{ ti.arot }});transition:all .3s cubic-bezier(.2,.7,.2,1)">→</span>
+              </button>
+              <sc-if value="{{ ti.on }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:4px 0 32px;display:flex;flex-direction:column;gap:24px">
+                <sc-for list="{{ shs }}" as="sh" hint-placeholder-count="1">
+                <div style="display:flex;flex-direction:column;gap:14px;padding-top:{{ sh.padT }};border-top:{{ sh.bt }}">
+                <sc-if value="{{ sh.headOn }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#a9b6cf">{{ sh.title }}</span><span style="font-size:13px;font-weight:600;color:#ffffff;text-align:right">{{ sh.value }}</span></div>
+                </sc-if>
+                <sc-if value="{{ sh.isCards }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax({{ sh.min }},1fr));gap:10px">
+                    <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="4">
+                      <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="position:relative;height:{{ sh.h }};padding:12px 14px;border-radius:10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:{{ o.bg }};color:#ffffff;transition:background .15s,border-color .15s" style-hover="border-color:{{ o.hbd }};background:rgba(255,255,255,0.05)">
+                        <span style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                          <span style="font:600 {{ sh.codeFs }} 'IBM Plex Mono',monospace;letter-spacing:-0.02em;line-height:1;color:{{ o.codeFg }}">{{ o.code }}</span>
+                          <span style="width:16px;height:16px;border-radius:50%;flex:0 0 auto;box-sizing:border-box;border:1px solid {{ o.rbd }};background:{{ o.rbg }};box-shadow:inset 0 0 0 3px #0b2655"></span>
+                        </span>
+                        <span style="display:flex;flex-direction:column;gap:2px">
+                          <span style="font-size:14px;font-weight:600;line-height:1.25">{{ o.label }}</span>
+                          <span style="font-size:12px;color:{{ o.subFg }}">{{ o.sub }}</span>
+                        </span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sh.isRuler }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:relative;height:112px;margin:0 12px">
+                    <div style="position:absolute;left:0;right:0;top:58px;height:18px;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.3) 0 1px,transparent 1px {{ ruler.tick }});background-position:0 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)"></div>
+                    <div style="position:absolute;left:0;right:0;top:58px;height:2px;background:rgba(255,255,255,0.16);border-radius:2px"></div>
+                    <div style="position:absolute;left:{{ ruler.fromP }};width:{{ ruler.fillP }};top:57px;height:4px;background:#f2c36b;border-radius:4px;transition:width .35s cubic-bezier(.2,.8,.2,1)"></div>
+                    <sc-for list="{{ ruler.stops }}" as="rs" hint-placeholder-count="5">
+                      <button onClick="{{ rs.onClick }}" aria-pressed="{{ rs.on }}" style="position:absolute;left:{{ rs.left }};top:0;transform:translateX(-50%);height:112px;width:64px;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:0">
+                        <span style="height:34px;display:flex;align-items:flex-end;padding-bottom:8px"><span style="font:600 11px 'IBM Plex Mono',monospace;color:#0b2655;background:#f5c400;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:{{ rs.tipOp }};transform:translateY({{ rs.tipY }});transition:opacity .2s,transform .2s">{{ rs.full }}</span></span>
+                        <span style="width:{{ rs.dot }};height:{{ rs.dot }};margin-top:{{ rs.dotM }};border-radius:50%;background:{{ rs.dotBg }};border:2px solid #ffffff;box-shadow:{{ rs.dotSh }};transition:all .2s"></span>
+                        <span style="margin-top:22px;font:600 13px 'IBM Plex Mono',monospace;color:{{ rs.fg }}">{{ rs.label }}</span>
+                        <span style="font:500 10px 'IBM Plex Mono',monospace;color:#8fa0bf;margin-top:2px">{{ rs.price }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sh.isFan }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:flex-end;flex-wrap:wrap;row-gap:40px;padding:40px 4px 6px 14px">
+                    <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="10">
+                      <button onClick="{{ o.onClick }}" title="{{ o.label }}" aria-label="{{ o.label }}" aria-pressed="{{ o.on }}" style="flex:0 0 auto;width:{{ fanW }};height:{{ fanH }};margin-left:-10px;border:0;border-radius:8px 8px 6px 6px;cursor:pointer;background:{{ o.hex }};box-shadow:{{ o.sh }};transform:translateY({{ o.y }}) rotate({{ o.rot }});transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;position:relative;z-index:{{ o.z }}" style-hover="transform:translateY(-10px) rotate(0deg)">
+                        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:{{ o.ink }}">{{ o.label }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sh.isFrame }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+                    <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="3">
+                      <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="padding:18px 10px 14px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:rgba(255,255,255,0.03);transition:border-color .15s,background .15s" style-hover="background:rgba(255,255,255,0.06)">
+                        <span style="width:{{ frameD }};height:{{ frameD }};border-radius:50%;background:{{ o.fill }};box-shadow:inset 0 -6px 12px rgba(0,0,0,0.18),0 6px 14px rgba(11,38,85,0.18),0 0 0 {{ o.ring }} #0b2655"></span>
+                        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center"><span style="font-size:13.5px;font-weight:600;color:#ffffff">{{ o.label }}</span><span style="font-size:12px;color:#a9b6cf">{{ o.sub }}</span></span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sh.isVal }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px 10px;padding-top:6px">
+                    <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="7">
+                      <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="border:0;background:transparent;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;filter:{{ o.shadow }};transform:translateY({{ o.y }});transition:transform .22s,filter .22s" style-hover="transform:translateY(-4px)">
+                        <span style="width:100%;height:64px;display:flex;align-items:center;justify-content:center;background:{{ o.tile }};color:{{ o.ink }};font-size:{{ o.fs }};font-weight:800;letter-spacing:0.03em;clip-path:polygon(0 0,100% 0,100% 74%,93.75% 100%,87.5% 74%,81.25% 100%,75% 74%,68.75% 100%,62.5% 74%,56.25% 100%,50% 74%,43.75% 100%,37.5% 74%,31.25% 100%,25% 74%,18.75% 100%,12.5% 74%,6.25% 100%,0 74%);padding-bottom:10px">{{ o.label }}</span>
+                        <span style="font:600 11px 'IBM Plex Mono',monospace;color:{{ o.capFg }}">{{ o.cap }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sh.isQty }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+                    <div style="display:flex;align-items:center;gap:18px">
+                      <button onClick="{{ qtyDown }}" aria-label="−" style="width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,0.14);background:#0b2655;color:#ffffff;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 1px 2px rgba(15,26,44,0.05);font-size:20px" style-hover="background:#16346b">−</button>
+                      <span style="min-width:90px;text-align:center;font-size:48px;font-weight:700;letter-spacing:-0.03em;color:#ffffff;line-height:1">{{ cfgQty }}</span>
+                      <button onClick="{{ qtyUp }}" aria-label="+" style="width:44px;height:44px;border-radius:8px;border:0;background:#f5c400;color:#0b2655;font-size:20px;cursor:pointer" style-hover="background:#ffd21f">+</button>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                      <sc-for list="{{ qtyPresets }}" as="qp" hint-placeholder-count="6">
+                        <button onClick="{{ qp.onClick }}" style="height:36px;min-width:44px;padding:0 12px;border-radius:8px;border:1px solid {{ qp.bd }};background:{{ qp.bg }};color:{{ qp.fg }};font:500 13px 'IBM Plex Mono',monospace;cursor:pointer">{{ qp.n }}</button>
+                      </sc-for>
+                    </div>
+                    <span style="font-size:14px;color:#a9b6cf">{{ unitKM }} {{ t.unit }}</span>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sh.isSum }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:0 32px">
+                    <sc-for list="{{ review }}" as="r" hint-placeholder-count="10">
+                      <button onClick="{{ r.edit }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:10px 8px;margin:0 -8px;border:0;border-bottom:1px solid rgba(255,255,255,0.12);border-radius:0;background:transparent;cursor:pointer;text-align:left;font-size:14px" style-hover="background:rgba(255,255,255,0.05)">
+                        <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#a9b6cf">{{ r.k }}</span><span style="font-weight:500;color:#ffffff">{{ r.v }}</span></span>
+                        <span style="font-size:12.5px;font-weight:500;color:#f2c36b">{{ editLbl }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                  <span style="font-size:13px;color:#a9b6cf;line-height:1.5">{{ t.lead }} · {{ t.vat }}</span>
+                </sc-if>
+
+                <sc-if value="{{ sh.note }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:12.5px;line-height:1.5;color:#a9b6cf">{{ sh.note }}</span>
+                </sc-if>
+                </div>
+                </sc-for>
+
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div style="border-top:1px solid rgba(255,255,255,0.14)"></div>
+        </div>
+        <sc-if value="{{ sumOn }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:clamp(22px,2vw,28px);font-weight:800;letter-spacing:-0.03em">{{ gp.title }}</span><button onClick="{{ sheetClose }}" aria-label="×" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.28);background:transparent;color:#ffffff;cursor:pointer;font-size:16px">×</button></div>
+              <sc-for list="{{ shs }}" as="sh" hint-placeholder-count="1">
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:{{ sh.padT }};border-top:{{ sh.bt }}">
+              <sc-if value="{{ sh.headOn }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#a9b6cf">{{ sh.title }}</span><span style="font-size:13px;font-weight:600;color:#ffffff;text-align:right">{{ sh.value }}</span></div>
+              </sc-if>
+              <sc-if value="{{ sh.isCards }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax({{ sh.min }},1fr));gap:10px">
+                  <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="4">
+                    <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="position:relative;height:{{ sh.h }};padding:12px 14px;border-radius:10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:{{ o.bg }};color:#ffffff;transition:background .15s,border-color .15s" style-hover="border-color:{{ o.hbd }};background:rgba(255,255,255,0.05)">
+                      <span style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                        <span style="font:600 {{ sh.codeFs }} 'IBM Plex Mono',monospace;letter-spacing:-0.02em;line-height:1;color:{{ o.codeFg }}">{{ o.code }}</span>
+                        <span style="width:16px;height:16px;border-radius:50%;flex:0 0 auto;box-sizing:border-box;border:1px solid {{ o.rbd }};background:{{ o.rbg }};box-shadow:inset 0 0 0 3px #0b2655"></span>
+                      </span>
+                      <span style="display:flex;flex-direction:column;gap:2px">
+                        <span style="font-size:14px;font-weight:600;line-height:1.25">{{ o.label }}</span>
+                        <span style="font-size:12px;color:{{ o.subFg }}">{{ o.sub }}</span>
+                      </span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sh.isRuler }}" hint-placeholder-val="{{ false }}">
+                <div style="position:relative;height:112px;margin:0 12px">
+                  <div style="position:absolute;left:0;right:0;top:58px;height:18px;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.3) 0 1px,transparent 1px {{ ruler.tick }});background-position:0 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)"></div>
+                  <div style="position:absolute;left:0;right:0;top:58px;height:2px;background:rgba(255,255,255,0.16);border-radius:2px"></div>
+                  <div style="position:absolute;left:{{ ruler.fromP }};width:{{ ruler.fillP }};top:57px;height:4px;background:#f2c36b;border-radius:4px;transition:width .35s cubic-bezier(.2,.8,.2,1)"></div>
+                  <sc-for list="{{ ruler.stops }}" as="rs" hint-placeholder-count="5">
+                    <button onClick="{{ rs.onClick }}" aria-pressed="{{ rs.on }}" style="position:absolute;left:{{ rs.left }};top:0;transform:translateX(-50%);height:112px;width:64px;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:0">
+                      <span style="height:34px;display:flex;align-items:flex-end;padding-bottom:8px"><span style="font:600 11px 'IBM Plex Mono',monospace;color:#0b2655;background:#f5c400;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:{{ rs.tipOp }};transform:translateY({{ rs.tipY }});transition:opacity .2s,transform .2s">{{ rs.full }}</span></span>
+                      <span style="width:{{ rs.dot }};height:{{ rs.dot }};margin-top:{{ rs.dotM }};border-radius:50%;background:{{ rs.dotBg }};border:2px solid #ffffff;box-shadow:{{ rs.dotSh }};transition:all .2s"></span>
+                      <span style="margin-top:22px;font:600 13px 'IBM Plex Mono',monospace;color:{{ rs.fg }}">{{ rs.label }}</span>
+                      <span style="font:500 10px 'IBM Plex Mono',monospace;color:#8fa0bf;margin-top:2px">{{ rs.price }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sh.isFan }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:flex-end;flex-wrap:wrap;row-gap:40px;padding:40px 4px 6px 14px">
+                  <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="10">
+                    <button onClick="{{ o.onClick }}" title="{{ o.label }}" aria-label="{{ o.label }}" aria-pressed="{{ o.on }}" style="flex:0 0 auto;width:{{ fanW }};height:{{ fanH }};margin-left:-10px;border:0;border-radius:8px 8px 6px 6px;cursor:pointer;background:{{ o.hex }};box-shadow:{{ o.sh }};transform:translateY({{ o.y }}) rotate({{ o.rot }});transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;position:relative;z-index:{{ o.z }}" style-hover="transform:translateY(-10px) rotate(0deg)">
+                      <span style="writing-mode:vertical-rl;transform:rotate(180deg);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:{{ o.ink }}">{{ o.label }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sh.isFrame }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+                  <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="3">
+                    <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="padding:18px 10px 14px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:rgba(255,255,255,0.03);transition:border-color .15s,background .15s" style-hover="background:rgba(255,255,255,0.06)">
+                      <span style="width:{{ frameD }};height:{{ frameD }};border-radius:50%;background:{{ o.fill }};box-shadow:inset 0 -6px 12px rgba(0,0,0,0.18),0 6px 14px rgba(11,38,85,0.18),0 0 0 {{ o.ring }} #0b2655"></span>
+                      <span style="display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center"><span style="font-size:13.5px;font-weight:600;color:#ffffff">{{ o.label }}</span><span style="font-size:12px;color:#a9b6cf">{{ o.sub }}</span></span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sh.isVal }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px 10px;padding-top:6px">
+                  <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="7">
+                    <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="border:0;background:transparent;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;filter:{{ o.shadow }};transform:translateY({{ o.y }});transition:transform .22s,filter .22s" style-hover="transform:translateY(-4px)">
+                      <span style="width:100%;height:64px;display:flex;align-items:center;justify-content:center;background:{{ o.tile }};color:{{ o.ink }};font-size:{{ o.fs }};font-weight:800;letter-spacing:0.03em;clip-path:polygon(0 0,100% 0,100% 74%,93.75% 100%,87.5% 74%,81.25% 100%,75% 74%,68.75% 100%,62.5% 74%,56.25% 100%,50% 74%,43.75% 100%,37.5% 74%,31.25% 100%,25% 74%,18.75% 100%,12.5% 74%,6.25% 100%,0 74%);padding-bottom:10px">{{ o.label }}</span>
+                      <span style="font:600 11px 'IBM Plex Mono',monospace;color:{{ o.capFg }}">{{ o.cap }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sh.isQty }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+                  <div style="display:flex;align-items:center;gap:18px">
+                    <button onClick="{{ qtyDown }}" aria-label="−" style="width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,0.14);background:#0b2655;color:#ffffff;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 1px 2px rgba(15,26,44,0.05);font-size:20px" style-hover="background:#16346b">−</button>
+                    <span style="min-width:90px;text-align:center;font-size:48px;font-weight:700;letter-spacing:-0.03em;color:#ffffff;line-height:1">{{ cfgQty }}</span>
+                    <button onClick="{{ qtyUp }}" aria-label="+" style="width:44px;height:44px;border-radius:8px;border:0;background:#f5c400;color:#0b2655;font-size:20px;cursor:pointer" style-hover="background:#ffd21f">+</button>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <sc-for list="{{ qtyPresets }}" as="qp" hint-placeholder-count="6">
+                      <button onClick="{{ qp.onClick }}" style="height:36px;min-width:44px;padding:0 12px;border-radius:8px;border:1px solid {{ qp.bd }};background:{{ qp.bg }};color:{{ qp.fg }};font:500 13px 'IBM Plex Mono',monospace;cursor:pointer">{{ qp.n }}</button>
+                    </sc-for>
+                  </div>
+                  <span style="font-size:14px;color:#a9b6cf">{{ unitKM }} {{ t.unit }}</span>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sh.isSum }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:0 32px">
+                  <sc-for list="{{ review }}" as="r" hint-placeholder-count="10">
+                    <button onClick="{{ r.edit }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:10px 8px;margin:0 -8px;border:0;border-bottom:1px solid rgba(255,255,255,0.12);border-radius:0;background:transparent;cursor:pointer;text-align:left;font-size:14px" style-hover="background:rgba(255,255,255,0.05)">
+                      <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#a9b6cf">{{ r.k }}</span><span style="font-weight:500;color:#ffffff">{{ r.v }}</span></span>
+                      <span style="font-size:12.5px;font-weight:500;color:#f2c36b">{{ editLbl }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+                <span style="font-size:13px;color:#a9b6cf;line-height:1.5">{{ t.lead }} · {{ t.vat }}</span>
+              </sc-if>
+
+              <sc-if value="{{ sh.note }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:12.5px;line-height:1.5;color:#a9b6cf">{{ sh.note }}</span>
+              </sc-if>
+              </div>
+              </sc-for>
+
+          </div>
+        </sc-if>
+      </div>
+      <div style="position:sticky;bottom:0;z-index:3;background:#0b2655;border-top:1px solid rgba(255,255,255,0.14);padding:{{ pFootPad }};display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+        <div role="group" aria-label="{{ t.o_qty }}" style="height:48px;display:flex;align-items:center;padding:0 4px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;flex:0 0 auto">
+          <button onClick="{{ qtyDown }}" aria-label="−" style="width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#ffffff;font-size:18px;cursor:pointer;opacity:{{ qtyDownOp }}" style-hover="background:rgba(255,255,255,0.1)">−</button>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" aria-label="{{ t.o_qty }}" value="{{ qtyInput }}" onChange="{{ onQtyInput }}" onBlur="{{ onQtyBlur }}" onKeyDown="{{ onQtyKey }}" onFocus="{{ onQtyFocus }}" style="width:{{ qtyW }};height:30px;padding:0;border:0;border-radius:4px;background:transparent;text-align:center;font:600 16px 'IBM Plex Mono',monospace;color:#ffffff;outline:none;box-shadow:0 0 0 1.5px {{ qtyLine }}">
+          <button onClick="{{ qtyUp }}" aria-label="+" style="width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#ffffff;font-size:18px;cursor:pointer" style-hover="background:rgba(255,255,255,0.1)">+</button>
+        </div>
+        <button onClick="{{ openSum }}" title="{{ sumLbl }}" style="flex:1;min-width:0;padding:0;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;color:#ffffff">
+          <span style="font-size:{{ pTotFs }};font-weight:800;letter-spacing:-0.03em;line-height:1;white-space:nowrap">{{ totalKM }}</span>
+          <span style="font-size:12.5px;color:#a9b6cf;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis">{{ totalEUR }} · <span style="color:#f5c400;font-weight:600;border-bottom:1px solid rgba(245,196,0,0.5)">{{ sumLbl }}</span></span>
+        </button>
+        <button onClick="{{ addToCart }}" style="height:{{ pAddH }};padding:0 22px;border-radius:999px;border:0;background:{{ addBg }};color:{{ addFg }};font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:10px;flex:{{ pAddFlex }};justify-content:center;transition:background .15s" style-hover="background:{{ addHov }}">{{ addLabel }} <span>→</span></button>
+      </div>
+    </div>
+  </section>
+</sc-if>
+<sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Korpa" style="max-width:1320px;margin:0 auto;padding:clamp(32px,5vw,64px) clamp(16px,4vw,56px) 96px">
+    <h1 style="margin:0 0 32px;font-size:clamp(40px,5vw,72px);line-height:0.92;font-weight:800;letter-spacing:-0.03em;color:#0b2655">{{ t.cart_t }}</h1>
+    <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:48px 0;border-top:1px solid #dcd6ca;display:flex;flex-direction:column;gap:20px;align-items:flex-start">
+        <p style="margin:0;font-size:18px;color:#3a4152">{{ t.cart_empty }}</p>
+        <button onClick="{{ goCatalog }}" style="height:52px;padding:0 26px;border-radius:999px;border:0;background:#0b2655;color:#fff;font-size:16px;font-weight:600;cursor:pointer">{{ t.cart_empty_cta }}</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ cartFull }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(28px,4vw,56px);align-items:start">
+        <div style="display:flex;flex-direction:column;gap:36px">
+          <div style="display:flex;flex-direction:column;border-top:1px solid #dcd6ca">
+            <sc-for list="{{ cartItems }}" as="it" hint-placeholder-count="1">
+              <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:16px;padding:20px 0;border-bottom:1px solid #dcd6ca">
+                <span style="width:56px;height:56px;border-radius:50%;background:conic-gradient({{ it.hex }} 0 45deg,{{ it.shade }} 45deg 90deg,{{ it.hex }} 90deg 135deg,{{ it.shade }} 135deg 180deg,{{ it.hex }} 180deg 225deg,{{ it.shade }} 225deg 270deg,{{ it.hex }} 270deg 315deg,{{ it.shade }} 315deg 360deg);box-shadow:inset 0 0 0 1px rgba(0,0,0,0.1)"></span>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                    <span style="font-size:17px;font-weight:700;color:#0b2655">{{ it.title }}</span>
+                    <span style="font-size:17px;font-weight:700">{{ it.line }}</span>
+                  </div>
+                  <span style="font-size:14px;line-height:1.5;color:#5b6272">{{ it.desc }}</span>
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                    <div style="display:flex;align-items:center;border:1.5px solid #dcd6ca;border-radius:999px;background:#fbfaf7">
+                      <button onClick="{{ it.down }}" style="width:40px;height:40px;border:0;background:transparent;font-size:18px;cursor:pointer;color:#0b2655">−</button>
+                      <span style="min-width:28px;text-align:center;font:500 14px 'IBM Plex Mono',monospace">{{ it.qty }}</span>
+                      <button onClick="{{ it.up }}" style="width:40px;height:40px;border:0;background:transparent;font-size:18px;cursor:pointer;color:#0b2655">+</button>
+                    </div>
+                    <span style="font:500 12px 'IBM Plex Mono',monospace;color:#5b6272">{{ it.unit }} / {{ t.pcs }}</span>
+                    <button onClick="{{ it.remove }}" style="border:0;background:transparent;color:#9a2a1f;font-size:14px;font-weight:600;cursor:pointer;padding:10px 0">{{ t.remove }}</button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:19px;font-weight:700">{{ t.deliv_t }}</span>
+            <sc-for list="{{ deliveries }}" as="d" hint-placeholder-count="3">
+              <button onClick="{{ d.onClick }}" style="display:flex;align-items:center;gap:14px;padding:16px;border-radius:6px;cursor:pointer;text-align:left;border:1.5px solid {{ d.bd }};background:{{ d.bg }};color:#0f1a2c">
+                <span style="width:20px;height:20px;border-radius:50%;flex:0 0 auto;border:2px solid #0b2655;box-shadow:inset 0 0 0 4px {{ d.bg }};background:{{ d.dot }}"></span>
+                <span style="flex:1;font-size:15px;font-weight:500">{{ d.label }}</span>
+                <span style="font-size:13px;color:#5b6272">{{ d.price }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ isShip }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:13px;color:#5b6272">{{ t.d_ship_note }}</span>
+            </sc-if>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:24px;background:#fbfaf7;border:1px solid #dcd6ca;border-radius:8px;padding:clamp(20px,3vw,32px)">
+          <span style="font-size:19px;font-weight:700">{{ t.cust_t }}</span>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px">
+            <sc-for list="{{ fields }}" as="f" hint-placeholder-count="6">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#3a4152;grid-column:{{ f.span }}">
+                {{ f.label }}
+                <input value="{{ f.value }}" onChange="{{ f.onChange }}" type="{{ f.type }}" style="height:48px;padding:0 14px;border-radius:6px;border:1.5px solid {{ f.bd }};background:#fff;color:#0f1a2c;outline:none">
+              </label>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;font-size:15px;border-top:1px solid #dcd6ca;padding-top:16px;gap:10px">
+            <div style="display:flex;justify-content:space-between"><span style="color:#5b6272">{{ t.subtotal }}</span><span>{{ subKM }}</span></div>
+            <sc-if value="{{ isB2B }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;justify-content:space-between;color:#8a5a00"><span>{{ t.disc }} {{ discPct }}</span><span>− {{ cartDiscKM }}</span></div>
+            </sc-if>
+            <div style="display:flex;justify-content:space-between"><span style="color:#5b6272">{{ t.shipping }}</span><span>{{ shipLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;border-top:1px solid #dcd6ca">
+              <span style="font-weight:700">{{ t.total }}</span>
+              <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-size:28px;font-weight:800;color:#0b2655">{{ grandKM }}</span><span style="font:500 13px 'IBM Plex Mono',monospace;color:#5b6272">{{ grandEUR }}</span></span>
+            </div>
+          </div>
+          <sc-if value="{{ formErr }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:14px;color:#9a2a1f;font-weight:500">{{ t.req }}</span>
+          </sc-if>
+          <button onClick="{{ submitOrder }}" style="height:56px;border-radius:999px;border:0;background:#0b2655;color:#fff;font-size:16px;font-weight:700;cursor:pointer">{{ t.submit }}</button>
+          <span style="font-size:13px;color:#5b6272;line-height:1.5">{{ t.vat }} {{ t.lead }}.</span>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+</sc-if>
+<sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Potvrda narudžbe" style="max-width:760px;margin:0 auto;padding:clamp(56px,10vw,128px) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:22px;align-items:flex-start">
+    <span style="width:56px;height:56px;border-radius:50%;background:#dcefe2;color:#1f6b3a;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700">✓</span>
+    <h1 style="margin:0;font-size:clamp(36px,5vw,60px);line-height:1;font-weight:800;letter-spacing:-0.025em;color:#0b2655">{{ t.conf_t }}</h1>
+    <p style="margin:0;font-size:17px;line-height:1.6;color:#3a4152;text-wrap:pretty">{{ t.conf_d }}</p>
+    <div style="display:flex;gap:14px;align-items:baseline;padding:16px 20px;border:1px solid #dcd6ca;border-radius:6px;background:#fbfaf7">
+      <span style="font-size:14px;color:#5b6272">{{ t.conf_no }}</span><span style="font:500 18px 'IBM Plex Mono',monospace;color:#0b2655">{{ confirmNo }}</span>
+    </div>
+    <button onClick="{{ goHome }}" style="height:52px;padding:0 26px;border-radius:999px;border:0;background:#0b2655;color:#fff;font-size:16px;font-weight:600;cursor:pointer">{{ t.conf_cta }}</button>
+  </section>
+</sc-if>
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="B2B prijava" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));min-height:calc(100vh - 64px)">
+    <div style="background:#0b2655;color:#fff;padding:clamp(40px,6vw,88px) clamp(20px,5vw,72px);display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+      <div style="display:flex;flex-direction:column;gap:18px;max-width:480px">
+        <span style="font:500 12px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#f2c36b;text-transform:uppercase">{{ t.nav_b2b }}</span>
+        <h1 style="margin:0;font-size:clamp(38px,4.6vw,64px);line-height:0.98;font-weight:800;letter-spacing:-0.025em">{{ t.l_d }}</h1>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ loginBullets }}" as="b" hint-placeholder-count="3">
+          <div style="display:flex;gap:16px;align-items:center;padding:14px 0;border-top:1px solid rgba(255,255,255,0.14);font-size:16px">
+            <span style="font:500 12px 'IBM Plex Mono',monospace;color:#f2c36b">{{ b.n }}</span>{{ b.label }}
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:clamp(40px,6vw,88px) clamp(20px,5vw,72px);display:flex;align-items:center">
+      <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:18px">
+        <h2 style="margin:0 0 6px;font-size:36px;font-weight:800;letter-spacing:-0.02em;color:#0b2655">{{ t.l_t }}</h2>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#3a4152">{{ t.l_email }}
+          <input value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" type="email" style="height:50px;padding:0 14px;border-radius:6px;border:1.5px solid #dcd6ca;background:#fff;outline:none">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#3a4152">{{ t.l_pass }}
+          <input value="{{ loginPass }}" onChange="{{ onLoginPass }}" type="password" style="height:50px;padding:0 14px;border-radius:6px;border:1.5px solid #dcd6ca;background:#fff;outline:none">
+        </label>
+        <button onClick="{{ doLogin }}" style="height:54px;border-radius:999px;border:0;background:#0b2655;color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px">{{ t.l_submit }}</button>
+        <a style="font-size:14px;font-weight:600;cursor:pointer">{{ t.l_forgot }}</a>
+        <p style="margin:10px 0 0;padding-top:18px;border-top:1px solid #dcd6ca;font-size:14px;line-height:1.55;color:#5b6272">{{ t.l_req }}</p>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="B2B narudžbe" style="max-width:1320px;margin:0 auto;padding:clamp(32px,5vw,64px) clamp(16px,4vw,56px) 96px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:500 12px 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:#8a5a00;text-transform:uppercase">{{ partnerLine }}</span>
+        <h1 style="margin:0;font-size:clamp(40px,5vw,72px);line-height:0.92;font-weight:800;letter-spacing:-0.03em;color:#0b2655">{{ t.o_t }}</h1>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onClick="{{ goProduct }}" style="height:46px;padding:0 20px;border-radius:999px;border:0;background:#0b2655;color:#fff;font-size:15px;font-weight:600;cursor:pointer">{{ t.o_new }}</button>
+        <button onClick="{{ doLogout }}" style="height:46px;padding:0 20px;border-radius:999px;border:1.5px solid #dcd6ca;background:transparent;color:#0f1a2c;font-size:15px;font-weight:600;cursor:pointer">{{ t.o_logout }}</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <sc-for list="{{ oFilters }}" as="f" hint-placeholder-count="6">
+        <button onClick="{{ f.onClick }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }};font-size:14px;font-weight:500;cursor:pointer;display:flex;gap:8px;align-items:center">{{ f.label }}<span style="font:500 12px 'IBM Plex Mono',monospace;opacity:0.7">{{ f.count }}</span></button>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1.5px solid #0b2655">
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:130px 110px minmax(0,1.4fr) minmax(0,1.3fr) 130px 120px;gap:16px;padding:12px 0;border-bottom:1px solid #dcd6ca;font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:#5b6272">
+          <span>{{ t.c_no }}</span><span>{{ t.c_date }}</span><span>{{ t.c_ref }}</span><span>{{ t.c_status }}</span><span>{{ t.c_eta }}</span><span style="text-align:right">{{ t.c_value }}</span>
+        </div>
+        <sc-for list="{{ orderRows }}" as="o" hint-placeholder-count="5">
+          <div onClick="{{ o.onClick }}" style="display:grid;grid-template-columns:130px 110px minmax(0,1.4fr) minmax(0,1.3fr) 130px 120px;gap:16px;padding:18px 0;border-bottom:1px solid #dcd6ca;align-items:center;cursor:pointer;font-size:15px" style-hover="background:#ece8e0">
+            <span style="font:500 14px 'IBM Plex Mono',monospace;color:#0b2655">{{ o.no }}</span>
+            <span style="color:#5b6272">{{ o.date }}</span>
+            <span style="font-weight:600">{{ o.ref }}</span>
+            <span style="display:flex;flex-direction:column;gap:8px">
+              <span style="align-self:flex-start;font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:{{ o.sbg }};color:{{ o.sfg }}">{{ o.status }}</span>
+              <span style="display:flex;gap:3px;max-width:180px"><sc-for list="{{ o.segs }}" as="g" hint-placeholder-count="5"><span style="flex:1;height:4px;border-radius:2px;background:{{ g.bg }}"></span></sc-for></span>
+            </span>
+            <span style="color:#3a4152">{{ o.eta }}</span>
+            <span style="text-align:right;font-weight:600">{{ o.value }}</span>
+          </div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ orderRows }}" as="o" hint-placeholder-count="5">
+          <div onClick="{{ o.onClick }}" style="display:flex;flex-direction:column;gap:10px;padding:18px 0;border-bottom:1px solid #dcd6ca;cursor:pointer">
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font:500 14px 'IBM Plex Mono',monospace;color:#0b2655">{{ o.no }}</span><span style="font-weight:600">{{ o.value }}</span></div>
+            <span style="font-size:16px;font-weight:600">{{ o.ref }}</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+              <span style="font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:{{ o.sbg }};color:{{ o.sfg }}">{{ o.status }}</span>
+              <span style="font-size:13px;color:#5b6272">{{ t.c_eta }}: {{ o.eta }}</span>
+            </div>
+            <span style="display:flex;gap:3px"><sc-for list="{{ o.segs }}" as="g" hint-placeholder-count="5"><span style="flex:1;height:4px;border-radius:2px;background:{{ g.bg }}"></span></sc-for></span>
+          </div>
+        </sc-for>
+      </sc-if>
+    </div>
+  </section>
+</sc-if>
+<sc-if value="{{ isOrder }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="B2B detalj narudžbe" style="max-width:1320px;margin:0 auto;padding:clamp(28px,4vw,56px) clamp(16px,4vw,56px) 96px;display:flex;flex-direction:column;gap:32px">
+    <a onClick="{{ goOrders }}" style="font-size:14px;font-weight:600;cursor:pointer">← {{ t.d_back }}</a>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px;padding-bottom:28px;border-bottom:1.5px solid #0b2655">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font:500 14px 'IBM Plex Mono',monospace;color:#8a5a00">{{ od.no }} · {{ od.date }}</span>
+        <h1 style="margin:0;font-size:clamp(34px,4.6vw,64px);line-height:0.95;font-weight:800;letter-spacing:-0.025em;color:#0b2655">{{ od.ref }}</h1>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <span style="font-size:14px;font-weight:600;padding:6px 14px;border-radius:999px;background:{{ od.sbg }};color:{{ od.sfg }}">{{ od.status }}</span>
+        <span style="font-size:14px;color:#5b6272">{{ t.c_eta }}: <strong style="color:#0f1a2c">{{ od.eta }}</strong></span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <span style="font-size:19px;font-weight:700">{{ t.d_prog }}</span>
+      <div style="display:grid;grid-template-columns:{{ tlCols }};gap:0">
+        <sc-for list="{{ od.steps }}" as="st" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:{{ tlDir }};gap:14px;position:relative">
+            <div style="display:flex;flex-direction:{{ tlLineDir }};align-items:center;flex:0 0 auto">
+              <span style="width:32px;height:32px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font:500 12px 'IBM Plex Mono',monospace;background:{{ st.dotBg }};color:{{ st.dotFg }};border:2px solid {{ st.dotBd }};box-shadow:{{ st.ring }}">{{ st.mark }}</span>
+              <span style="flex:1;min-width:{{ tlLineMin }};min-height:{{ tlLineMinH }};background:{{ st.line }};opacity:{{ st.lineOp }}"></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;padding:{{ tlPad }}">
+              <span style="font-size:16px;font-weight:700;color:{{ st.fg }}">{{ st.label }}</span>
+              <span style="font:500 12px 'IBM Plex Mono',monospace;color:#5b6272">{{ st.date }}</span>
+              <span style="font-size:14px;line-height:1.5;color:#5b6272;max-width:240px;text-wrap:pretty">{{ st.desc }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:clamp(24px,4vw,48px);align-items:start">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:19px;font-weight:700">{{ t.d_items }}</span>
+        <div style="display:flex;flex-direction:column;border-top:1px solid #dcd6ca">
+          <sc-for list="{{ od.items }}" as="it" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;padding:16px 0;border-bottom:1px solid #dcd6ca">
+              <span style="font:500 15px 'IBM Plex Mono',monospace;color:#0b2655">{{ it.q }} {{ t.pcs }}</span>
+              <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:16px;font-weight:600">{{ it.n }}</span><span style="font-size:14px;color:#5b6272">{{ it.d }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:6px">
+          <span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700">{{ t.d_value }}</span><span style="font-size:13px;color:#5b6272">{{ t.d_net }}</span></span>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-size:26px;font-weight:800;color:#0b2655">{{ od.value }}</span><span style="font:500 13px 'IBM Plex Mono',monospace;color:#5b6272">{{ od.valueEUR }}</span></span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:28px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span style="font-size:19px;font-weight:700">{{ t.d_docs }}</span>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+            <sc-for list="{{ od.docs }}" as="d" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:6px;border:1px solid #dcd6ca;background:{{ d.bg }};opacity:{{ d.op }};cursor:{{ d.cur }}">
+                <span style="font-size:15px;font-weight:600">{{ d.label }}</span>
+                <span style="font:500 11px 'IBM Plex Mono',monospace;color:#5b6272">{{ d.meta }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:20px;padding:20px;border-radius:8px;background:#fbfaf7;border:1px solid #dcd6ca">
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
+            <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:#5b6272">{{ t.d_addr }}</span>
+            <span style="font-weight:600">{{ partnerName }}</span><span style="color:#3a4152">{{ od.addr }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
+            <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:#5b6272">{{ t.o_mgr }}</span>
+            <span style="font-weight:600">{{ mgr.manager }}</span><a href="tel:{{ mgr.managerPhone }}">{{ mgr.managerPhone }}</a><a href="mailto:{{ mgr.managerMail }}">{{ mgr.managerMail }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</sc-if>
+</main>
+
+<footer ref="{{ footRef }}" style="background:#071a3b;color:#cfd7e6;display:{{ footDisp }}">
+  <div style="max-width:1320px;margin:0 auto;padding:56px clamp(16px,4vw,56px) 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:36px">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <span style="font-weight:800;letter-spacing:0.16em;font-size:18px;color:#fff">SUMAN</span>
+      <p style="margin:0;font-size:14px;line-height:1.6;max-width:280px">{{ t.foot_d }}</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+      <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#8fa0bf;text-transform:uppercase">{{ t.nav_umb }} · {{ t.nav_awn }} · {{ t.nav_perg }}</span>
+      <a onClick="{{ goCatalog }}" style="color:#fff;cursor:pointer">{{ t.cat_t }}</a>
+      <a onClick="{{ goProduct }}" style="color:#fff;cursor:pointer">Advance – {{ t.configure }}</a>
+      <a href="mailto:info@suman.ba" style="color:#fff">{{ t.pie_cta_ask }}</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+      <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#8fa0bf;text-transform:uppercase">{{ t.nav_contact }}</span>
+      <span style="color:#fff">SUMAN d.o.o. Gračanica</span>
+      <span>Gračanica · Sarajevo</span>
+      <span>Bosna i Hercegovina</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+      <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#8fa0bf;text-transform:uppercase">Web</span>
+      <a href="https://www.suman.ba" style="color:#fff">suman.ba</a>
+      <a href="https://www.suman.hr" style="color:#fff">suman.hr</a>
+      <a onClick="{{ goB2B }}" style="color:#fff;cursor:pointer">{{ t.nav_b2b }}</a>
+    </div>
+  </div>
+  <div style="max-width:1320px;margin:0 auto;padding:20px clamp(16px,4vw,56px) 32px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-wrap:wrap;gap:12px 28px;font-size:13px;color:#8fa0bf">
+    <span>© 2026 SUMAN d.o.o. Gračanica</span>
+    <span>{{ t.foot_terms }}</span>
+    <span>{{ t.foot_cookies }}</span>
+  </div>
+</footer>
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;background:#0f1a2c;color:#fff;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 12px 32px rgba(0,0,0,0.25)">{{ toast }}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;hubStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;badge&quot;,&quot;logo&quot;,&quot;dot&quot;],&quot;default&quot;:&quot;badge&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Početna – centar&quot;},&quot;tendeImg&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,&quot;5&quot;,&quot;6&quot;],&quot;default&quot;:&quot;3&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Početna – fotografija tende&quot;},&quot;tendePos&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;center 20%&quot;,&quot;center 45%&quot;,&quot;center 70%&quot;],&quot;default&quot;:&quot;center 70%&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Početna – fotografija tende&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'home', lang: 'bs', w: 1280, h: 800, hover: null, menu: false, ready: false,
+    cfg: { shape: 'LS', mech: 'CR', size: '300', frame: 'white', look: 'std', vent: 'none', fabric: '220', color: '286C', brand: 'none', base: 'none', qty: 1 },
+    view: '3d', photo: 0, cart: [], delivery: 'gr', form: {}, formErr: false,
+    b2b: false, login: { email: 'nabava@adria-ugostiteljstvo.ba', pass: '' }, orderNo: null, oFilter: -1, catFilter: 'all', confirmNo: null, toast: null, justAdded: false
+  };
+  footRef = React.createRef();
+  bodyRef = React.createRef();
+  needleRef = React.createRef();
+  cfgRef = React.createRef();
+  attachOrbit() {
+    const el = document.querySelector('umbrella-view');
+    if (el === this._uv) return;
+    if (this._uv && this._onOrbit) this._uv.removeEventListener('orbit', this._onOrbit);
+    this._uv = el;
+    if (!el) return;
+    this._onOrbit = (e) => { const n = this.needleRef.current; if (n) n.style.transform = 'rotate(' + (-(e.detail.az - 0.7)).toFixed(3) + 'rad)'; };
+    el.addEventListener('orbit', this._onOrbit);
+    this._onWheel = (e) => { const z = this.state.zoom || 1, d = e.detail > 0 ? -0.1 : 0.1; this.setState({ zoom: Math.max(0.7, Math.min(1.6, +(z + d).toFixed(2))) }); };
+    el.addEventListener('wheelzoom', this._onWheel);
+  }
+  componentDidUpdate() { this.attachOrbit(); }
+  secRefs = [0, 1, 2, 3, 4].map(() => React.createRef());
+  spy(fromWindow) {
+    const wide = this.state.w >= 1024;
+    if (this.state.screen !== 'product' || (fromWindow && wide)) return;
+    const body = this.bodyRef.current;
+    let act = 0;
+    this.secRefs.forEach((r, i) => {
+      const el = r.current; if (!el) return;
+      const top = wide && body ? el.offsetTop - body.scrollTop - body.offsetTop : el.getBoundingClientRect().top - 150;
+      if (top <= (wide ? 80 : 0)) act = i;
+    });
+    if (wide && body && body.scrollTop + body.clientHeight >= body.scrollHeight - 4) act = 4;
+    if (act !== (this.state.step || 0)) this.setState({ step: act });
+  }
+  scrollToSec(i) {
+    const el = this.secRefs[i].current, body = this.bodyRef.current;
+    if (!el) return;
+    if (this.state.w >= 1024 && body) body.scrollTo({ top: el.offsetTop - body.offsetTop - 4, behavior: 'smooth' });
+    else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72 - 64 - 8, behavior: 'smooth' });
+    this.setState({ step: i });
+  }
+  componentDidMount() {
+    try {
+      const s = JSON.parse(localStorage.getItem('suman_ui') || '{}');
+      const p = {};
+      if (s.lang) p.lang = s.lang; if (s.screen) p.screen = s.screen; if (s.b2b) p.b2b = true; if (s.orderNo) p.orderNo = s.orderNo; if (s.cart) p.cart = s.cart; if (s.cat) p.cat = s.cat;
+      this.setState(p);
+    } catch (e) {}
+    this.onResize = () => {
+      const de = document.documentElement;
+      const w = window.innerWidth || de.clientWidth || 1280, hh = window.innerHeight || de.clientHeight || 800;
+      if (w !== this.state.w || hh !== this.state.h) this.setState({ w, h: hh });
+    };
+    this.onResize();
+    requestAnimationFrame(this.onResize);
+    setTimeout(this.onResize, 300);
+    window.addEventListener('resize', this.onResize);
+    this.onScroll = () => { const y = window.scrollY || 0, sc = y > 40; if (sc !== this.state.scrolled) this.setState({ scrolled: sc });
+      const p = Math.round(Math.min(1, Math.max(0, (y - 24) / 150)) * 50) / 50; if (p !== (this.state.catP || 0)) this.setState({ catP: p }); this.spy(true); };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onKey = (e) => {
+      if (this.state.screen !== 'product' || this.state.view !== '3d') return;
+      const tg = e.target && e.target.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA') return;
+      const s = this.state, k = e.key.toLowerCase();
+      const cam = (id) => this.setState({ cam: id, camN: (s.camN || 0) + 1, focus: 'none', viewsOpen: false });
+      if (k === '1') cam('front'); else if (k === '2') cam('top'); else if (k === '3') cam('low');
+      else if (k === 'r') this.setState({ cam: 'front', camN: (s.camN || 0) + 1, zoom: 1, focus: 'none' });
+      else if (k === 'm') this.setState({ dims: !s.dims });
+      else if (k === '+' || k === '=') this.setState({ zoom: Math.min(1.6, +((s.zoom || 1) + 0.15).toFixed(2)) });
+      else if (k === '-') this.setState({ zoom: Math.max(0.7, +((s.zoom || 1) - 0.15).toFixed(2)) });
+      else if (k === ' ') { e.preventDefault(); this.setState({ rot: s.rot === false }); }
+      else if (k === 'escape') this.setState({ viewsOpen: false, detPop: false, sheet: null });
+    };
+    window.addEventListener('keydown', this.onKey);
+    this._ixI = setInterval(() => {
+      if (this.state.screen !== 'catalog' || (this._ixN || 1) < 2 || Date.now() - (this._ixT || 0) < 4200) return;
+      this._ixT = Date.now(); this.setState((st) => ({ ixSlide: ((st.ixSlide || 0) + 1) % (this._ixN || 1) }));
+    }, 500);
+    if (window.ResizeObserver) { this._ro = new ResizeObserver(this.onResize); this._ro.observe(document.documentElement); }
+    const wait = () => { if (window.SUMAN && window.SUMAN_CATS && window.SUMAN_I18N && window.SUMAN_I18N.de && window.SUMAN_I18N.bs) this.setState({ ready: true }); else this._w = setTimeout(wait, 40); };
+    wait();
+  }
+  componentWillUnmount() { clearInterval(this._ixI); window.removeEventListener('resize', this.onResize); if (this._ro) this._ro.disconnect(); document.documentElement.style.overflow = ''; clearTimeout(this._w); clearTimeout(this._t); }
+  persist() {
+    const { lang, screen, b2b, orderNo, cart, cat } = this.state;
+    try { localStorage.setItem('suman_ui', JSON.stringify({ lang, screen, b2b, orderNo, cart, cat })); } catch (e) {}
+  }
+  save(p) { this.setState(p, () => this.persist()); }
+  go(screen, extra) { this.save(Object.assign({ screen, menu: false, hover: null }, extra || {})); try { window.scrollTo(0, 0); } catch (e) {} }
+  flash(msg) { clearTimeout(this._t); this.setState({ toast: msg }); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  toFooter() {
+    const el = this.footRef.current;
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 64, behavior: 'smooth' });
+  }
+  fmt(v) { return (Math.round(v * 100) / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  km(v) { return this.fmt(v) + ' KM'; }
+  eur(v) { return this.fmt(v / window.SUMAN.EUR) + ' €'; }
+
+  baseVals(t) {
+    const s = this.state, D = window.SUMAN;
+    const mobile = s.w < 860;
+    const scr = s.screen;
+    const navItems = [
+      { k: 'umb', label: t.nav_umb, on: false, onClick: () => this.go('catalog', { cat: 'umb' }) },
+      { k: 'awn', label: t.nav_awn, on: false, onClick: () => this.go('catalog', { cat: 'awn' }) },
+      { k: 'perg', label: t.nav_perg, on: false, onClick: () => this.go('catalog', { cat: 'perg' }) }
+    ].map((n) => Object.assign(n, { bd: n.on ? '#0b2655' : 'transparent' }));
+    const LN = { bs: ['Bosanski', 'ba'], hr: ['Hrvatski', 'hr'], en: ['English', 'gb'], de: ['Deutsch', 'de'] };
+    const langs = ['bs', 'hr', 'en', 'de'].map((c) => ({ code: c.toUpperCase(), name: LN[c][0], flag: 'https://flagcdn.com/w80/' + LN[c][1] + '.png', fw: s.lang === c ? 700 : 500, rowBg: s.lang === c ? '#e6ebf4' : 'transparent', bd: s.lang === c ? '#0b2655' : '#dcd6ca', onClick: () => this.save({ lang: c, menu: false, langOpen: false }) }));
+
+    // pie geometry: three 120° sectors of equal area
+    const W = s.w || 1280, H = Math.max(360, s.h || 800);
+    const cx = W / 2, tan30 = Math.tan(Math.PI / 6);
+    let cy = (2 * H / 3 + (W / 2) * tan30) / 2, e = 2 * H / 3 - cy;
+    if (e < 0) { e = 0; cy = Math.min(H * 0.8, (W / 2) * tan30); }
+    const P = (pts) => 'polygon(' + pts.map((p) => p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px').join(',') + ')';
+    const pad = mobile ? 18 : Math.max(32, W * 0.04);
+    const hv = s.hover;
+    const dim = (k) => (hv === k ? 0.5 : hv ? 0.95 : 0.78);
+    const sc = (k) => (hv === k ? 1.05 : 1);
+    const ask = (k) => () => { this.toFooter(); this.flash(t[k] + ': ' + t.pie_cta_ask.toLowerCase() + ' – info@suman.ba'); };
+    const vm = ({ bs: 'Pogledajte modele', hr: 'Pogledajte modele', en: 'View models', de: 'Modelle ansehen' })[s.lang];
+    const sectors = [
+      { k: 'awn', num: '02', title: t.nav_awn, desc: t.pie_awn_d, cta: vm, img: this.tendeSrc(), pos: this.props.tendePos ?? 'center 45%', il: '0px', it: '0px', iw: W + 'px', ih: cy + 'px', base: '#1d3a6b',
+        clip: P([[0, 0], [W, 0], [W, e], [cx, cy], [0, e]]), l: '0px', r: '0px', t: Math.max(28, cy * 0.14) + 'px', b: 'auto', mw: 'none', ai: 'center', al: 'center', onClick: () => this.go('catalog', { cat: 'awn' }) },
+      { k: 'umb', num: '01', title: t.nav_umb, desc: t.pie_umb_d, cta: t.pie_cta_umb, img: 'https://suman.ba/assets/photos/homebox/original/1552311171-suncobran-1.jpg', pos: 'center 35%', il: '0px', it: e + 'px', iw: cx + 'px', ih: (H - e) + 'px', base: '#0b2655',
+        clip: P([[0, e], [cx, cy], [cx, H], [0, H]]), l: pad + 'px', r: 'auto', t: 'auto', b: pad + 'px', mw: Math.min(420, cx - pad - 24) + 'px', ai: 'flex-start', al: 'left', onClick: () => this.go('catalog', { cat: 'umb' }) },
+      { k: 'perg', num: '03', title: t.nav_perg, desc: t.pie_perg_d, cta: vm, img: 'https://suman.ba/assets/photos/gallery/original/21-palmiye-056-1603960604.jpg', pos: 'center', il: cx + 'px', it: e + 'px', iw: cx + 'px', ih: (H - e) + 'px', base: '#2c4f8c',
+        clip: P([[W, e], [W, H], [cx, H], [cx, cy]]), l: 'auto', r: pad + 'px', t: 'auto', b: pad + 'px', mw: Math.min(420, cx - pad - 24) + 'px', ai: 'flex-end', al: 'right', onClick: () => this.go('catalog', { cat: 'perg' }) }
+    ].map((x) => Object.assign(x, { dim: dim(x.k), scale: sc(x.k), enter: () => { if (!mobile) this.setState({ hover: x.k }); } }));
+    const seams = [{ x1: cx, y1: cy, x2: cx, y2: H }, { x1: cx, y1: cy, x2: 0, y2: e }, { x1: cx, y1: cy, x2: W, y2: e }];
+
+    return {
+      t, mobile, desktop: !mobile, menuOpen: mobile && s.menu,
+      toggleMenu: () => this.setState({ menu: !s.menu }),
+      navItems, langs, b2bShort: s.b2b ? D.partner.company.split(' ')[0] : ({ bs: 'Partneri', hr: 'Partneri', en: 'Partners', de: 'Partner' })[s.lang], cartBadge: s.cart.length ? 'block' : 'none', showNav: false, curLang: langs.find((l) => l.code === s.lang.toUpperCase()), langOpen: !!s.langOpen, langRot: s.langOpen ? '180deg' : '0deg',
+      toggleLang: () => this.setState({ langOpen: !s.langOpen }),
+      logoImg: s.logoFail ? 'none' : 'block', logoTxt: s.logoFail ? 'block' : 'none', onLogoErr: () => this.setState({ logoFail: true }),
+      goHome: () => this.go('home'), goCatalog: () => this.go('catalog', { cat: 'umb' }), goProduct: () => this.go('product'), goCart: () => this.go('cart'),
+      goB2B: () => this.go(s.b2b ? 'orders' : 'login'),
+      b2bLabel: t.nav_b2b, b2bDot: s.b2b ? '#3aa864' : '#e2a33a',
+      cartCount: s.cart.reduce((a, c) => a + c.qty, 0),
+      isHome: scr === 'home', heroH: H, sectors, seams, seamBox: '0 0 ' + W + ' ' + H,
+      hubX: cx, hubY: cy, hubD: mobile ? 96 : 132, hubLogo: mobile ? 40 : 54, hubFs: mobile ? 22 : 30, hubBar: mobile ? 52 : 72,
+      hubBadge: (this.props.hubStyle ?? 'badge') === 'badge', hubLogoOn: this.props.hubStyle === 'logo', hubDot: this.props.hubStyle === 'dot', hubCap: (this.props.hubStyle ?? 'cap') === 'cap', hubLogoOn: this.props.hubStyle === 'logo', leave: () => this.setState({ hover: null }),
+      advFrom: this.km(D.models[1].from),
+      stageNames: [0, 1, 2, 3, 4].map((i) => ({ n: '0' + (i + 1), label: t['st' + i] })),
+      footRef: this.footRef, toast: s.toast, footDisp: scr === 'home' ? 'none' : 'block',
+      mainPad: scr === 'home' || scr === 'catalog' || scr === 'product' ? '0px' : '72px',
+      backOn: false,
+      backLbl: scr === 'product' ? t.nav_umb : scr === 'order' ? t.d_back : t.home,
+      goBack: () => (scr === 'product' ? this.go('catalog', { cat: 'umb' }) : scr === 'order' ? this.go('orders') : this.go('home')),
+      logoH: scr === 'catalog' ? 'CATLOGO' : scr === 'home' ? '84px' : '56px',
+      ...(() => { const p = scr === 'catalog' ? (s.catP || 0) : 0, e = p * p * (3 - 2 * p);
+        return { ctxOn: scr === 'catalog', ctxDescOn: !mobile, ctxOp: e.toFixed(3), ctxY: ((1 - e) * 18).toFixed(1) + 'px', ctxPe: e > 0.6 ? 'auto' : 'none',
+          catH1Op: Math.max(0, 1 - e * 1.25).toFixed(3), catH1Tf: 'translateY(' + (-e * 28).toFixed(1) + 'px) scale(' + (1 - e * 0.22).toFixed(3) + ')',
+          catLogoH: '84px', catHdrBg: 'linear-gradient(180deg,rgba(4,14,34,' + (0.62 * (1 - e)).toFixed(3) + ') 0%,rgba(4,14,34,' + (0.28 * (1 - e)).toFixed(3) + ') 60%,rgba(4,14,34,0) 100%),rgba(11,38,85,' + (0.96 * e).toFixed(3) + ')' }; })(),
+      hdr: scr === 'catalog'
+        ? { barSh: 'none', hov: 'rgba(255,255,255,0.12)', dotRing: '#0b2655', badgeBg: '#0b2655', badgeFg: '#f5c400', pos: 'fixed', blur: 'none', bg: 'CATBG', bd: 'transparent', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.06)', btnBd: 'rgba(255,255,255,0.16)', cartBg: '#f5c400', cartFg: '#0b2655' }
+        : scr === 'home' || (scr === 'catalog' && !s.scrolled)
+        ? { barSh: 'none', hov: 'rgba(255,255,255,0.14)', dotRing: '#1b2f55', badgeBg: '#0b2655', badgeFg: '#f5c400', pos: 'fixed', blur: 'none', bg: 'linear-gradient(180deg,rgba(4,14,34,0.62) 0%,rgba(4,14,34,0.28) 60%,rgba(4,14,34,0) 100%)', bd: 'transparent', fg: '#ffffff', muted: '#dfe5f0', btnBg: 'rgba(8,20,44,0.35)', btnBd: 'rgba(255,255,255,0.28)', cartBg: '#f5c400', cartFg: '#0b2655' }
+        : { hov: '#ece8e0', dotRing: '#ffffff', badgeBg: '#f5c400', badgeFg: '#0b2655', blur: 'none', bg: 'transparent', bd: 'transparent', barSh: '0 1px 2px rgba(11,38,85,0.04),0 12px 32px rgba(11,38,85,0.10)', fg: '#0f1a2c', muted: '#5b6272', btnBg: 'rgba(255,255,255,0.88)', btnBd: 'rgba(11,38,85,0.08)', cartBg: '#0b2655', cartFg: '#ffffff', pos: 'fixed' }
+    };
+  }
+  fixHdr(o) { if (o.hdr && o.hdr.bg === 'CATBG') o.hdr = Object.assign({}, o.hdr, { bg: o.catHdrBg }); if (o.logoH === 'CATLOGO') o.logoH = o.catLogoH; return o; }
+  setCfg(k, v) {
+    this.setState((s) => {
+      const D = window.SUMAN, c = Object.assign({}, s.cfg, { [k]: v });
+      const list = D.sizes[c.mech === 'T3' ? 'tele' : 'classic'][c.shape];
+      if (!list.includes(c.size)) c.size = list.includes('300') ? '300' : list[0];
+      const fab = D.fabrics.find((f) => f.id === c.fabric);
+      if (k === 'brand') { const br = D.brands.find((b) => b.id === v); const m = br.canopy && fab.colors.find((x) => x[1] === br.canopy); if (m) c.color = m[0]; }
+      if (!fab.colors.find((x) => x[0] === c.color)) c.color = fab.colors[0][0];
+      return { cfg: c };
+    });
+  }
+  unitPrice(c) {
+    const D = window.SUMAN, f = (arr, id) => arr.find((x) => x.id === id);
+    const b = D.basePrice[c.shape + c.size] || 0;
+    return b + Math.round(b * f(D.fabrics, c.fabric).pct) + f(D.mech, c.mech).add + f(D.frames, c.frame).add + f(D.looks, c.look).add + f(D.vents, c.vent).add + (c.brand !== 'none' ? D.brandAdd : 0) + f(D.bases, c.base).add;
+  }
+  cfgText(c, t) {
+    const D = window.SUMAN, br = D.brands.find((b) => b.id === c.brand);
+    return [t['fr_' + c.frame], t['look_' + c.look], t['vent_' + c.vent], t['fab_' + c.fabric] + ' · ' + c.color, br.name || t.brand_none, t['base_' + c.base]].join(' · ');
+  }
+  cfg3Vals(t) {
+    const s = this.state, D = window.SUMAN, c = s.cfg, lg = s.lang, wide = s.w >= 1024, mob = s.w < 860;
+    const fab = D.fabrics.find((f) => f.id === c.fabric), sizes = D.sizes[c.mech === 'T3' ? 'tele' : 'classic'][c.shape];
+    const spec = D.specs[c.mech === 'T3' ? 'tele' : 'classic'][c.shape + c.size] || [0, 0, '—'];
+    const curHex = (fab.colors.find((x) => x[0] === c.color) || fab.colors[0])[1];
+    const addLbl = (a) => (a > 0 ? '+ ' + a + ' KM' : a < 0 ? '− ' + -a + ' KM' : t.incl);
+    const lum = (hx) => { const q = hx.replace('#', ''); return (0.2126 * parseInt(q.slice(0, 2), 16) + 0.7152 * parseInt(q.slice(2, 4), 16) + 0.0722 * parseInt(q.slice(4, 6), 16)) / 255; };
+    const br = D.brands.find((b) => b.id === c.brand), frame = D.frames.find((f) => f.id === c.frame);
+    const KEYS = ['shape', 'size', 'mech', 'frame', 'look', 'vent', 'fabric', 'color', 'brand', 'base', 'qty', 'sum'];
+    const SUM = ({ bs: 'Sažetak', hr: 'Sažetak', en: 'Summary', de: 'Übersicht' })[lg];
+    const lab = { shape: t.o_shape, size: t.o_size, mech: t.o_mech, frame: t.o_frame, look: t.o_look, vent: t.o_vent, fabric: t.o_fabric, color: t.o_color, brand: t.o_brand, base: t.o_base, qty: t.o_qty, sum: SUM };
+    const val = { shape: t['sh_' + c.shape], size: D.sizeLabel[c.shape](c.size), mech: t['mech_' + c.mech], frame: t['fr_' + c.frame], look: t['look_' + c.look], vent: t['vent_' + c.vent], fabric: c.fabric + ' g/m²', color: c.color, brand: br.name || t.brand_none, base: t['base_' + c.base], qty: c.qty + ' ' + t.pcs, sum: this.km(this.unitPrice(c) * (1 - (s.b2b ? D.B2B_DISCOUNT : 0)) * c.qty) };
+    const GRP = [['g1', ({ bs: 'Konstrukcija', hr: 'Konstrukcija', en: 'Frame', de: 'Gestell' })[lg], ['shape', 'size', 'mech', 'frame']], ['g2', ({ bs: 'Platno', hr: 'Platno', en: 'Canopy', de: 'Bespannung' })[lg], ['look', 'vent', 'fabric', 'color']], ['g3', ({ bs: 'Štampa', hr: 'Tisak', en: 'Print', de: 'Druck' })[lg], ['brand']], ['g4', ({ bs: 'Postolje', hr: 'Postolje', en: 'Base', de: 'Ständer' })[lg], ['base']]];
+    const KMAP = { shape: 'g1', size: 'g1', mech: 'g1', frame: 'g1', look: 'g2', vent: 'g2', fabric: 'g2', color: 'g2', brand: 'g3', base: 'g4', qty: 'sum', sum: 'sum' };
+    const sheet = s.sheet ? (KMAP[s.sheet] || s.sheet) : null, open = (k) => () => this.setState({ sheet: sheet === k ? null : k, detPop: false });
+    const gsum = { g1: c.shape + ' ' + c.size + ' · ' + c.mech, g2: t['fab_' + c.fabric].replace(' g/m²', '') + ' · ' + c.color, g3: br.name || t.brand_none, g4: t['base_' + c.base] };
+    const gsub = { g1: t['sh_' + c.shape] + ' · ' + t['fr_' + c.frame], g2: t['look_' + c.look] + ' · ' + t['vent_' + c.vent].toLowerCase(), g3: c.brand === 'none' ? (({ bs: 'Odobreni brendovi partnera', hr: 'Odobreni brendovi partnera', en: 'Approved partner brands', de: 'Freigegebene Partnermarken' })[lg]) : '+ ' + D.brandAdd + ' KM', g4: c.base === 'none' ? (({ bs: 'Betonsko · metalno · sklopivo', hr: 'Betonsko · metalno · sklopivo', en: 'Concrete · steel · folding', de: 'Beton · Stahl · klappbar' })[lg]) : t.incl };
+    const tiles = GRP.map(([k, label], i) => {
+      const on = sheet === k;
+      return { k, n: String(i + 1), label, upper: label.toUpperCase(), value: gsum[k], sub: gsub[k], on, onClick: (e) => { const el = e.currentTarget.parentElement, wasOn = on; open(k)(); if (wasOn) return;
+          setTimeout(() => { const p = this.pPanelRef.current; if (!el) return; if (p && p.scrollHeight > p.clientHeight + 4) p.scrollTo({ top: el.offsetTop - 16, behavior: 'smooth' }); else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth' }); }, 60); },
+        sw: k === 'g2' ? curHex : k === 'g1' ? frame.hex : k === 'g3' && br.canopy ? br.canopy : '', swRing: on ? 'rgba(255,255,255,0.6)' : '#ffffff',
+        bg: on ? 'rgba(255,255,255,0.1)' : 'transparent', hbg: on ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)', kFg: '#ffffff', nameFg: on ? '#f5c400' : '#ffffff', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', abd: on ? '#f5c400' : 'rgba(255,255,255,0.28)', arot: on ? '90deg' : '0deg', vFg: '#a9b6cf', nBg: 'transparent', nFg: '#6b7180', rot: on ? '0deg' : '180deg' };
+    });
+    const card = (key, list, code, name, sub) => list.map((o) => { const on = c[key] === o.id, sv = sub(o);
+      return { code: code(o), label: name(o), sub: sv, on, bd: on ? '#f2c36b' : 'rgba(255,255,255,0.14)', ibd: on ? '#f2c36b' : 'transparent', hbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', bg: on ? 'rgba(242,195,107,0.08)' : 'rgba(255,255,255,0.03)', fg: '#ffffff', codeFg: on ? '#f2c36b' : '#ffffff', rbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', rbg: on ? '#f2c36b' : '#0b2655', subFg: '#a9b6cf', onClick: () => this.setCfg(key, o.id) }; });
+    const shapeIc = { LS: '▢', LO: '◯', LR: '▭' };
+    const baseCode = { none: '—', concrete: 'Ø600', m854: '854', m860: '860', fold880: '880', embed: 'Ø58' };
+    let ruler = { stops: [], tick: '10px', fromP: '0%', fillP: '0%' };
+    const mk = (sheet) => {
+    let sh = { isCards: false, isRuler: false, isFan: false, isFrame: false, isVal: false, isQty: false, isSum: false, note: '', min: '150px', h: '104px', codeFs: '20px', opts: [] };
+    if (sheet === 'shape') sh = Object.assign(sh, { isCards: true, codeFs: '26px', opts: card('shape', [{ id: 'LS' }, { id: 'LO' }, { id: 'LR' }], (o) => shapeIc[o.id], (o) => t['sh_' + o.id], (o) => o.id) });
+    if (sheet === 'mech') sh = Object.assign(sh, { isCards: true, opts: card('mech', D.mech, (o) => o.id, (o) => t['mech_' + o.id], (o) => addLbl(o.add)), note: t.mech_T3 + ': ' + (({ bs: 'dostupan od 300 cm', hr: 'dostupan od 300 cm', en: 'available from 300 cm', de: 'ab 300 cm erhältlich' })[lg]) });
+    if (sheet === 'look') sh = Object.assign(sh, { isCards: true, min: '200px', opts: card('look', D.looks, (o) => (o.id === 'std' ? 'STD' : 'CL®'), (o) => t['look_' + o.id], (o) => addLbl(o.add)) });
+    if (sheet === 'vent') sh = Object.assign(sh, { isCards: true, opts: card('vent', D.vents, (o) => (o.id === 'none' ? '—' : o.id), (o) => t['vent_' + o.id], (o) => addLbl(o.add)) });
+    if (sheet === 'fabric') sh = Object.assign(sh, { isCards: true, min: '200px', note: t.fab_note, opts: card('fabric', D.fabrics, (o) => o.id, (o) => t['fab_' + o.id], (o) => (o.pct ? '+ ' + Math.round(o.pct * 100) + ' %' : t.incl)) });
+    if (sheet === 'base') sh = Object.assign(sh, { isCards: true, opts: card('base', D.bases, (o) => baseCode[o.id], (o) => t['base_' + o.id], (o) => addLbl(o.add)) });
+    if (sheet === 'color') sh = Object.assign(sh, { isFan: true, note: t.fab_note, opts: fab.colors.map(([id, hex], i) => { const on = c.color === id; return { label: id, hex, on, ink: lum(hex) > 0.55 ? '#0b2655' : '#ffffff', y: on ? '-18px' : '0px', rot: on ? '0deg' : ((i % 2 ? 1 : -1) * 1.5) + 'deg', z: on ? 5 : 1, sh: on ? '0 12px 24px rgba(0,0,0,0.35),0 0 0 2px #0b2655,0 0 0 4px #f2c36b' : '0 2px 6px rgba(0,0,0,0.25)', onClick: () => this.setCfg('color', id) }; }) });
+    if (sheet === 'frame') sh = Object.assign(sh, { isFrame: true, opts: D.frames.map((o) => { const on = c.frame === o.id; return { label: t['fr_' + o.id], sub: addLbl(o.add), on, bd: on ? '#f2c36b' : 'rgba(255,255,255,0.14)', ibd: on ? '#f2c36b' : 'transparent', ring: '0px',
+      fill: o.id === 'wood' ? 'repeating-linear-gradient(100deg,#7a4f2f 0 3px,#8b5e3c 3px 7px,#9c6c47 7px 9px)' : 'radial-gradient(circle at 32% 26%,#ffffff 0%,' + o.hex + ' 46%,' + this.shade(o.hex) + ' 100%)', onClick: () => this.setCfg('frame', o.id) }; }) });
+    if (sheet === 'brand') sh = Object.assign(sh, { isVal: true, note: t.brand_note, opts: D.brands.map((b) => { const on = c.brand === b.id, none = b.id === 'none';
+      return { label: none ? t.brand_none : b.text, tile: none ? '#ffffff' : b.canopy, ink: none ? '#5b6272' : '#ffffff', fs: none ? '12px' : b.text.length > 9 ? '12px' : '15px', cap: none ? t.incl : '+ ' + D.brandAdd + ' KM', capFg: on ? '#f2c36b' : '#8fa0bf', y: on ? '-6px' : '0px',
+        shadow: on ? 'drop-shadow(0 0 0 #0b2655) drop-shadow(0 10px 16px rgba(11,38,85,0.3))' : none ? 'drop-shadow(0 0 1px rgba(11,38,85,0.5))' : 'drop-shadow(0 4px 8px rgba(11,38,85,0.15))', onClick: () => this.setCfg('brand', b.id) }; }) });
+    if (sheet === 'qty') sh = Object.assign(sh, { isQty: true });
+    if (sheet === 'sum') sh = Object.assign(sh, { isSum: true });
+    sh = Object.assign(sh, { title: lab[sheet] || '', value: sheet === 'sum' ? '' : val[sheet] || '' });
+    if (sheet === 'size') {
+      const first = (z) => (c.shape === 'LR' ? +z.slice(0, 2) * 10 : +z);
+      const all = D.sizes.classic[c.shape].concat(D.sizes.tele[c.shape]).filter((v, i, a) => a.indexOf(v) === i).sort((x, y) => first(x) - first(y));
+      const lo = first(all[0]) - 40, hi = first(all[all.length - 1]) + 40, P = (v) => ((v - lo) / (hi - lo)) * 100;
+      ruler = { tick: (100 / ((hi - lo) / 10)).toFixed(3) + '%', fromP: '0%', fillP: P(first(c.size)).toFixed(2) + '%',
+        stops: all.map((z) => { const on = c.size === z, ok = sizes.includes(z);
+          return { left: P(first(z)).toFixed(2) + '%', on, label: c.shape === 'LR' ? z.slice(0, 2) + '0×' + z.slice(2) + '0' : z, full: D.sizeLabel[c.shape](z), tipOp: on ? 1 : 0, tipY: on ? '0px' : '6px',
+            dot: on ? '22px' : '12px', dotM: on ? '13px' : '18px', dotBg: on ? '#f5c400' : ok ? '#0b2655' : 'rgba(255,255,255,0.15)', dotSh: on ? '0 0 0 5px rgba(245,196,0,0.25)' : 'none', fg: ok ? (on ? '#ffffff' : '#cfd7e6') : 'rgba(255,255,255,0.35)',
+            price: ok ? this.km(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add) : (D.sizes.classic[c.shape].includes(z) ? 'CR · CS' : 'T3'),
+            onClick: () => { if (!ok) this.setCfg('mech', D.sizes.classic[c.shape].includes(z) ? 'CR' : 'T3'); this.setCfg('size', z); } }; }) };
+      sh.isRuler = true; sh.note = t.mech_T3 + ' (T3) · CR · CS';
+    }
+    return sh;
+    };
+    const gi = GRP.findIndex((g) => g[0] === sheet), grp = gi >= 0 ? GRP[gi] : null;
+    const shs = sheet === 'sum' ? [mk('sum')] : grp ? grp[2].map(mk) : [];
+    const gp = sheet === 'sum' ? { n: '', title: SUM, value: '' } : grp ? { n: String(gi + 1) + ' / ' + GRP.length, title: grp[1], value: gsum[grp[0]] } : { n: '', title: '', value: '' };
+    const multi = shs.length > 1;
+    shs.forEach((x, i) => { x.headOn = multi; x.padT = i ? '18px' : '0px'; x.bt = i ? '1px solid rgba(255,255,255,0.12)' : '0'; });
+    const qtyPresets = [1, 2, 4, 6, 8, 12].map((n) => ({ n, bd: c.qty === n ? '#f5c400' : 'rgba(255,255,255,0.14)', bg: c.qty === n ? '#f5c400' : 'transparent', fg: c.qty === n ? '#0b2655' : '#ffffff', onClick: () => this.setCfg('qty', n) }));
+    const hover = 'rgba(11,38,85,0.07)';
+    const tb = (on) => ({ bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0b2655', h: on ? '#0b2655' : hover });
+    const v3 = tb(s.view === '3d'), vp = tb(s.view === 'photo'), cm = s.cam || 'front', nf = (s.focus || 'none') === 'none';
+    const cF = tb(cm === 'front' && nf), cT = tb(cm === 'top' && nf), cL = tb(cm === 'low' && nf), dm = tb(!!s.dims), dt = tb(!!s.detPop || !nf), rt = tb(s.rot !== false);
+    const CN = ({ bs: ['Pogled', 'Odozgo', 'Ispod'], hr: ['Pogled', 'Odozgo', 'Ispod'], en: ['Front', 'Top', 'Below'], de: ['Vorne', 'Oben', 'Unten'] })[lg];
+    const setCam = (id) => () => this.setState({ cam: id, camN: (s.camN || 0) + 1, focus: 'none' });
+    const sheetOn = !!sheet, short = s.h && s.h < 780;
+    const specRowsP = [[t.o_size, D.sizeLabel[c.shape](c.size).replace('×', ' × ')], [({ bs: 'Visina H1', hr: 'Visina H1', en: 'Height H1', de: 'Höhe H1' })[lg], spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg']].map(([k, v]) => ({ k, v }));
+    return {
+      cfgH: s.h ? s.h + 'px' : '100vh', narrowCfg: !wide,
+      pCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.3fr) minmax(460px,1fr)', pSpecs: specRowsP.slice(0, 3), pPanelRef: this.pPanelRef || (this.pPanelRef = React.createRef()), pStagePos: mob ? 'relative' : 'sticky', pStageH: mob ? '64vh' : (s.h ? s.h + 'px' : '100vh'), pStageTop: '72px',
+      pTabsTop: mob ? '84px' : '96px', pPanelH: mob ? 'auto' : (s.h ? s.h + 'px' : '100vh'), pPanelOv: mob ? 'visible' : 'auto',
+      pPad: mob ? '32px 18px 8px' : (short ? '100px' : '124px') + ' clamp(24px,3.4vw,64px) 16px', pRowPad: mob ? '18px 0' : '24px 0', pRowFs: mob ? '26px' : 'clamp(26px,2.4vw,36px)', pSubPl: mob ? '0px' : '34px',
+      pH1: mob ? '64px' : short ? 'clamp(52px,5vw,72px)' : 'clamp(64px,6.4vw,104px)', pValMax: mob ? '130px' : '200px', pFootPad: mob ? '14px 18px calc(14px + env(safe-area-inset-bottom))' : (short ? '14px' : '18px') + ' clamp(24px,3.4vw,64px) ' + (short ? '16px' : '22px'), pAddFlex: mob || s.w < 1180 ? '1 1 100%' : '0 0 auto', pAddH: short ? '46px' : '52px', pTotFs: s.w < 1200 ? '21px' : '24px',
+      sumOn: sheet === 'sum',
+      tabsDisp: sheetOn ? 'none' : 'flex', hdrTop: wide ? '112px' : '92px', eyebrow: t.nav_umb, codeFs: wide ? 'clamp(56px,5.6vw,84px)' : '40px', modelTag: c.shape + ' ' + c.size + ' ' + c.mech, sheetW: 'min(1120px,calc(100% - 24px))', addHov: s.justAdded ? '#1f6b3a' : '#ffd21f', specDisp: mob ? 'none' : 'grid',
+      specRows: [[t.o_size, D.sizeLabel[c.shape](c.size).replace('×', ' × ')], [({ bs: 'Visina H1', hr: 'Visina H1', en: 'Height H1', de: 'Höhe H1' })[lg], spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg'], [t.sp_pole, 'Ø 58 mm']].map(([k, v]) => ({ k, v })),
+      resetOn: s.view === '3d', modelLbl: ({ bs: 'Model', hr: 'Model', en: 'Model', de: 'Modell' })[lg], resetB: wide ? '112px' : '166px', resetTxt: ({ bs: 'RESET POGLEDA', hr: 'RESET POGLEDA', en: 'RESET VIEW', de: 'ANSICHT ZURÜCK' })[lg],
+      barBg: sheetOn ? '#fbfaf7' : 'transparent', barH: wide ? '120px' : '96px', pcsUp: t.pcs.toUpperCase().replace('.', ''), totalUp: t.total.toUpperCase(), stageTopOff: wide ? '72px' : '150px', modeTop: '0px',
+      modeTabs: [['3d', ({ bs: '3D model', hr: '3D model', en: '3D model', de: '3D-Modell' })[lg], ({ bs: 'vaša konfiguracija', hr: 'vaša konfiguracija', en: 'your configuration', de: 'Ihre Konfiguration' })[lg]], ['photo', ({ bs: 'Fotografije', hr: 'Fotografije', en: 'Photos', de: 'Fotos' })[lg], ({ bs: 'referentni objekti', hr: 'referentni objekti', en: 'reference projects', de: 'Referenzen' })[lg]]].map(([id, label, sub]) => {
+        const on = s.view === id;
+        return { label, is3d: id === '3d', isPh: id === 'photo', on, pbg: on ? '#0b2655' : 'transparent', pfg: on ? '#ffffff' : '#0b2655', fg: on ? '#0b2655' : '#5b6272', ul: on ? '#e2a33a' : 'transparent', onClick: () => this.setState({ view: id, sheet: id === 'photo' ? null : s.sheet, viewsOpen: false, detPop: false }) };
+      }),
+      cfgRef: this.cfgRef, toolsBottom: wide ? '110px' : '162px', menuB: wide ? '160px' : '212px', viewsMenuR: 'clamp(16px,2.6vw,40px)', detMenuR: 'clamp(16px,2.6vw,40px)',
+      tbFg: '#8a8f9c', tbBg0: 'transparent', tbS: s.h && s.h < 720 ? '32px' : '36px',
+      ...(() => { const b = s.h && s.h < 720 ? 32 : s.h && s.h < 860 ? 35 : 38, avail = (s.h || 800) - 96 - (wide ? 110 : 162), core = 6 * b + 2 * 9 + 20, zoomH = 2 * b + 26 + 9 + 6, fsH = b + 9 + 4;
+        const zoomOn = core + zoomH + fsH <= avail || core + zoomH <= avail, fsOn = core + (zoomOn ? zoomH : 0) + fsH <= avail;
+        return { zoomGrpDisp: zoomOn ? 'flex' : 'none', fsGrpDisp: fsOn ? 'flex' : 'none' }; })(),
+      rvFg3d: s.view === '3d' ? '#f5c400' : '#c9d3e6', rvBg3d: s.view === '3d' ? 'rgba(255,255,255,0.12)' : 'transparent',
+      rvFgPh: s.view === 'photo' ? '#f5c400' : '#c9d3e6', rvBgPh: s.view === 'photo' ? 'rgba(255,255,255,0.12)' : 'transparent',
+      resetLbl: ({ bs: 'Početni pogled (R)', hr: 'Početni pogled (R)', en: 'Reset view (R)', de: 'Ansicht zurücksetzen (R)' })[lg],
+      resetView: () => this.setState({ cam: 'front', camN: (s.camN || 0) + 1, zoom: 1, focus: 'none', viewsOpen: false, detPop: false }),
+      viewsLbl: ({ bs: 'Pogledi', hr: 'Pogledi', en: 'Views', de: 'Ansichten' })[lg], viewsOn: !!s.viewsOpen && s.view === '3d',
+      toggleViews: () => this.setState({ viewsOpen: !s.viewsOpen, detPop: false, sheet: null }),
+      viewsFg: s.viewsOpen ? '#0b2655' : '#8a8f9c', viewsBg: s.viewsOpen ? 'rgba(11,38,85,0.08)' : 'transparent',
+      viewItems: CN.map((label, i) => { const id = ['front', 'top', 'low'][i], on = (s.cam || 'front') === id && nf; return { label, key: String(i + 1), mark: on ? '●' : '', bg: on ? 'rgba(11,38,85,0.06)' : 'transparent', onClick: () => this.setState({ cam: id, camN: (s.camN || 0) + 1, focus: 'none', viewsOpen: false }) }; }),
+      detItems: (window.SUMAN_DETAILS ? window.SUMAN_DETAILS.order : []).map((k, i) => { const DL = window.SUMAN_DETAILS[lg] || window.SUMAN_DETAILS.bs, on = s.focus === k; return { label: DL[k][0], key: '0' + (i + 1), mark: on ? '●' : '', bg: on ? 'rgba(11,38,85,0.06)' : 'transparent', onClick: () => this.setState({ focus: on ? 'none' : k, detPop: false, view: '3d' }) }; }),
+      fsLbl: ({ bs: 'Cijeli ekran', hr: 'Cijeli zaslon', en: 'Fullscreen', de: 'Vollbild' })[lg],
+      toggleFs: () => { try { if (document.fullscreenElement) document.exitFullscreen(); else if (this.cfgRef.current) this.cfgRef.current.requestFullscreen(); } catch (e) {} },
+      hintOn: false, hintB: '124px',
+      hintTxt: ({ bs: 'Povucite za rotaciju · kotačić za zum · 1 2 3 pogledi · R reset', hr: 'Povucite za rotaciju · kotačić za zum · 1 2 3 pogledi · R reset', en: 'Drag to orbit · scroll to zoom · 1 2 3 views · R reset', de: 'Ziehen zum Drehen · Mausrad zum Zoomen · 1 2 3 Ansichten · R Reset' })[lg], qtyDownOp: c.qty <= 1 ? 0.35 : 1,
+      qtyInput: s.qtyDraft != null ? s.qtyDraft : String(c.qty), qtyW: Math.max(2, String(s.qtyDraft != null ? s.qtyDraft : c.qty).length) * 11 + 12 + 'px', qtyLine: s.qtyDraft != null ? '#f2c36b' : 'transparent',
+      onQtyFocus: (e) => { this.setState({ qtyDraft: String(c.qty) }); const el = e.target; setTimeout(() => { try { el.select(); } catch (x) {} }, 0); },
+      onQtyInput: (e) => { const v = e.target.value.replace(/[^0-9]/g, '').slice(0, 3); this.setState({ qtyDraft: v }); const n = parseInt(v, 10); if (n >= 1) this.setCfg('qty', Math.min(999, n)); },
+      onQtyBlur: () => this.setState({ qtyDraft: null }),
+      onQtyKey: (e) => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'ArrowUp') { e.preventDefault(); this.setCfg('qty', Math.min(999, c.qty + 1)); this.setState({ qtyDraft: String(Math.min(999, c.qty + 1)) }); } if (e.key === 'ArrowDown') { e.preventDefault(); this.setCfg('qty', Math.max(1, c.qty - 1)); this.setState({ qtyDraft: String(Math.max(1, c.qty - 1)) }); } }, dockH: wide ? '96px' : '150px',
+      barW: wide ? 'auto' : '100%', barMb: wide ? '16px' : '0px', barR: wide ? '14px' : '14px 14px 0 0', grpFlex: wide ? '0 1 auto' : '1 1 100%', grpMin: wide ? '0px' : '150px',
+      buyFlex: wide ? '0 0 auto' : '1 1 100%', buyPl: wide ? '6px' : '0px', buyBl: wide ? '1px solid rgba(11,38,85,0.1)' : '0', buyBt: wide ? '0' : '1px solid rgba(11,38,85,0.08)', buyPt: wide ? '0px' : '6px', zoomDisp: s.h && s.h < 640 ? 'none' : 'flex', stageShift: sheetOn ? (mob ? '-14%' : '-9%') : '0%',
+      tagTop: wide ? '112px' : mob ? '140px' : '92px', tagW: wide ? '208px' : '150px', tagFs: wide ? '26px' : '20px', tagRowsDisp: wide ? 'flex' : 'none', tagNo: 'Nº ' + String(this.unitPrice(c)).padStart(5, '0').slice(-4),
+      tagRows: [[t.o_size, D.sizeLabel[c.shape](c.size)], ['H1', spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg']].map(([k, v]) => ({ k, v })),
+      priceTop: '96px', priceDisp: 'none', addBg: s.justAdded ? '#1f6b3a' : '#f5c400', addFg: s.justAdded ? '#ffffff' : '#0b2655',
+      railTop: 'calc(' + (sheetOn ? '38%' : '50%') + ' - ' + (wide ? 10 : 40) + 'px)', railMaxH: 'none', rbS: s.h && s.h < 640 ? '30px' : s.h && s.h < 760 ? '34px' : '40px',
+      rv3d: () => this.setState({ view: '3d' }), rvLbl3d: t.v3d, rvBg3dH: v3.h,
+      rvPh: () => this.setState({ view: 'photo', sheet: null }), rvLblPh: t.vph, rvBgPhH: vp.h,
+      camF: setCam('front'), camT: setCam('top'), camL: setCam('low'), camLblF: CN[0], camLblT: CN[1], camLblL: CN[2],
+      camBgF: cF.bg, camFgF: cF.fg, camBgFH: cF.h, camBgT: cT.bg, camFgT: cT.fg, camBgTH: cT.h, camBgL: cL.bg, camFgL: cL.fg, camBgLH: cL.h,
+      dimsBg: s.dims ? 'rgba(11,38,85,0.08)' : 'transparent', dimsFg: s.dims ? '#0b2655' : '#8a8f9c', dimsBgH: dm.h, detBg: (s.detPop || !nf) ? 'rgba(11,38,85,0.08)' : 'transparent', detFg: (s.detPop || !nf) ? '#0b2655' : '#8a8f9c', detBgH: dt.h, rotBg: rt.bg, rotFg: rt.fg, rotBgH: rt.h, zBg: 'transparent', zFg: '#0b2655', zBgH: hover,
+      toggleDet: () => this.setState({ detPop: !s.detPop, sheet: null, viewsOpen: false }), detPopOn: !!s.detPop && s.view === '3d',
+      needleRef: this.needleRef, nudgeVal: (s.nudgeN || 0) + (s.nudgeD || ''),
+      nudgeL: () => this.setState({ nudgeN: (s.nudgeN || 0) + 1, nudgeD: 'L', focus: 'none' }), nudgeR: () => this.setState({ nudgeN: (s.nudgeN || 0) + 1, nudgeD: 'R', focus: 'none' }),
+      topBarY: s.w >= 1280 ? '14px' : '84px', topLblDisp: mob ? 'none' : 'inline', detRot: s.detPop ? '180deg' : '0deg', detPopY: s.w >= 1280 ? '66px' : '136px',
+      navBottom: wide ? '112px' : '166px', dialD: mob ? '104px' : '124px', hubBtn: mob ? '40px' : '46px', rotOff: s.rot === false, navShow: s.view === '3d' && !sheetOn,
+      camChips: CN.map((label, i) => { const id = ['front', 'top', 'low'][i], on = (s.cam || 'front') === id && nf; return { label, bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0b2655', hbg: on ? '#0b2655' : 'rgba(11,38,85,0.07)', onClick: setCam(id) }; }),
+      capBottom: mob ? '150px' : '100px',
+      tiles, sheetOn, shs, gp, ruler, qtyPresets, openSum: open('sum'), sumLbl: SUM,
+      sheetPad: mob ? '16px' : '18px 20px 20px', sheetMaxH: 'max(220px, calc(100vh - ' + (wide ? 72 : 150) + 'px - ' + (wide ? 120 : 176) + 'px - 150px))',
+      sheetPrev: () => this.setState({ sheet: GRP[((gi < 0 ? 0 : gi) - 1 + GRP.length) % GRP.length][0] }), sheetNext: () => this.setState({ sheet: GRP[((gi < 0 ? -1 : gi) + 1) % GRP.length][0] }), sheetClose: () => this.setState({ sheet: null }), navOn: sheet !== 'sum',
+      fanW: mob ? '44px' : '58px', fanH: mob ? '96px' : '124px', frameD: mob ? '52px' : '72px'
+    };
+  }
+  toolVals(s) {
+    const DT = window.SUMAN_DETAILS, L = (DT && DT[s.lang]) || (DT && DT.bs) || { title: 'Detalji' }, lg = s.lang, pop = s.show3dPop || null, is3d = s.view === '3d';
+    const TL = ({ bs: ['Kamera', 'Okruženje'], hr: ['Kamera', 'Okruženje'], en: ['Camera', 'Surroundings'], de: ['Kamera', 'Umgebung'] })[lg];
+    const setPop = (p) => () => this.setState({ show3dPop: pop === p ? null : p });
+    const toolBtns = is3d ? [['cam', TL[0]], ['det', L.title]].map(([k, label]) => {
+      const on = pop === k;
+      return { label, on, rot: on ? '0deg' : '180deg', bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0b2655', hbg: on ? '#0b2655' : 'rgba(11,38,85,0.07)', onClick: setPop(k) };
+    }) : [];
+    const radio = (on) => ({ rb: on ? '#0b2655' : '#cfc9bd', rf: on ? '#0b2655' : 'transparent', mark: on ? '✓' : '', bg: on ? 'rgba(11,38,85,0.05)' : 'transparent' });
+    let popItems = [], popTitle = '';
+    if (pop === 'cam') {
+      popTitle = TL[0];
+      const CN = ({ bs: ['Pogled', 'Odozgo', 'Ispod', 'Približi', 'Udalji'], hr: ['Pogled', 'Odozgo', 'Ispod', 'Približi', 'Udalji'], en: ['Front', 'Top', 'Below', 'Zoom in', 'Zoom out'], de: ['Vorne', 'Oben', 'Unten', 'Näher', 'Weiter'] })[lg];
+      popItems = ['front', 'top', 'low'].map((id, i) => Object.assign({ label: CN[i], meta: '', on: (s.cam || 'front') === id && (s.focus || 'none') === 'none', onClick: () => this.setState({ cam: id, camN: (s.camN || 0) + 1, focus: 'none' }) }, radio((s.cam || 'front') === id && (s.focus || 'none') === 'none')))
+;
+    } else if (pop === 'env') {
+      popTitle = TL[1];
+      const EN = ({ bs: ['Studio', 'Terasa', 'Vrt', 'Plaža'], hr: ['Studio', 'Terasa', 'Vrt', 'Plaža'], en: ['Studio', 'Terrace', 'Garden', 'Beach'], de: ['Studio', 'Terrasse', 'Garten', 'Strand'] })[lg];
+      const SN = ({ bs: ['Osoba', 'Stol i stolice'], hr: ['Osoba', 'Stol i stolice'], en: ['Person', 'Table & chairs'], de: ['Person', 'Tisch & Stühle'] })[lg];
+      popItems = ['studio', 'terrace', 'garden', 'beach'].map((id, i) => Object.assign({ label: EN[i], meta: '', on: (s.env || 'studio') === id, onClick: () => this.setState({ env: id }) }, radio((s.env || 'studio') === id)))
+        .concat([['person', SN[0], '175 cm'], ['furn', SN[1], '']].map(([k, label, meta]) => Object.assign({ label, meta, on: !!s[k], onClick: () => this.setState({ [k]: !s[k] }) }, radio(!!s[k]), { rb: s[k] ? '#0b2655' : '#cfc9bd' })));
+    } else if (pop === 'det' && DT) {
+      popTitle = L.title;
+      popItems = DT.order.map((k, i) => Object.assign({ label: L[k][0], meta: String(i + 1).padStart(2, '0'), on: s.focus === k, onClick: () => this.setState({ focus: s.focus === k ? 'none' : k, show3dPop: null }) }, radio(s.focus === k)));
+    }
+    const f = s.focus || 'none', k = DT && DT.order.indexOf(f);
+    return {
+      toolBtns, popOn: is3d && !!pop, popTitle, popItems,
+      capOn: is3d && !pop && f !== 'none' && !!DT, cap: f !== 'none' && DT ? { n: String(k + 1), title: L[f][0], text: L[f][1] } : { n: '', title: '', text: '' },
+      ptPad: s.w >= 1024 ? '18px clamp(18px,2vw,28px) 16px' : '16px 16px 12px'
+    };
+  }
+  detVals(s) {
+    const DT = window.SUMAN_DETAILS, L = (DT && DT[s.lang]) || (DT && DT.bs), wide = s.w >= 1024, f = s.focus || 'none';
+    if (!L) return { detBtns: [], detInfoOn: false, focusMode: 'none', det: {} };
+    const off = () => this.setState({ focus: 'none' });
+    return {
+      focusMode: s.view === '3d' ? f : 'none', detTitle: L.title, detClose: off,
+      detInfoOn: f !== 'none' && wide, detCapOn: f !== 'none' && !wide, detInfo: f !== 'none' ? { title: L[f][0], text: L[f][1], close: L.close } : { title: '', text: '', close: L.close },
+      detBtns: DT.order.map((k, i) => {
+        const on = f === k;
+        return { label: L[k][0], n: String(i + 1), on, bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0f1a2c', hbg: on ? '#0b2655' : 'rgba(11,38,85,0.07)', nBg: on ? '#f5c400' : 'rgba(11,38,85,0.08)', nFg: '#0b2655', onClick: () => this.setState({ focus: on ? 'none' : k, view: '3d', detPop: false }) };
+      }),
+      det: wide
+        ? { l: 'clamp(16px,2.5vw,36px)', r: 'auto', t: '214px', b: 'auto', w: '260px', dir: 'column', headDisp: 'block', infoOrder: 2 }
+        : { l: '12px', r: '12px', t: 'auto', b: '68px', w: 'auto', dir: 'row', headDisp: 'none', infoOrder: 0 }
+    };
+  }
+  tendeSrc() {
+    const g = 'https://suman.ba/assets/photos/', L = {
+      '1': 'products/original/1557488985-ravna-tenda.jpg', '2': 'gallery/original/15-fotografija-0079-1636623526.jpg', '3': 'gallery/original/15-ravna-tenda-sarajevski-kiseljak-bosna-1636623434.jpg',
+      '4': 'gallery/original/15-1629708957258-1636623065.jpg', '5': 'gallery/original/15-ravna-tenda-metropolis-old-town-2-1557488973.jpg', '6': 'gallery/original/15-vremeplov-1636623215.jpg'
+    };
+    return g + (L[String(this.props.tendeImg ?? '1')] || L['1']);
+  }
+  productVals(t) {
+    const s = this.state, D = window.SUMAN, c = s.cfg, mobile = s.w < 860, b2b = s.b2b;
+    const addLbl = (a) => (a > 0 ? '+ ' + a + ' KM' : a < 0 ? '− ' + -a + ' KM' : t.incl);
+    const catFilters = [['all', t.flt_all], ['home', t.flt_home], ['pro', t.flt_pro]].map(([id, label]) => {
+      const on = s.catFilter === id;
+      return { label, fg: on ? '#ffffff' : '#8fa0bf', ul: on ? '#e2a33a' : 'transparent', onClick: () => this.setState({ catFilter: id, ixHover: 0 }) };
+    });
+    const cat = s.cat || 'umb', CT = window.SUMAN_CATS;
+    const mtm = ({ bs: 'Izrada po mjeri', hr: 'Izrada po mjeri', en: 'Made to measure', de: 'Nach Maß' })[s.lang];
+    const vis = cat === 'umb' ? D.models : CT[cat];
+    const featOn = cat === 'umb' && vis.some((m) => m.id === 'advance');
+    const ask = (n) => () => { this.toFooter(); this.flash(n + ': ' + t.pie_cta_ask.toLowerCase() + ' – info@suman.ba'); };
+    const models = cat === 'umb'
+      ? vis.filter((m) => m.id !== 'advance').map((m) => ({ name: m.name, bgi: 'url(' + m.img.replace('/small/', '/original/') + ')', desc: t['m_' + m.id], fromLbl: t.from, price: this.km(m.from), cta: t.inquire, fact: '', seg: m.seg === 'home' ? t.flt_home : t.flt_pro, onClick: ask(m.name) }))
+      : vis.map((m) => ({ name: m.name, bgi: m.img ? 'url(' + m.img + ')' : 'none', desc: m.d[s.lang] || m.d.bs, fromLbl: '', price: mtm, cta: t.inquire, fact: m.fact, seg: cat === 'awn' ? t.nav_awn : t.nav_perg, onClick: ask(m.name) }));
+    models.forEach((m, i) => { m.num = String(i + (cat === 'umb' ? 2 : 1)).padStart(2, '0'); });
+    const CATS = [['umb', 180, '01'], ['awn', -60, '02'], ['perg', 60, '03']];
+    const catMeta = {
+      catIsUmb: cat === 'umb', catTitle: t['nav_' + cat], catDesc: t['pie_' + cat + '_d'], catNum: (CATS.find((x) => x[0] === cat) || CATS[0])[2] + ' · ' + t['nav_' + cat],
+      catHero: cat === 'awn' ? this.tendeSrc() : CT.heroes[cat], catHeroPos: cat === 'awn' ? (this.props.tendePos ?? 'center 45%') : 'center',
+      catHeroH: s.w < 860 ? '64vh' : 'min(72vh, 760px)',
+      catSwitch: CATS.map(([k, from]) => { const on = k === cat; return { label: t['nav_' + k], from, on, bg: on ? '#ffffff' : 'transparent', fg: on ? '#0b2655' : '#ffffff', hbg: on ? '#ffffff' : 'rgba(255,255,255,0.12)', rest: on ? 'rgba(11,38,85,0.22)' : 'rgba(255,255,255,0.35)', onClick: () => this.go('catalog', { cat: k }) }; })
+    };
+    const nW = ({ bs: 'modela', hr: 'modela', en: 'models', de: 'Modelle' })[s.lang];
+    const catExtra = {
+      ...catMeta, modelCount: vis.length + ' ' + nW, featOn, lbl3d: s.lang === 'de' ? '3D-Konfigurator' : s.lang === 'en' ? '3D configurator' : '3D konfigurator',
+      featFacts: [[t.o_size, '200–500 cm'], [t.sp_pole, 'Ø58 mm'], [t.o_mech, 'CR · CS · T3']].map(([k, v]) => ({ k, v }))
+    };
+    {
+      const mob = s.w < 860, raw = [];
+      if (featOn) raw.push({ name: 'Advance', bgi: 'url(https://suman.ba/assets/photos/products/original/1557424992-advance.jpg)', desc: t.feat_d, seg: '', fromLbl: t.from, price: this.km(D.models[1].from), hot: true, cta: t.configure, onClick: () => this.go('product') });
+      models.forEach((m) => raw.push({ name: m.name, bgi: m.bgi, desc: m.desc, seg: cat === 'umb' ? '' : (m.fact || ''), fromLbl: m.fromLbl, price: m.price, hot: false, cta: m.cta, onClick: m.onClick }));
+      const P = 'https://suman.ba/assets/photos/', G = P + 'gallery/original/', PO = P + 'products/original/';
+      const IMG = {
+        Beach: [PO + '1557471741-beach.jpg', G + '10-beach-01-1557471730.jpg', G + '10-beach-03-1557471732.jpg'],
+        Advance: [PO + '1557424992-advance.jpg', G + '1-suman-suncobran-advance-1-1700829309.jpg', G + '1-suman-suncobran-advance-2-1700829502.jpg'],
+        Prestige: [PO + '1557416077-prestige.jpg', G + '4-suman-suncobran-prestige-4-1700837209.jpg', G + '4-suman-suncobran-prestige-3-1700837209.jpg'],
+        Magnum: [PO + '1557425199-magnum.jpg', G + '9-magnum-02-1557470662.jpg', G + '9-magnum-04-1557470660.jpg'],
+        Console: [PO + '1774259687-console.jpg', G + '11-konzolni-suncobran-krk-1557425290.jpg', G + '11-coca-cola-portela-1-1774259660.jpg'],
+        'Ravna tenda': [PO + '1557488985-ravna-tenda.jpg', G + '15-ravna-tenda-sarajevski-kiseljak-bosna-1636623434.jpg', G + '15-fotografija-0079-1636623526.jpg'],
+        Atika: [PO + '1552142028-atika.jpg', G + '2-img-1288-1645265190.jpg', G + '2-dsc04206-1645265080.jpg'],
+        'Bioklimatska tenda': [PO + '1603960755-bioklimatska-tenda.jpg', G + '21-palmiye-042-1603960604.jpg', G + '21-cen8852-1603960724.jpg'],
+        'Regulus Bioklimatska': [G + '21-palmiye-043-1603960574.jpg', G + '21-palmiye-051-1603960605.jpg']
+      };
+      raw.forEach((x) => { const L = IMG[x.name]; x.imgs = L ? L.map((u) => 'url(' + u + ')') : [x.bgi]; if (L) x.bgi = x.imgs[0]; });
+      const act = Math.min(s.ixHover || 0, Math.max(0, raw.length - 1));
+      const cur = raw[act] || { imgs: ['none'] }, nImg = cur.imgs.length, sl = (s.ixSlide || 0) % nImg;
+      this._ixN = nImg;
+      const ixItems = raw.map((x, i) => { const on = i === act;
+        return Object.assign(x, { on, op: on ? 1 : 0, sc: on ? 1 : 1.06, fg: on || mob ? '#ffffff' : 'rgba(255,255,255,0.55)', abd: on ? '#f5c400' : 'rgba(255,255,255,0.24)', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', ax: on && !mob ? '4px' : '0px', enter: () => { if ((this.state.ixHover || 0) !== i) { this.setState({ ixHover: i, ixSlide: 0 }); this._ixT = Date.now(); } } }); });
+      Object.assign(catExtra, { ixItems, ixAct: raw[act] || { name: '', desc: '', hot: false, cta: '', onClick: () => {} },
+        ixSlides: cur.imgs.map((bgi, i) => ({ bgi, op: i === sl ? 1 : 0, sc: i === sl ? 1.04 : 1 })),
+        ixDotsOn: nImg > 1, ixDots: cur.imgs.map((_, i) => ({ n: String(i + 1), on: i === sl, w: i === sl ? '22px' : '8px', bg: i === sl ? '#ffffff' : 'rgba(255,255,255,0.45)', onClick: () => { this.setState({ ixSlide: i }); this._ixT = Date.now(); } })), ixCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.05fr) minmax(0,1fr)', ixPos: mob ? 'relative' : 'sticky', ixH: mob ? '58vh' : '100vh',
+        ixPad: mob ? '32px 18px 72px' : '128px clamp(28px,4vw,72px) 96px', ixRow: mob ? '76px minmax(0,1fr) auto' : 'minmax(0,1fr) auto 44px', ixRowPad: mob ? '16px 0' : '26px 0', ixThumb: mob, ixArrow: mob ? 'none' : 'flex' });
+    }
+    const sizes = D.sizes[c.mech === 'T3' ? 'tele' : 'classic'][c.shape];
+    const fab = D.fabrics.find((f) => f.id === c.fabric);
+    const unitBase = this.unitPrice(c);
+    const chip = (key, list, lbl, add, hex) => list.map((o) => {
+      const on = c[key] === o.id;
+      return { label: lbl(o), add: add ? add(o) : '', hex: hex ? hex(o) : '', bd: on ? '#0b2655' : '#dcd6ca', bg: on ? '#e6ebf4' : '#fbfaf7', onClick: () => this.setCfg(key, o.id) };
+    });
+    const sizeOpts = sizes.map((z) => ({ id: z }));
+    const colOpts = fab.colors.map(([id, hex]) => ({ id, hex, label: id, bd: c.color === id ? '#0b2655' : 'transparent', onClick: () => this.setCfg('color', id) }));
+    const curHex = (fab.colors.find((x) => x[0] === c.color) || fab.colors[0])[1];
+    const brandOpts = D.brands.map((b) => {
+      const on = c.brand === b.id, none = b.id === 'none';
+      return { label: none ? t.brand_none : b.text, tile: none ? '#fbfaf7' : b.canopy, ink: none ? '#3a4152' : '#fff', fs: none ? '13px' : b.text.length > 9 ? '12px' : '15px', bd: on ? '#e2a33a' : none ? '#dcd6ca' : 'transparent', onClick: () => this.setCfg('brand', b.id) };
+    });
+    const L = s.lang;
+    const SL = ({ bs: ['Konstrukcija', 'Platno', 'Štampa', 'Postolje', 'Pregled'], hr: ['Konstrukcija', 'Platno', 'Tisak', 'Postolje', 'Pregled'], en: ['Frame', 'Canopy', 'Print', 'Base', 'Review'], de: ['Gestell', 'Bespannung', 'Druck', 'Ständer', 'Übersicht'] })[L];
+    const W2 = ({ bs: ['Dalje', 'Nazad', 'Uredi'], hr: ['Dalje', 'Natrag', 'Uredi'], en: ['Next', 'Back', 'Edit'], de: ['Weiter', 'Zurück', 'Ändern'] })[L];
+    const step = s.step || 0;
+    const card = (key, list, lbl, sub, extra) => list.map((o) => {
+      const on = c[key] === o.id, sv = sub ? sub(o) : '';
+      return Object.assign({ label: lbl(o), sub: sv, on, bd: on ? '#0b2655' : '#e2ddd2', hbd: on ? '#0b2655' : '#b9b2a4', bg: on ? '#0b2655' : '#ffffff', sh: 'none',
+        subFg: sv === t.incl ? '#8a8f9c' : '#5b6272', ic: on ? '#0b2655' : '#8a8f9c', icSq: false, icCi: false, icRe: false, hex: '',
+        fg: on ? '#ffffff' : '#0f1a2c', segBg: on ? '#ffffff' : 'transparent', segFg: on ? '#0b2655' : '#3a4152', segSh: on ? '0 1px 2px rgba(11,38,85,0.12),0 2px 8px rgba(11,38,85,0.08)' : 'none', segSub: on ? '#5b6272' : '#8a8f9c',
+        lbd: on ? '#0b2655' : '#e2ddd2', ringW: on ? '5px' : '3px', rowBg: on ? '#f1f4fa' : '#ffffff', radioBd: on ? '#0b2655' : '#cfc9bd', radioBg: on ? '#0b2655' : '#ffffff', fw: on ? 700 : 500,
+        onClick: () => this.setCfg(key, o.id) }, extra ? extra(o) : {});
+    });
+    const grp = (o) => Object.assign({ isCards: false, isTiles: false, isSeg: false, isChips: false, isSwatchL: false, isList: false, isSwatch: false, isBrand: false, isQty: false, note: '', cols: 3 }, o);
+    const pre = (a) => addLbl(a);
+    const G = [
+      [
+        grp({ title: t.o_shape, value: t['sh_' + c.shape] + ' · ' + c.shape, isTiles: true, opts: card('shape', [{ id: 'LS' }, { id: 'LO' }, { id: 'LR' }], (o) => t['sh_' + o.id], (o) => o.id, (o) => ({ icSq: o.id === 'LS', icCi: o.id === 'LO', icRe: o.id === 'LR' })) }),
+        grp({ title: t.o_mech, value: t['mech_' + c.mech] + ' (' + c.mech + ')', isSeg: true, cols: 3, opts: card('mech', D.mech, (o) => t['mech_' + o.id], (o) => pre(o.add)) }),
+        grp({ title: t.o_size, value: D.sizeLabel[c.shape](c.size), isChips: true, opts: card('size', sizeOpts, (o) => D.sizeLabel[c.shape](o.id).replace(' cm', ''), (o) => this.km(D.basePrice[c.shape + o.id] + D.mech.find((m) => m.id === c.mech).add)) }),
+        grp({ title: t.o_frame, value: t['fr_' + c.frame], isSwatchL: true, opts: card('frame', D.frames, (o) => t['fr_' + o.id], (o) => pre(o.add), (o) => ({ hex: o.hex })) })
+      ],
+      [
+        grp({ title: t.o_look, value: t['look_' + c.look], isSeg: true, cols: 2, opts: card('look', D.looks, (o) => t['look_' + o.id], (o) => pre(o.add)) }),
+        grp({ title: t.o_vent, value: t['vent_' + c.vent], isList: true, opts: card('vent', D.vents, (o) => t['vent_' + o.id], (o) => pre(o.add)) }),
+        grp({ title: t.o_fabric, value: t['fab_' + c.fabric], isSeg: true, cols: 2, note: t.fab_note, opts: card('fabric', D.fabrics, (o) => t['fab_' + o.id], (o) => (o.pct ? '+ ' + Math.round(o.pct * 100) + ' %' : t.incl)) }),
+        grp({ title: t.o_color, value: 'Pantone ' + c.color, isSwatch: true, opts: colOpts.map((o) => Object.assign(o, { on: o.bd !== 'transparent', bd: o.bd === 'transparent' ? 'transparent' : '#0b2655' })) })
+      ],
+      [grp({ title: t.o_brand, value: c.brand === 'none' ? t.brand_none : '+ ' + D.brandAdd + ' KM', isBrand: true, note: t.brand_note,
+        opts: brandOpts.map((o, i) => Object.assign(o, { on: c.brand === D.brands[i].id, ring: c.brand === D.brands[i].id ? '0 0 0 2px #fbfaf7, 0 0 0 4px #0b2655' : D.brands[i].id === 'none' ? 'inset 0 0 0 1.5px #e2ddd2' : 'none' })) })],
+      [
+        grp({ title: t.o_base, value: t['base_' + c.base], isList: true, opts: card('base', D.bases, (o) => t['base_' + o.id], (o) => pre(o.add)) }),
+        grp({ title: t.o_qty, value: c.qty + ' ' + t.pcs, isQty: true })
+      ],
+      []
+    ];
+    const goStep = (i) => () => this.scrollToSec(i);
+    const steps = SL.map((label, i) => {
+      const on = i === step, done = i < step;
+      return { label, mark: done ? '✓' : String(i + 1), fg: on ? '#0b2655' : done ? '#0f1a2c' : '#8a8f9c', dotBg: on ? '#0b2655' : done ? '#e6ebf4' : 'transparent', dotFg: on ? '#fff' : '#0b2655', dotBd: on || done ? '#0b2655' : '#cfc9bd', bar: on ? '#0b2655' : 'transparent', onClick: goStep(i) };
+    });
+    const wide = s.w >= 1024;
+    const brN = D.brands.find((b) => b.id === c.brand);
+    const cfgUI = {
+      steps, sections: SL.map((label, i) => ({ n: i + 1, label, groups: G[i], isReview: i === 4, ref: this.secRefs[i] })),
+      bodyRef: this.bodyRef, onBodyScroll: () => this.spy(false), asideOv: s.w >= 1024 ? 'hidden' : 'visible', editLbl: W2[2], backLbl: W2[1], canBack: false, stepBack: goStep(Math.max(0, step - 1)),
+      review: [
+        [t.o_shape, t['sh_' + c.shape], 0], [t.o_mech, t['mech_' + c.mech], 0], [t.o_size, D.sizeLabel[c.shape](c.size), 0], [t.o_frame, t['fr_' + c.frame], 0],
+        [t.o_look, t['look_' + c.look], 1], [t.o_vent, t['vent_' + c.vent], 1], [t.o_fabric, t['fab_' + c.fabric] + ' · ' + c.color, 1],
+        [t.o_brand, brN.name || t.brand_none, 2], [t.o_base, t['base_' + c.base], 3], [t.o_qty, c.qty + ' ' + t.pcs, 3]
+      ].map(([k, v, i]) => ({ k, v, edit: goStep(i) })),
+      cfgCols: wide ? 'minmax(0,1fr) minmax(400px,460px)' : 'minmax(0,1fr)', cfgMinH: wide ? '100vh' : 'auto', stageTop: wide ? '104px' : '92px', asidePadT: wide ? '72px' : '0px',
+      stagePos: wide ? 'sticky' : 'relative', stageH: wide ? '100vh' : Math.round(Math.max(340, Math.min(540, s.w * 1.05, (s.h || 800) - 96))) + 'px',
+      panelH: wide ? '100vh' : 'auto', panelPos: wide ? 'sticky' : 'relative', tabsPos: wide ? 'relative' : 'sticky', tabsTop: wide ? '0px' : '72px', bodyScroll: wide ? 'auto' : 'visible',
+      footPos: wide ? 'relative' : 'fixed', asidePadB: wide ? '0px' : '88px',
+      dragDisp: s.view === '3d' ? 'block' : 'none', thumbW: wide ? 64 : 48, thumbH: wide ? 46 : 36,
+      primaryLbl: s.justAdded ? t.added + ' ✓' : t.add, primaryBg: s.justAdded ? '#1f6b3a' : '#0b2655', primaryFg: '#ffffff'
+    };
+
+    const disc = b2b ? D.B2B_DISCOUNT : 0;
+    const unit = unitBase * (1 - disc), total = unit * c.qty;
+    const code = 'Advance ' + c.shape + ' ' + c.size + ' ' + c.mech;
+    const br = D.brands.find((b) => b.id === c.brand);
+    const spec = D.specs[c.mech === 'T3' ? 'tele' : 'classic'][c.shape + c.size] || [0, 0, '—'];
+    this._add = () => {
+      const item = { id: Date.now(), title: code, desc: this.cfgText(c, t), cfg: Object.assign({}, c), hex: curHex, unit: unitBase, qty: c.qty };
+      this.save({ cart: this.state.cart.concat([item]), justAdded: true });
+      this.flash(t.added + ' · ' + code);
+      setTimeout(() => this.setState({ justAdded: false }), 2200);
+    };
+    const vh = mobile ? Math.round(Math.min(420, s.w * 0.95)) : Math.max(460, Math.min(720, s.h - 190));
+
+    return {
+      isCatalog: s.screen === 'catalog', catFilters, models, ...catExtra,
+      isProduct: s.screen === 'product',
+      prodCols: mobile ? 'minmax(0,1fr)' : 'minmax(0,1.35fr) minmax(360px,1fr)', viewerPos: mobile ? 'relative' : 'sticky', viewerH: vh,
+      show3d: s.view === '3d', showPhoto: s.view === 'photo', photoSrc: D.gallery[s.photo],
+      u: { shape: c.shape, size: c.size, canopy: curHex, frame: D.frames.find((f) => f.id === c.frame).hex, vent: c.vent, look: c.look, brandtext: c.brand === 'none' ? '' : br.text, base: c.base, mech: c.mech },
+      viewTabs: [['3d', t.v3d, '3D'], ['photo', t.vph, '▦']].map(([id, label, ic]) => ({ label, ic, bg: s.view === id ? '#0b2655' : 'transparent', fg: s.view === id ? '#fff' : '#0f1a2c', onClick: () => this.setState({ view: id }) })),
+      photos: D.gallery.map((src, i) => ({ src, ring: s.photo === i ? '0 0 0 2px #ffffff, 0 0 0 4px #0b2655' : 'none', op: s.photo === i ? 1 : 0.62, onClick: () => this.setState({ view: 'photo', photo: i }) })),
+      photoPrev: () => this.setState({ photo: (s.photo - 1 + D.gallery.length) % D.gallery.length }),
+      photoNext: () => this.setState({ photo: (s.photo + 1) % D.gallery.length }),
+      photoCount: String(s.photo + 1).padStart(2, '0') + ' / ' + String(D.gallery.length).padStart(2, '0'),
+      phX: s.w >= 1024 ? '88px' : '64px', phTop: s.w >= 1024 ? '120px' : '88px', phBot: s.w >= 1024 ? '100px' : '96px',
+      stripB: s.w >= 1024 ? '110px' : '162px', thW: s.w < 860 ? '64px' : '84px', thH: s.w < 860 ? '44px' : '56px',
+      stripThumbs: (() => { const n = D.gallery.length, st = Math.max(0, Math.min(n - 3, s.photo - 1)); return D.gallery.slice(st, st + 3).map((src, k) => { const i = st + k, on = i === s.photo; return { src, n: String(i + 1), on, op: on ? 1 : 0.6, ring: on ? '0 0 0 2px #0b2655' : '0 0 0 1px rgba(11,38,85,0.1)', onClick: () => this.setState({ photo: i }) }; }); })(),
+      camBtns: (({ bs: ['Pogled', 'Odozgo', 'Ispod'], hr: ['Pogled', 'Odozgo', 'Ispod'], en: ['Front', 'Top', 'Below'], de: ['Vorne', 'Oben', 'Unten'] })[s.lang]).map((label, i) => {
+        const id = ['front', 'top', 'low'][i], on = (s.cam || 'front') === id;
+        return { label, bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0b2655', hbg: on ? '#0b2655' : 'rgba(11,38,85,0.07)', onClick: () => this.setState({ cam: id, camN: (s.camN || 0) + 1, focus: 'none' }) };
+      }),
+      camMode: (s.cam || 'front') + ((s.camN || 0) % 2 ? ' ' : ''), camZoom: String(s.zoom || 1),
+      zoomIn: () => this.setState({ zoom: Math.min(1.6, +((s.zoom || 1) + 0.15).toFixed(2)) }),
+      zoomReset: () => this.setState({ zoom: 1 }), zoomPct: Math.round((s.zoom || 1) * 100) + '%',
+      zInOp: (s.zoom || 1) >= 1.6 ? 0.35 : 1, zOutOp: (s.zoom || 1) <= 0.7 ? 0.35 : 1,
+      zoomOut: () => this.setState({ zoom: Math.max(0.7, +((s.zoom || 1) - 0.15).toFixed(2)) }),
+      autoRot: s.rot === false ? 'false' : 'true', rotOn: s.rot !== false, rotBg: s.rot === false ? 'transparent' : '#0b2655', rotFg: s.rot === false ? '#0b2655' : '#ffffff',
+      rotLbl: ({ bs: 'Automatska rotacija', hr: 'Automatska rotacija', en: 'Auto-rotate', de: 'Automatisch drehen' })[s.lang],
+      toggleRot: () => this.setState({ rot: s.rot === false }), hintDisp: s.w >= 1024 ? 'block' : 'none',
+      dimsLine: D.sizeLabel[c.shape](c.size) + ' · H ' + spec[0] + ' cm',
+      ...this.detVals(s), ...this.toolVals(s),
+      envMode: 'studio', personOn: 'false', furnOn: 'false',
+      dimsOn: s.dims ? 'true' : 'false', dimsPressed: !!s.dims, toggleDims: () => this.setState({ dims: !s.dims, show3dPop: null }),
+      dimsBg: s.dims ? 'rgba(11,38,85,0.08)' : 'transparent', dimsFg: s.dims ? '#0b2655' : '#8a8f9c', dimsHbg: s.dims ? '#0b2655' : 'rgba(11,38,85,0.07)',
+      dimsLbl: ({ bs: 'Mjere', hr: 'Mjere', en: 'Dimensions', de: 'Maße' })[s.lang],
+      wLabel: D.sizeLabel[c.shape](c.size), hLabel: 'H ' + spec[0] + ' cm',
+      envTop: (parseInt(s.w >= 1024 ? 104 : 92) + 54) + 'px', envLblDisp: s.w >= 1024 ? 'inline' : 'none',
+      envBtns: [['studio', '#f3efe7'], ['terrace', 'linear-gradient(135deg,#d7cfc2 50%,#f0eadf 50%)'], ['garden', 'linear-gradient(180deg,#dde8f0 45%,#6f9a4e 45%)'], ['beach', 'linear-gradient(180deg,#3d86ad 45%,#e6d5b3 45%)']].map(([id, sw], i) => {
+        const on = (s.env || 'studio') === id, label = (({ bs: ['Studio', 'Terasa', 'Vrt', 'Plaža'], hr: ['Studio', 'Terasa', 'Vrt', 'Plaža'], en: ['Studio', 'Terrace', 'Garden', 'Beach'], de: ['Studio', 'Terrasse', 'Garten', 'Strand'] })[s.lang])[i];
+        return { label, sw, on, bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0b2655', hbg: on ? '#0b2655' : 'rgba(11,38,85,0.07)', ring: on ? 'rgba(255,255,255,0.9)' : 'transparent', padR: s.w >= 1024 ? '12px' : '5px', onClick: () => this.setState({ env: id }) };
+      }),
+      scaleBtns: [['person', ({ bs: 'Osoba 175 cm', hr: 'Osoba 175 cm', en: 'Person 175 cm', de: 'Person 175 cm' })[s.lang]], ['furn', ({ bs: 'Stol i stolice', hr: 'Stol i stolice', en: 'Table & chairs', de: 'Tisch & Stühle' })[s.lang]]].map(([k, label]) => {
+        const on = !!s[k];
+        return { label, title: label, on, mark: on ? '✓' : '', bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0b2655', hbg: on ? '#0b2655' : 'rgba(11,38,85,0.07)', onClick: () => this.setState({ [k]: !on }) };
+      }),
+      modelCode: c.shape + ' ' + c.size + ' ' + c.mech,
+      ...cfgUI, cfgQty: c.qty,
+      qtyDown: () => this.setCfg('qty', Math.max(1, c.qty - 1)), qtyUp: () => this.setCfg('qty', Math.min(999, c.qty + 1)),
+      summary: [
+        [t.o_size, t['sh_' + c.shape] + ' ' + D.sizeLabel[c.shape](c.size)], [t.o_mech, t['mech_' + c.mech]], [t.o_frame, t['fr_' + c.frame]],
+        [t.o_look, t['look_' + c.look]], [t.o_vent, t['vent_' + c.vent]], [t.o_fabric, t['fab_' + c.fabric] + ' · ' + c.color],
+        [t.o_brand, br.name || t.brand_none], [t.o_base, t['base_' + c.base]]
+      ].map(([k, v]) => ({ k, v })),
+      isB2B: b2b, discPct: Math.round(disc * 100) + ' %', discKM: this.km(unitBase * disc * c.qty),
+      unitKM: this.km(unit), totalKM: this.km(total), totalEUR: this.eur(total),
+      addLabel: s.justAdded ? t.added + ' ✓' : t.add,
+      primaryAct: () => this._add(),
+      addToCart: () => this._add(),
+      _unused: () => {
+        const item = { id: Date.now(), title: code, desc: this.cfgText(c, t), cfg: Object.assign({}, c), hex: curHex, unit: unitBase, qty: c.qty };
+        this.save({ cart: s.cart.concat([item]), justAdded: true });
+        this.flash(t.added + ' · ' + code);
+        setTimeout(() => this.setState({ justAdded: false }), 2200);
+      },
+      specs: [
+        [t.sp_frame, t.sp_frame_v], [t.sp_ribs, (c.shape === 'LS' && c.size === '400' ? '32×20' : '30×20') + ' mm'], [t.sp_pole, 'Ø58 mm'],
+        [t.sp_height, spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg'], [t.sp_pack, spec[2] + ' cm'], [t.sp_plastic, t.sp_plastic_v]
+      ].map(([k, v]) => ({ k, v }))
+    };
+  }
+  shade(hex) {
+    const h = hex.replace('#', ''), f = (i) => Math.round(parseInt(h.slice(i, i + 2), 16) * 0.82).toString(16).padStart(2, '0');
+    return '#' + f(0) + f(2) + f(4);
+  }
+  cartVals(t) {
+    const s = this.state, D = window.SUMAN, disc = s.b2b ? D.B2B_DISCOUNT : 0;
+    const upd = (id, fn) => this.save({ cart: s.cart.map((c) => (c.id === id ? fn(c) : c)).filter((c) => c.qty > 0) });
+    const cartItems = s.cart.map((c) => ({
+      title: c.title, desc: c.cfg ? this.cfgText(c.cfg, t) : c.desc, hex: c.hex, shade: this.shade(c.hex), qty: c.qty,
+      unit: this.km(c.unit * (1 - disc)), line: this.km(c.unit * c.qty * (1 - disc)),
+      up: () => upd(c.id, (x) => Object.assign({}, x, { qty: x.qty + 1 })),
+      down: () => upd(c.id, (x) => Object.assign({}, x, { qty: Math.max(1, x.qty - 1) })),
+      remove: () => this.save({ cart: s.cart.filter((x) => x.id !== c.id) })
+    }));
+    const sub = s.cart.reduce((a, c) => a + c.unit * c.qty, 0), dAmt = sub * disc, grand = sub - dAmt;
+    const deliveries = [['gr', t.d_gr, t.free], ['sa', t.d_sa, t.free], ['ship', t.d_ship, t.by_offer]].map(([id, label, price]) => {
+      const on = s.delivery === id;
+      return { label, price, bd: on ? '#0b2655' : '#dcd6ca', bg: on ? '#e6ebf4' : '#fbfaf7', dot: on ? '#0b2655' : 'transparent', onClick: () => this.setState({ delivery: id }) };
+    });
+    const f = s.form, ship = s.delivery === 'ship';
+    const req = ['name', 'email', 'phone'];
+    const defs = [['name', t.f_name, 'text'], ['company', t.f_company, 'text'], ['email', t.f_email, 'email'], ['phone', t.f_phone, 'tel'], ['city', t.f_city, 'text']];
+    if (ship) defs.push(['addr', t.f_addr, 'text', true]);
+    defs.push(['note', t.f_note, 'text', true]);
+    const fields = defs.map(([k, label, type, full]) => ({
+      label: label + (req.includes(k) ? ' *' : ''), type, value: f[k] || '', span: full ? '1 / -1' : 'auto',
+      bd: s.formErr && req.includes(k) && !(f[k] || '').trim() ? '#9a2a1f' : '#dcd6ca',
+      onChange: (e) => { const v = e.target.value; this.setState((st) => ({ form: Object.assign({}, st.form, { [k]: v }) })); }
+    }));
+    return {
+      isCart: s.screen === 'cart', isDone: s.screen === 'done', cartEmpty: s.cart.length === 0, cartFull: s.cart.length > 0,
+      cartItems, deliveries, isShip: ship, fields, formErr: s.formErr,
+      subKM: this.km(sub), cartDiscKM: this.km(dAmt), shipLabel: ship ? t.by_offer : t.free, grandKM: this.km(grand), grandEUR: this.eur(grand),
+      confirmNo: s.confirmNo,
+      submitOrder: () => {
+        if (req.some((k) => !(f[k] || '').trim())) { this.setState({ formErr: true }); return; }
+        const no = 'SU-26-' + String(Math.floor(430 + Math.random() * 500)).padStart(4, '0');
+        this.go('done', { cart: [], confirmNo: no, formErr: false });
+      }
+    };
+  }
+  b2bVals(t) {
+    const s = this.state, D = window.SUMAN, mobile = s.w < 860, scr = s.screen;
+    const SC = [['#e9e6df', '#3a4152'], ['#f6e7c8', '#7a4f00'], ['#d5ebee', '#0b4f5c'], ['#dde3f0', '#0b2655'], ['#dcefe2', '#1f6b3a']];
+    const gate = (scr === 'orders' || scr === 'order') && !s.b2b;
+    const counts = [0, 1, 2, 3, 4].map((i) => D.orders.filter((o) => o.stage === i).length);
+    const oFilters = [[-1, t.o_all, D.orders.length]].concat([0, 1, 2, 3, 4].map((i) => [i, t['st' + i], counts[i]])).filter((x) => x[2] > 0).map(([id, label, count]) => {
+      const on = s.oFilter === id;
+      return { label, count, bd: on ? '#0b2655' : '#dcd6ca', bg: on ? '#0b2655' : 'transparent', fg: on ? '#fff' : '#0f1a2c', onClick: () => this.setState({ oFilter: id }) };
+    });
+    const segs = (st) => [0, 1, 2, 3, 4].map((i) => ({ bg: i <= st ? (st === 4 ? '#1f6b3a' : '#0b2655') : '#dcd6ca' }));
+    const orderRows = D.orders.filter((o) => s.oFilter === -1 || o.stage === s.oFilter).map((o) => ({
+      no: o.no, date: o.date, ref: o.ref, eta: o.eta, value: this.km(o.value), status: t['st' + o.stage], sbg: SC[o.stage][0], sfg: SC[o.stage][1], segs: segs(o.stage),
+      onClick: () => this.go('order', { orderNo: o.no })
+    }));
+    const O = D.orders.find((o) => o.no === s.orderNo) || D.orders[0];
+    const steps = [0, 1, 2, 3, 4].map((i) => {
+      const done = i < O.stage || (i === O.stage && O.stage === 4), cur = i === O.stage;
+      return {
+        label: t['st' + i], desc: t['sd' + i], date: O.dates[i] ? O.dates[i] + '2026.' : cur ? '' : t.d_pending,
+        mark: done ? '✓' : '0' + (i + 1),
+        dotBg: done ? '#0b2655' : cur ? '#e2a33a' : '#fbfaf7', dotFg: done ? '#fff' : cur ? '#0b2655' : '#5b6272', dotBd: done ? '#0b2655' : cur ? '#e2a33a' : '#dcd6ca',
+        ring: cur && O.stage < 4 ? '0 0 0 6px rgba(226,163,58,0.25)' : 'none', fg: i <= O.stage ? '#0f1a2c' : '#5b6272',
+        line: i < O.stage ? '#0b2655' : '#dcd6ca', lineOp: i === 4 ? 0 : 1
+      };
+    });
+    const docs = [['doc_offer', 0, 'PDF · ' + O.date], ['doc_pro', 0, 'PDF · ' + O.date], ['doc_del', 3, O.dates[3] ? 'PDF · ' + O.dates[3] + '2026.' : ''], ['doc_inv', 4, O.dates[4] ? 'PDF · ' + O.dates[4] + '2026.' : '']].map(([k, min, meta]) => {
+      const ok = O.stage >= min;
+      return { label: t[k], meta: ok ? meta : t.d_pending, bg: ok ? '#fbfaf7' : 'transparent', op: ok ? 1 : 0.55, cur: ok ? 'pointer' : 'default' };
+    });
+    return {
+      isLogin: scr === 'login' || gate, isOrders: scr === 'orders' && s.b2b, isOrder: scr === 'order' && s.b2b,
+      loginBullets: [t.l_b1, t.l_b2, t.l_b3].map((label, i) => ({ n: '0' + (i + 1), label })),
+      loginEmail: s.login.email, loginPass: s.login.pass,
+      onLoginEmail: (e) => { const v = e.target.value; this.setState((st) => ({ login: Object.assign({}, st.login, { email: v }) })); },
+      onLoginPass: (e) => { const v = e.target.value; this.setState((st) => ({ login: Object.assign({}, st.login, { pass: v }) })); },
+      doLogin: () => this.go('orders', { b2b: true }),
+      doLogout: () => this.go('home', { b2b: false }),
+      goOrders: () => this.go('orders'),
+      partnerLine: D.partner.company + ' · ' + D.partner.city, partnerName: D.partner.company, mgr: D.partner,
+      oFilters, orderRows,
+      od: { no: O.no, date: O.date, ref: O.ref, eta: O.eta, addr: O.addr, items: O.items, value: this.km(O.value), valueEUR: this.eur(O.value), status: t['st' + O.stage], sbg: SC[O.stage][0], sfg: SC[O.stage][1], steps, docs },
+      tlCols: mobile ? 'minmax(0,1fr)' : 'repeat(5,minmax(0,1fr))', tlDir: mobile ? 'row' : 'column', tlLineDir: mobile ? 'column' : 'row',
+      tlLineMin: mobile ? '2px' : '0px', tlLineMinH: mobile ? '28px' : '2px', tlPad: mobile ? '4px 0 22px' : '0 16px 0 0'
+    };
+  }
+  renderVals() {
+    if (!this.state.ready) return { t: {}, curLang: { code: 'BS', name: 'Bosanski', flag: 'https://flagcdn.com/w80/ba.png' }, langRot: '0deg', hdr: { bg: '#0b2655', bd: '#0b2655', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.08)', btnBd: 'rgba(255,255,255,0.22)', cartBg: '#f5c400', cartFg: '#0b2655' }, logoImg: 'block', logoTxt: 'none', footDisp: 'none', isHome: true, sectors: [], seams: [], navItems: [], langs: [], stageNames: [], heroH: 700, desktop: this.state.w >= 860, footRef: this.footRef };
+    const t = window.SUMAN_I18N[this.state.lang] || window.SUMAN_I18N.bs;
+    try { document.documentElement.style.overflow = (this.state.screen === 'home' || this.state.screen === 'product') && !this.state.menu ? 'hidden' : ''; } catch (e) {}
+    const pv = this.productVals(t), c3 = this.state.screen === 'product' ? this.cfg3Vals(t) : {};
+    if (pv.review) pv.review = pv.review.map((r, i) => Object.assign({}, r, { edit: () => this.setState({ sheet: ['shape', 'mech', 'size', 'frame', 'look', 'vent', 'fabric', 'brand', 'base', 'qty'][i] }) }));
+    return this.fixHdr(Object.assign({}, this.baseVals(t), pv, c3, this.cartVals(t), this.b2bVals(t)));
+  }
+}
+</script>
+</body>
+</html>
