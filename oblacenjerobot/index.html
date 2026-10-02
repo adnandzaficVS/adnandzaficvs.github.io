@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-a6ae0b04-59f0-49ed-b984-1225651de6b2/styles.css">
+<script src="_ds/industry-a6ae0b04-59f0-49ed-b984-1225651de6b2/_ds_bundle.js"></script>
+<style>html,body{margin:0;height:100%;background:var(--color-bg);overflow:auto} a{color:var(--color-accent-700)} a:hover{color:var(--color-accent-900)} input[type=number]::-webkit-inner-spin-button{opacity:.5}</style>
+</helmet>
+<div style="height:100vh;min-width:1280px;display:grid;grid-template-rows:auto minmax(0,1fr);color:var(--color-text);font-family:var(--font-body)">
+
+<header style="display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+<div style="display:flex;flex-direction:column;margin-right:8px">
+<span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700)">Simulacija · IRB 6640-235/2.55</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:20px;line-height:1.1">Oblačenje suncobrana</span>
+</div>
+<label style="display:flex;flex-direction:column;font-size:11px;color:var(--color-neutral-700);gap:2px">Ćelija
+<select class="input" style="min-height:30px;padding:3px 8px;width:150px" value="{{ variant }}" onChange="{{ onVariant }}"><option value="2c">2c · Ugaoni</option><option value="rad">Radijalni</option><option value="2b">2b · Korpa iza</option></select></label>
+<label style="display:flex;flex-direction:column;font-size:11px;color:var(--color-neutral-700);gap:2px">Raspored
+<select class="input" style="min-height:30px;padding:3px 8px;width:170px" value="{{ cluster }}" onChange="{{ onCluster }}"><option value="1">1 ćelija</option><option value="niz">4 ćelije · u nizu</option><option value="2x2">4 ćelije · blok 2×2</option><option value="ledja">4 ćelije · leđa uz leđa</option></select></label>
+<label style="display:flex;flex-direction:column;font-size:11px;color:var(--color-neutral-700);gap:2px">Gripper
+<select class="input" style="min-height:30px;padding:3px 8px;width:190px" value="{{ gtype }}" onChange="{{ onGrip }}"><option value="2a">2a · Aksijalni + 2 stege</option><option value="1a">1a · Bočni dvostruki</option><option value="1b">1b · Aksijalni (glava)</option><option value="1c">1c · Bočni + F/T</option></select></label>
+<div style="width:1px;align-self:stretch;background:var(--color-divider)"></div>
+<button class="btn btn-primary" style="min-width:96px;height:34px" onClick="{{ onPlay }}">{{ playLabel }}</button>
+<div class="seg">
+<sc-for list="{{ speeds }}" as="s" hint-placeholder-count="5"><button class="seg-opt" style="border:0;font:inherit;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.fg }}" onClick="{{ s.on }}">{{ s.l }}</button></sc-for>
+</div>
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" checked="{{ stepMode }}" onChange="{{ onStepMode }}">Korak po korak</label>
+<button class="btn btn-secondary" style="height:34px" disabled="{{ noStep }}" onClick="{{ onStepNext }}">Sljedeći korak ›</button>
+<button class="btn btn-secondary" style="height:34px" onClick="{{ onReset }}">Reset</button>
+<div style="display:flex;gap:4px;margin-left:auto"><sc-for list="{{ panelBtns }}" as="pb"><button class="btn btn-secondary" title="{{ pb.tip }}" style="height:30px;font-size:12px;background:{{ pb.bg }};color:{{ pb.fg }}" onClick="{{ pb.on }}">{{ pb.l }}</button></sc-for></div>
+<span style="font-family:var(--font-heading);font-size:22px;font-variant-numeric:tabular-nums">{{ simTime }}</span>
+</header>
+
+<div style="display:grid;grid-template-columns:{{ bodyCols }};min-height:0;overflow:hidden">
+
+<sc-if value="{{ showL }}" hint-placeholder-val="{{ true }}"><aside style="grid-column:1;grid-row:1;border-right:1px solid var(--color-divider);overflow:auto;padding:12px 14px 80px;display:flex;flex-direction:column;gap:16px;min-height:0">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:-12px;background:var(--color-bg);padding:8px 0;z-index:2;border-bottom:1px solid var(--color-divider)">
+<span style="font-family:var(--font-heading);font-weight:600;font-size:17px">Parametri</span>
+<button class="btn btn-primary" style="height:30px" disabled="{{ notDirty }}" onClick="{{ onApply }}">Primijeni</button>
+</div>
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="5">
+<div style="display:flex;flex-direction:column;gap:7px">
+<button style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)" onClick="{{ g.toggle }}"><span style="font-size:10px;width:10px">{{ g.arrow }}</span>{{ g.title }}</button>
+<sc-if value="{{ g.open }}"><sc-for list="{{ g.items }}" as="f">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 92px;align-items:center;gap:8px;font-size:13px">
+<span style="color:var(--color-neutral-800)">{{ f.label }}<span style="color:var(--color-neutral-600);font-size:11px"> {{ f.unit }}</span></span>
+<sc-if value="{{ f.isNum }}"><input class="input" type="number" step="{{ f.step }}" value="{{ f.value }}" onChange="{{ f.onChange }}" style="min-height:28px;padding:3px 6px;font-size:13px;text-align:right"></sc-if>
+<sc-if value="{{ f.isBool }}"><input type="checkbox" checked="{{ f.value }}" onChange="{{ f.onChange }}" style="justify-self:end;width:16px;height:16px"></sc-if>
+<sc-if value="{{ f.isSel }}"><select class="input" value="{{ f.value }}" onChange="{{ f.onChange }}" style="min-height:28px;padding:2px 4px;font-size:12px"><sc-for list="{{ f.options }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+</div>
+</sc-for></sc-if>
+</div>
+</sc-for>
+<span style="font-size:12px;color:var(--color-neutral-700);text-wrap:pretty">Promjena parametara ponovo gradi ćeliju i resetuje simulaciju. Vrijednosti se pamte u pregledniku.</span>
+</aside></sc-if>
+
+<main style="grid-column:2;grid-row:1;display:grid;grid-template-rows:{{ mainRows }};min-width:0;min-height:0;overflow:hidden">
+<div style="position:relative;min-height:0;overflow:hidden;border-bottom:1px solid var(--color-divider)">
+<div ref="{{ r3d }}" style="position:absolute;inset:0;overflow:hidden"></div>
+<div style="position:absolute;left:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap">
+<sc-for list="{{ views }}" as="v" hint-placeholder-count="4"><button class="btn btn-secondary" style="height:28px;font-size:13px;background:{{ v.bg }};color:{{ v.fg }}" onClick="{{ v.on }}">{{ v.l }}</button></sc-for>
+</div>
+<div style="position:absolute;right:12px;top:12px;display:flex;gap:6px"><button class="btn btn-secondary" style="height:28px;font-size:13px" onClick="{{ f3d }}">{{ f3dLabel }}</button></div>
+<sc-if value="{{ multi }}">
+<div style="position:absolute;right:12px;top:48px;display:flex;gap:6px">
+<sc-for list="{{ cellBtns }}" as="b"><button class="btn btn-secondary" style="height:28px;font-size:13px;background:{{ b.bg }};color:{{ b.fg }}" onClick="{{ b.on }}">{{ b.l }}</button></sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-heading);font-size:20px;color:var(--color-accent-700)">Učitavanje modela robota…</div>
+</sc-if>
+<sc-if value="{{ err }}"><div style="position:absolute;left:12px;bottom:12px;right:12px;font-size:13px;color:var(--color-accent-900)">Greška: {{ err }}</div></sc-if>
+<div style="position:absolute;left:12px;bottom:10px;display:flex;gap:12px;font-size:12px;color:var(--color-neutral-700)"><span>Lijevi klik: rotacija</span><span>Desni klik: pomak</span><span>Točkić: zum</span></div>
+</div>
+<div style="display:grid;grid-template-columns:{{ botCols }};min-height:0;overflow:hidden">
+<div style="display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;border-right:1px solid var(--color-divider)">
+<div style="display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid var(--color-divider)">
+<span style="font-family:var(--font-heading);font-weight:600;font-size:15px">2D tlocrt</span>
+<span style="font-size:12px;color:var(--color-neutral-700)">Klik = osoba ulazi u ćeliju</span>
+<button class="btn btn-secondary" style="margin-left:auto;height:26px;font-size:12px" disabled="{{ noIntr }}" onClick="{{ onClearIntr }}">Osoba izlazi</button>
+<button class="btn btn-secondary" style="height:26px;font-size:12px" onClick="{{ f2d }}">{{ f2dLabel }}</button>
+</div>
+<div style="flex:1;min-height:0;position:relative;overflow:hidden;cursor:crosshair"><canvas ref="{{ r2d }}" style="position:absolute;inset:0;width:100%;height:100%"></canvas></div>
+</div>
+<div style="display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden">
+<div style="display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid var(--color-divider)">
+<span style="font-family:var(--font-heading);font-weight:600;font-size:15px">Vremenska linija · {{ cellName }}</span>
+<button class="btn btn-secondary" style="margin-left:auto;height:26px;font-size:12px" onClick="{{ fGantt }}">{{ fGanttLabel }}</button>
+<div class="seg">
+<sc-for list="{{ wins }}" as="w"><button class="seg-opt" style="border:0;font:inherit;font-size:12px;padding:4px 9px;cursor:pointer;background:{{ w.bg }};color:{{ w.fg }}" onClick="{{ w.on }}">{{ w.l }}</button></sc-for>
+</div>
+</div>
+<div style="flex:1;min-height:0;padding:8px 12px;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+<sc-for list="{{ lanes }}" as="ln" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:8px">
+<span style="font-size:12px;color:var(--color-neutral-800)">{{ ln.name }}</span>
+<div style="position:relative;height:30px;border:1px solid var(--color-divider);overflow:hidden">
+<sc-for list="{{ ln.bars }}" as="b"><div title="{{ b.tip }}" style="position:absolute;top:2px;bottom:2px;left:{{ b.left }}%;width:{{ b.w }}%;background:{{ b.bg }};color:{{ b.fg }};font-size:10.5px;line-height:26px;padding-left:3px;overflow:hidden;white-space:nowrap;border-right:1px solid var(--color-bg)">{{ b.txt }}</div></sc-for>
+</div>
+</div>
+</sc-for>
+<div style="display:grid;grid-template-columns:70px minmax(0,1fr);gap:8px"><span></span>
+<div style="position:relative;height:14px;font-size:10.5px;color:var(--color-neutral-700)"><sc-for list="{{ ticks }}" as="t"><span style="position:absolute;left:{{ t.left }}%;transform:translateX(-50%)">{{ t.l }}</span></sc-for></div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--color-neutral-800);margin-top:2px">
+<sc-for list="{{ legend }}" as="lg"><span style="display:flex;align-items:center;gap:5px"><i style="width:12px;height:9px;display:block;background:{{ lg.bg }}"></i>{{ lg.l }}</span></sc-for>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<sc-if value="{{ showR }}" hint-placeholder-val="{{ true }}"><aside style="grid-column:3;grid-row:1;border-left:1px solid var(--color-divider);overflow:auto;padding:12px 14px 40px;display:flex;flex-direction:column;gap:16px;min-height:0">
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--font-heading);font-weight:600;font-size:18px">{{ cellName }}</span><span class="tag" style="margin-left:auto;font-weight:700;background:{{ safeBg }};color:{{ safeFg }}">{{ safeLabel }}</span></div>
+<span style="font-size:13px;color:var(--color-neutral-700)">{{ layoutName }} · faza: <b style="color:var(--color-text)">{{ phase }}</b></span>
+<span style="font-size:14px">{{ opLabel }}</span>
+<span style="font-size:12px;color:var(--color-neutral-700)">{{ safeText }}</span>
+</div>
+
+<div class="blueprint" style="padding:12px;display:flex;flex-direction:column;gap:10px">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px">
+<sc-for list="{{ stepPills }}" as="p" hint-placeholder-count="5"><div title="{{ p.name }}" style="padding:5px 0;text-align:center;font-family:var(--font-heading);font-size:15px;border:1px solid var(--color-divider);background:{{ p.bg }};color:{{ p.fg }}">{{ p.n }}</div></sc-for>
+</div>
+<span style="font-size:13px"><b>{{ stepTitle }}</b></span>
+<span style="font-size:12px;color:var(--color-neutral-700)">{{ o1Text }}</span>
+<sc-if value="{{ isStep5 }}">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<button class="btn btn-primary" style="height:48px;font-size:16px" disabled="{{ noPedal }}" onClick="{{ onPedalOk }}">Pedala · OK</button>
+<button class="btn btn-secondary" style="height:48px;font-size:16px" disabled="{{ noPedal }}" onClick="{{ onPedalNok }}">NOK</button>
+</div>
+</sc-if>
+<sc-if value="{{ notStep5 }}">
+<button class="btn btn-primary" style="height:48px;font-size:16px;width:100%" disabled="{{ noPedal }}" onClick="{{ onPedalOk }}">{{ pedalLabel }}</button>
+</sc-if>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--color-divider)">
+<sc-for list="{{ counters }}" as="k" hint-placeholder-count="9"><div style="padding:8px 10px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column"><span style="font-size:10.5px;color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:.06em">{{ k.l }}</span><span style="font-family:var(--font-heading);font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums">{{ k.v }}</span></div></sc-for>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Korpa</span><span style="font-size:12px;color:var(--color-neutral-700)">{{ basketText }}</span></div>
+<div style="display:flex;flex-direction:column;gap:3px;border:1px solid var(--color-divider);padding:6px">
+<sc-for list="{{ bRows }}" as="row"><div style="display:grid;grid-template-columns:repeat({{ bCols }},1fr);gap:3px"><sc-for list="{{ row.cells }}" as="cl"><div style="height:16px;border:1px solid var(--color-neutral-400);background:{{ cl.bg }}"></div></sc-for></div></sc-for>
+</div>
+<span style="font-size:12px;color:var(--color-neutral-700)">{{ protText }}</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Sila otvaranja</span><span style="font-size:12px;color:var(--color-neutral-700)">{{ ftText }}</span></div>
+<div style="display:flex;align-items:flex-end;gap:14px">
+<div style="display:flex;flex-direction:column"><span style="font-size:11px;color:var(--color-neutral-700)">Trenutno</span><span style="font-family:var(--font-heading);font-size:28px;line-height:1">{{ fNow }}</span></div>
+<div style="display:flex;flex-direction:column"><span style="font-size:11px;color:var(--color-neutral-700)">Maks.</span><span style="font-family:var(--font-heading);font-size:28px;line-height:1">{{ fMax }}</span></div>
+<div style="flex:1;height:44px;display:flex;align-items:flex-end;gap:1px;border-bottom:1px solid var(--color-divider)"><sc-for list="{{ fBars }}" as="fb"><div style="flex:1;height:{{ fb.h }}%;background:var(--color-accent-500)"></div></sc-for></div>
+</div>
+<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 0.8fr;font-size:12px">
+<span style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);padding:4px 2px;border-bottom:1px solid var(--color-divider)">ID</span><span style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);padding:4px 2px;border-bottom:1px solid var(--color-divider)">Vrijeme</span><span style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);padding:4px 2px;border-bottom:1px solid var(--color-divider);text-align:right">F max</span><span style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);padding:4px 2px;border-bottom:1px solid var(--color-divider);text-align:right">Rez.</span>
+<sc-for list="{{ hist }}" as="h"><span style="padding:3px 2px;border-bottom:1px solid var(--color-neutral-200)">{{ h.id }}</span><span style="padding:3px 2px;border-bottom:1px solid var(--color-neutral-200)">{{ h.t }}</span><span style="padding:3px 2px;border-bottom:1px solid var(--color-neutral-200);text-align:right">{{ h.f }}</span><span style="padding:3px 2px;border-bottom:1px solid var(--color-neutral-200);text-align:right;font-weight:700;color:{{ h.c }}">{{ h.ok }}</span></sc-for>
+</div>
+<sc-if value="{{ noHist }}"><span style="font-size:12px;color:var(--color-neutral-700)">Još nema zapisa.</span></sc-if>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Provjere</span>
+<sc-for list="{{ warns }}" as="w"><span style="font-size:12.5px;color:var(--color-accent-900);text-wrap:pretty">⚠ {{ w }}</span></sc-for>
+<sc-if value="{{ noWarn }}"><span style="font-size:12.5px;color:var(--color-neutral-700)">Doseg, prepust i visina u redu.</span></sc-if>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Ose robota (°)</span>
+<div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:1px solid var(--color-divider)">
+<sc-for list="{{ joints }}" as="j" hint-placeholder-count="6"><div style="padding:5px 4px;text-align:center;border-right:1px solid var(--color-divider)"><div style="font-size:10.5px;color:var(--color-neutral-700)">{{ j.l }}</div><div style="font-family:var(--font-heading);font-size:15px;font-variant-numeric:tabular-nums">{{ j.v }}</div></div></sc-for>
+</div>
+</div>
+</aside></sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const KEY = 'suncobranSim.P.v2';
+const DEF = {
+  umb: { D: 4.0, L: 3.0, ribs: 8, mass: 10, poleD: 0.068 },
+  basket: { rows: 6, cols: 6, len: 2.0, width: 1.0, height: 1.2, wall: true, wallDist: 0.55 },
+  grip: { type: '2a', toolLen: 0.35, clampSpacing: 0.26, ft: true, gripOffset: 0.25 },
+  robot: { speed: 60, slow: 30, lin: 0.8, approach: 0.15 },
+  op: { mode: 'auto', standby: 'izvan', t2: 25, t3: 20, t4: 15, t5: 12, t6: 6, t7: 35, h2: 1.35, o2: 40, vertH: 0.8, vertTilt: 30, vertR: 2.5, nokRate: 3 },
+  cell: { variant: '2c', cluster: '1', bx: 0.35, robDx: 1.75, robDz: 1.3, tDx: 1.75, tDz: 0.6, frontC: 1.2, presAngle: 50, rB: 2.1, rT: 1.7, rP: 1.6, front: 2.0, stopDepth: 1.2, slowDepth: 1.4, basketChange: 180, tableCap: 2, palletCap: 24, phase: 20, hall: 4.5 },
+  force: { mean: 120, sd: 15, limit: 160 },
+};
+const INT = ['umb.ribs', 'basket.rows', 'basket.cols', 'cell.tableCap', 'cell.palletCap'];
+const FIELDS = [
+  ['Suncobran', [['umb.D', 'Prečnik krošnje', 'm', 0.1], ['umb.L', 'Dužina konstrukcije', 'm', 0.05], ['umb.ribs', 'Broj žbica', '', 1], ['umb.mass', 'Masa', 'kg', 0.5]]],
+  ['Korpa', [['basket.rows', 'Broj redova', '', 1], ['basket.cols', 'Ćelija u redu', '', 1], ['basket.len', 'Dužina korpe', 'm', 0.05], ['basket.width', 'Širina', 'm', 0.05], ['basket.height', 'Visina', 'm', 0.05], ['basket.wall', 'Graničnik (podna klapna)', ''], ['basket.wallDist', 'Graničnik iza čela', 'm', 0.05]]],
+  ['Gripper', [['grip.clampSpacing', 'Razmak stega', 'm', 0.01], ['grip.toolLen', 'Prirubnica → konus', 'm', 0.01], ['grip.gripOffset', 'Hvat od dna (bočni)', 'm', 0.01], ['grip.ft', 'F/T senzor sile', '']]],
+  ['Robot', [['robot.speed', 'Brzina programa', '%', 5], ['robot.slow', 'Smanjena brzina', '%', 5], ['robot.lin', 'Linearna brzina', 'm/s', 0.05], ['robot.approach', 'Brzina prilaza', 'm/s', 0.01]]],
+  ['Operater', [['op.mode', 'Potvrda koraka', '', 0, [['auto', 'Automatski O1'], ['rucno', 'Ručna pedala']]], ['op.standby', 'O1 čeka', '', 0, [['izvan', 'izvan polja'], ['spora', 'u sporoj zoni']]], ['op.t2', 'Korak 2 · platno', 's', 1], ['op.t3', 'Korak 3 · fiksiranje', 's', 1], ['op.t4', 'Korak 4 · zatezanje', 's', 1], ['op.t5', 'Korak 5 · kontrola', 's', 1], ['op.t6', 'Korak 6 · zatvaranje', 's', 1], ['op.t7', 'O2 · pakovanje', 's', 1], ['op.nokRate', 'Udio NOK (auto)', '%', 1]]],
+  ['Prezentacija operateru', [['cell.rP', 'Robot → dno štapa', 'm', 0.05], ['cell.presAngle', 'Ugao štapa (0° = radijalno)', '°', 5], ['op.h2', 'Visina štapa – horizontalno', 'm', 0.05], ['op.o2', 'Otvaranje u koraku 2', '%', 5], ['op.vertH', 'Dno štapa – vertikalno', 'm', 0.05], ['op.vertTilt', 'Nagib od vertikale', '°', 1], ['op.vertR', 'Udaljenost – vertikalno', 'm', 0.05]]],
+  ['Raspored 2c · ugaoni', [['cell.bx', 'Korpa od lijeve ograde', 'm', 0.05], ['cell.robDx', 'Robot desno od ose korpe', 'm', 0.05], ['cell.robDz', 'Robot ispred čela korpe', 'm', 0.05], ['cell.tDx', 'Sto desno od robota', 'm', 0.05], ['cell.tDz', 'Kraj stola ispred čela korpe', 'm', 0.05], ['cell.frontC', 'Robot → prednja linija', 'm', 0.1]]],
+  ['Raspored radijalni / 2b', [['cell.rB', 'Robot → čelo korpe', 'm', 0.05], ['cell.rT', 'Robot → početak stola', 'm', 0.05], ['cell.front', 'Robot → prednja linija', 'm', 0.1]]],
+  ['Sigurnost i ćelija', [['cell.stopDepth', 'Dubina zone stop', 'm', 0.1], ['cell.slowDepth', 'Dubina spore zone', 'm', 0.1], ['cell.basketChange', 'Zamjena korpe', 's', 10], ['cell.tableCap', 'Kapacitet stola', 'kom', 1], ['cell.palletCap', 'Kutija po paleti', 'kom', 1], ['cell.phase', 'Pomak starta ćelija', 's', 5], ['cell.hall', 'Visina hale', 'm', 0.1]]],
+  ['Sila otvaranja (simulacija)', [['force.mean', 'Srednja vrijednost', 'N', 5], ['force.sd', 'Rasipanje', 'N', 1], ['force.limit', 'Granica NOK', 'N', 5]]],
+];
+const COL = { 'Uzimanje': 'var(--color-accent-700)', 'Prenos': 'var(--color-accent-500)', 'Prezentacija': 'var(--color-accent-400)', 'Čeka O1': 'var(--color-accent-200)', 'Odlaganje': 'var(--color-accent)', 'Čeka': 'var(--color-neutral-300)', 'Stop': 'var(--color-accent-900)', 'Sporo': 'var(--color-accent-300)', 'Zamjena korpe': 'var(--color-neutral-500)', 'Hod': 'var(--color-neutral-400)', 'Platno': 'var(--color-accent-400)', 'Fiksiranje': 'var(--color-accent-500)', 'Zatezanje': 'var(--color-accent)', 'Kontrola': 'var(--color-accent-700)', 'Zatvaranje': 'var(--color-accent-300)', 'Preuzimanje': 'var(--color-accent-400)', 'Pakovanje': 'var(--color-accent)', 'Paleta': 'var(--color-accent-700)' };
+const DARK = ['Uzimanje', 'Stop', 'Odlaganje', 'Zatezanje', 'Pakovanje', 'Paleta', 'Prenos', 'Kontrola', 'Fiksiranje', 'Zamjena korpe'];
+const STEPN = { 2: 'Otvaranje i nabacivanje platna', 3: 'Fiksiranje platna', 4: 'Zatezanje platna', 5: 'Otvaranje · sila · vizuelna kontrola', 6: 'Zatvaranje' };
+const getK = (o, k) => k.split('.').reduce((a, p) => a && a[p], o);
+const setK = (o, k, v) => { const p = k.split('.'); let a = o; for (let i = 0; i < p.length - 1; i++) a = a[p[i]]; a[p[p.length - 1]] = v; };
+const clone = o => JSON.parse(JSON.stringify(o));
+const mmss = t => { t = Math.max(0, Math.floor(t)); const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60; return (h ? h + ':' : '') + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); };
+const fmt = (v, d = 0) => v == null || isNaN(v) ? '—' : Number(v).toFixed(d);
+
+class Component extends DCLogic {
+  r3d = React.createRef(); r2d = React.createRef();
+  state = { P: this.loadP(), raw: {}, st: null, loading: true, err: '', win: 120, stepMode: false, showL: true, showR: true, showB: true, focus: null, closed: { 'Sila otvaranja (simulacija)': true, 'Raspored radijalni / 2b': true } };
+  loadP() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) { const P = clone(DEF); for (const g in P) Object.assign(P[g], s[g] || {}); if (s.op && s.op.vertTilt === 15) P.op.vertTilt = 30; return P; } } catch (e) {} return clone(DEF); }
+  componentDidMount() { this.boot(); }
+  async boot() {
+    try {
+      const mod = await import(new URL('sim/engine.js?v=murfvng2', document.baseURI).href);
+      this.sim = new mod.Sim(this.r3d.current, this.r2d.current, st => this.setState({ st })); window.__sim = this.sim;
+      await this.sim.load(new URL('assets/IRB6640_235-255.glb', document.baseURI).href);
+      this.sim.build(this.state.P); this.setState({ loading: false });
+    } catch (e) { console.error(e); this.setState({ err: String(e && e.message || e), loading: false }); }
+  }
+  apply(P) { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {} this.setState({ P, raw: {} }); if (this.sim) { this.sim.build(P); this.sim.setStepMode(this.state.stepMode); } }
+  applyRaw() { const P = clone(this.state.P); for (const [k, v] of Object.entries(this.state.raw)) { const old = getK(P, k); if (typeof old === 'number') { const n = parseFloat(v); if (!isNaN(n)) setK(P, k, INT.includes(k) ? Math.max(1, Math.round(n)) : n); } else setK(P, k, v); } this.apply(P); }
+  quick(k, v) { const P = clone(this.state.P); setK(P, k, v); this.apply(P); }
+  renderVals() {
+    const S = this.state, P = S.P, raw = S.raw, st = S.st, sim = this.sim;
+    const c = st && st.cells[st.sel] ? st.cells[st.sel] : null;
+    const groups = FIELDS.map(([title, items]) => ({ title, open: !S.closed[title], arrow: S.closed[title] ? '▸' : '▾', toggle: () => this.setState(s => ({ closed: { ...s.closed, [title]: !s.closed[title] } })), items: items.map(([k, label, unit, step, opts]) => {
+      const base = getK(P, k), v = k in raw ? raw[k] : base, isBool = typeof base === 'boolean', isSel = !!opts;
+      return { k, label, unit, step, value: isBool ? !!v : String(v), isBool, isSel, isNum: !isBool && !isSel, options: (opts || []).map(([v2, l]) => ({ v: v2, l })),
+        onChange: e => { const nv = isBool ? e.target.checked : e.target.value; this.setState(s => ({ raw: { ...s.raw, [k]: nv } })); } };
+    }) }));
+    const playing = st ? st.playing : true, speed = sim ? sim.speed : 1;
+    const speeds = [1, 2, 5, 10, 30].map(x => ({ l: x + '×', bg: x === speed ? 'var(--color-accent)' : 'transparent', fg: x === speed ? 'var(--color-bg)' : 'var(--color-text)', on: () => { if (sim) { sim.speed = x; this.forceUpdate(); } } }));
+    const vm = sim ? sim.viewMode : 'persp';
+    const views = [['persp', 'Perspektiva'], ['op', 'Pogled operatera'], ['top', 'Odozgo'], ['all', 'Cijeli raspored']].map(([k, l]) => ({ l, bg: vm === k ? 'var(--color-accent)' : 'var(--color-bg)', fg: vm === k ? 'var(--color-bg)' : 'var(--color-text)', on: () => { sim && sim.view(k); this.forceUpdate(); } }));
+    const cellBtns = st ? st.cells.map((x, i) => ({ l: String(i + 1), bg: i === st.sel ? 'var(--color-accent)' : 'var(--color-bg)', fg: i === st.sel ? 'var(--color-bg)' : 'var(--color-text)', on: () => sim && sim.select(i) })) : [];
+    // gantt
+    const W = S.win, now = c ? c.time : 0, t0 = Math.max(0, now - W), span = Math.max(W, 1);
+    const used = new Set();
+    const lanes = ['Robot', 'Sigurnost', 'O1', 'O2'].map(name => ({ name, bars: c ? c.gantt.filter(g => g.lane === name && g.t1 > t0 && g.label).map(g => {
+      const a = Math.max(g.t0, t0), left = (a - t0) / span * 100, w = Math.max(0.2, (g.t1 - a) / span * 100); used.add(g.label);
+      return { left: left.toFixed(2), w: w.toFixed(2), bg: COL[g.label] || 'var(--color-neutral-300)', fg: DARK.includes(g.label) ? 'var(--color-bg)' : 'var(--color-text)', txt: w > 7 ? g.label : '', tip: g.label + ' · ' + (g.t1 - g.t0).toFixed(1) + ' s' };
+    }) : [] }));
+    const tstep = W <= 60 ? 10 : W <= 120 ? 20 : 60, ticks = [];
+    for (let t = Math.ceil(t0 / tstep) * tstep; t <= t0 + span; t += tstep) ticks.push({ left: ((t - t0) / span * 100).toFixed(2), l: mmss(t) });
+    const legend = [...used].map(l => ({ l, bg: COL[l] || 'var(--color-neutral-300)' }));
+    const wins = [60, 120, 300].map(x => ({ l: x < 120 ? x + ' s' : x / 60 + ' min', bg: x === W ? 'var(--color-accent)' : 'transparent', fg: x === W ? 'var(--color-bg)' : 'var(--color-text)', on: () => this.setState({ win: x }) }));
+    // status
+    const sf = c ? c.safety.state : 'OK';
+    const safeText = !c ? '' : sf === 'STOP' ? 'Osoba u zoni stop – robot stoji (ponovni start 1 s nakon izlaska).' : sf === 'SPORO' ? (c.windowActive ? 'Prozor O1 aktivan – robot radi smanjenom brzinom (' + P.robot.slow + ' %).' : 'Osoba u sporoj zoni – smanjena brzina (' + P.robot.slow + ' %).') : 'Zone slobodne – puna programirana brzina.';
+    const ws = c ? c.waitStep : null, jp = c ? c.jobPh : null, manual = P.op.mode !== 'auto';
+    const o1Text = !c ? '' : !ws ? (c.windowActive ? 'Robot rotira konstrukciju.' : 'O1 čeka sljedeći suncobran.') : jp === 'walk' ? 'O1 ide na radnu poziciju.' : jp === 'task' ? 'O1 radi…' : jp === 'done' ? (manual ? 'Korak završen – pritisnite pedalu.' : 'Korak završen – O1 potvrđuje.') : '';
+    const stepPills = [2, 3, 4, 5, 6].map(n => ({ n, name: STEPN[n], bg: ws === n ? 'var(--color-accent)' : 'transparent', fg: ws === n ? 'var(--color-bg)' : 'var(--color-text)' }));
+    const counters = c ? [['Gotovo', c.done], ['NOK', c.nok], ['U korpi', c.remaining], ['Zadnji ciklus', c.cycleLast ? fmt(c.cycleLast, 1) + ' s' : '—'], ['Prosjek', c.cycleAvg ? fmt(c.cycleAvg, 1) + ' s' : '—'], ['Kom / h', fmt(c.perHour, 1)], ['Kom / smjena', c.perHour ? fmt(c.perHour * 7.5, 0) : '—'], ['Na stolu', c.tableN + ' / ' + P.cell.tableCap], ['Paleta', c.nbox + ' / ' + P.cell.palletCap]].map(([l, v]) => ({ l, v: String(v) })) : [];
+    const bRows = c ? c.grid.map(row => ({ cells: row.map(x => ({ bg: x.cur ? 'var(--color-accent-900)' : x.full ? 'var(--color-accent-400)' : 'transparent' })) })) : [];
+    const ftOn = P.grip.ft && (P.grip.type === '2a' || P.grip.type === '1c');
+    const curve = c ? c.force.curve : [], step = Math.max(1, Math.ceil(curve.length / 48)), mx = Math.max(P.force.limit, ...curve, 1);
+    const fBars = []; for (let i = 0; i < curve.length; i += step) fBars.push({ h: (curve[i] / mx * 100).toFixed(1) });
+    const hist = c ? c.hist.map(h => ({ id: h.id, t: mmss(h.t), f: h.f == null ? 'ručno' : h.f.toFixed(0) + ' N', ok: h.ok ? 'OK' : 'NOK', c: h.ok ? 'var(--color-accent-700)' : 'var(--color-accent-900)' })) : [];
+    const warns = c ? [...(c.coll || []).map(k => 'Kolizija: ' + k), ...(st.clusterWarn || []), ...(c.staticWarn || []), ...c.warn] : [];
+    const F = S.focus, on = 'var(--color-accent)', off = 'var(--color-bg)';
+    const tog = k => () => this.setState(s => ({ [k]: !s[k] }));
+    const panelBtns = [['showL', '◧ Parametri', 'Sakrij/prikaži parametre'], ['showB', '▭ 2D i vrijeme', 'Sakrij/prikaži donje panele'], ['showR', 'Status ◨', 'Sakrij/prikaži status']].map(([k, l, tip]) => ({ l, tip, bg: S[k] ? on : off, fg: S[k] ? 'var(--color-bg)' : 'var(--color-text)', on: tog(k) }));
+    const fset = k => () => this.setState(s => ({ focus: s.focus === k ? null : k }));
+    const mainRows = F === '3d' ? 'minmax(0,1fr) 0px' : F ? '0px minmax(0,1fr)' : S.showB ? 'minmax(0,1.5fr) minmax(230px,1fr)' : 'minmax(0,1fr) 0px';
+    const botCols = F === '2d' ? 'minmax(0,1fr) 0px' : F === 'gantt' ? '0px minmax(0,1fr)' : 'minmax(0,1fr) minmax(0,1.15fr)';
+    const bodyCols = (S.showL ? '290px' : '0px') + ' minmax(0,1fr) ' + (S.showR ? '350px' : '0px');
+    const joints = c ? c.joints.map((v, i) => ({ l: 'J' + (i + 1), v: v.toFixed(0) })) : [];
+    return {
+      r3d: this.r3d, r2d: this.r2d, groups, loading: S.loading, err: S.err,
+      variant: P.cell.variant, cluster: P.cell.cluster, gtype: P.grip.type,
+      onVariant: e => this.quick('cell.variant', e.target.value), onCluster: e => this.quick('cell.cluster', e.target.value), onGrip: e => this.quick('grip.type', e.target.value),
+      playLabel: playing ? '❚❚ Pauza' : '▶ Pokreni', onPlay: () => { if (sim) { sim.playing = !sim.playing; this.forceUpdate(); } },
+      speeds, stepMode: S.stepMode, onStepMode: e => { const v = e.target.checked; this.setState({ stepMode: v }); sim && sim.setStepMode(v); },
+      noStep: !(c && c.paused), onStepNext: () => sim && sim.stepNext(), onReset: () => this.apply(clone(P)),
+      simTime: mmss(now), notDirty: !Object.keys(raw).length, onApply: () => this.applyRaw(),
+      views, multi: st ? st.n > 1 : false, cellBtns, noIntr: !(st && st.intruders), onClearIntr: () => sim && sim.clearIntruders(),
+      cellName: c ? 'Ćelija ' + (c.idx + 1) : 'Ćelija', layoutName: c ? c.name : '', phase: c ? (c.ph || '—') : '—', opLabel: c ? c.opLabel : '', lanes, ticks, legend, wins,
+      safeLabel: sf, safeBg: sf === 'STOP' ? 'var(--color-accent-900)' : sf === 'SPORO' ? 'var(--color-accent-300)' : 'var(--color-accent-100)', safeFg: sf === 'STOP' ? 'var(--color-bg)' : 'var(--color-accent-900)', safeText,
+      stepPills, stepTitle: ws ? 'Korak ' + ws + ' · ' + STEPN[ws] : 'Koraci kod operatera 1', o1Text,
+      isStep5: ws === 5, notStep5: ws !== 5, noPedal: !(c && c.waitingPedal), pedalLabel: manual ? 'Pedala · potvrdi korak' : 'Automatski operater', onPedalOk: () => sim && sim.pedal(true), onPedalNok: () => sim && sim.pedal(false),
+      counters, bRows, bCols: P.basket.cols, basketText: c ? c.remaining + ' / ' + P.basket.rows * P.basket.cols + ' · klapne preklopljene: ' + c.flaps.filter(a => a > 0.99).length : '',
+      protText: c ? 'Prepust donjeg kraja nakon guranja: ' + fmt(c.prot * 1000) + ' mm (potrebno ' + fmt(c.need * 1000) + ' mm) · vrh pri okretanju ≈ ' + fmt(c.crownTop, 2) + ' m' : '',
+      ftText: ftOn ? 'F/T senzor u alatu – zapis po komadu' : 'Bez senzora – zapis samo OK/NOK', fNow: c ? fmt(c.force.now) + ' N' : '—', fMax: c ? fmt(c.force.max) + ' N' : '—', fBars, hist, noHist: !hist.length,
+      warns, noWarn: !warns.length, joints, panelBtns, mainRows, botCols, bodyCols, showL: S.showL, showR: S.showR,
+      f3d: fset('3d'), f3dLabel: F === '3d' ? '✕ Zatvori fokus' : '⤢ Fokus 3D', f2d: fset('2d'), f2dLabel: F === '2d' ? '✕' : '⤢', fGantt: fset('gantt'), fGanttLabel: F === 'gantt' ? '✕' : '⤢',
+    };
+  }
+}
+</script>
+</body>
+</html>
