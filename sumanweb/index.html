@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2655">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -23,6 +24,7 @@ a{color:#0b2655;text-decoration:none}
 a:hover{color:#2c4f8c}
 button{font-family:inherit}
 input,textarea,select{font-family:inherit;font-size:15px}
+@keyframes sumanNudge{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 </style>
 </helmet>
 <div style="min-height:100vh;display:flex;flex-direction:column">
@@ -54,12 +56,12 @@ input,textarea,select{font-family:inherit;font-size:15px}
   </sc-if>
   <div style="flex:1"></div>
   <div style="display:flex;align-items:center;gap:2px;height:48px;padding:4px;border-radius:999px;border:1px solid {{ hdr.btnBd }};background:{{ hdr.btnBg }};color:{{ hdr.fg }};backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:{{ hdr.barSh }};transition:background .3s,box-shadow .3s">
-    <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ hdrTools }}" hint-placeholder-val="{{ true }}">
       <div style="position:relative;display:flex">
-        <button onClick="{{ toggleLang }}" title="{{ curLang.name }}" aria-label="{{ curLang.name }}" style="height:38px;padding:0 10px 0 7px;border:0;border-radius:999px;background:transparent;cursor:pointer;display:flex;align-items:center;gap:7px;color:inherit" style-hover="background:{{ hdr.hov }}">
+        <button onClick="{{ toggleLang }}" title="{{ curLang.name }}" aria-label="{{ curLang.name }}" style="height:38px;padding:{{ langPad }};border:0;border-radius:999px;background:transparent;cursor:pointer;display:flex;align-items:center;gap:7px;color:inherit" style-hover="background:{{ hdr.hov }}">
           <span style="width:24px;height:24px;flex:0 0 auto;border-radius:50%;background-image:url({{ curLang.flag }});background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(0,0,0,0.12)"></span>
-          <span style="font:500 13px 'IBM Plex Mono',monospace">{{ curLang.code }}</span>
-          <span style="font-size:9px;opacity:0.7;transform:rotate({{ langRot }});transition:transform .2s">▼</span>
+          <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}"><span style="font:500 13px 'IBM Plex Mono',monospace">{{ curLang.code }}</span>
+          <span style="font-size:9px;opacity:0.7;transform:rotate({{ langRot }});transition:transform .2s">▼</span></sc-if>
         </button>
           <sc-if value="{{ langOpen }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute;top:50px;right:0;min-width:200px;background:#fbfaf7;border:1px solid #dcd6ca;border-radius:10px;box-shadow:0 16px 40px rgba(11,38,85,0.14);padding:6px;display:flex;flex-direction:column;gap:2px;z-index:60">
@@ -75,22 +77,17 @@ input,textarea,select{font-family:inherit;font-size:15px}
   
       </div>
       <span style="width:1px;height:22px;background:{{ hdr.btnBd }}"></span>
-      <button onClick="{{ goB2B }}" title="{{ b2bLabel }}" style="height:38px;padding:0 12px 0 10px;border:0;border-radius:999px;background:transparent;cursor:pointer;display:flex;align-items:center;gap:8px;color:inherit;font-size:14px;font-weight:600" style-hover="background:{{ hdr.hov }}">
+      <button onClick="{{ goB2B }}" title="{{ b2bLabel }}" style="height:38px;padding:{{ b2bPad }};border:0;border-radius:999px;background:transparent;cursor:pointer;display:flex;align-items:center;gap:8px;color:inherit;font-size:14px;font-weight:600" style-hover="background:{{ hdr.hov }}">
         <span style="position:relative;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span style="position:absolute;right:-1px;bottom:0;width:8px;height:8px;border-radius:50%;background:{{ b2bDot }};box-shadow:0 0 0 2px {{ hdr.dotRing }}"></span></span>
-        {{ b2bShort }}
+        <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">{{ b2bShort }}</sc-if>
       </button>
       <span style="width:1px;height:22px;background:{{ hdr.btnBd }}"></span>
     </sc-if>
-    <button onClick="{{ goCart }}" title="{{ t.nav_cart }}" aria-label="{{ t.nav_cart }}" style="height:38px;padding:0 14px 0 10px;border:0;border-radius:999px;background:{{ hdr.cartBg }};color:{{ hdr.cartFg }};cursor:pointer;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700">
+    <button onClick="{{ goCart }}" title="{{ t.nav_cart }}" aria-label="{{ t.nav_cart }}" style="width:38px;height:38px;padding:0;border:0;border-radius:50%;background:{{ hdr.cartBg }};color:{{ hdr.cartFg }};cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s" style-hover="background:#ffd21f">
       <span style="position:relative;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 8h14l-1 13H6L5 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg><span style="position:absolute;top:-6px;right:-8px;min-width:17px;height:17px;border-radius:9px;background:{{ hdr.badgeBg }};color:{{ hdr.badgeFg }};font:600 10px/17px 'IBM Plex Mono',monospace;text-align:center;padding:0 4px;display:{{ cartBadge }}">{{ cartCount }}</span></span>
-      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}"><span style="margin-left:4px">{{ t.nav_cart }}</span></sc-if>
     </button>
+
   </div>
-  <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
-    <button onClick="{{ toggleMenu }}" aria-label="Meni" style="width:44px;height:44px;border:1px solid {{ hdr.btnBd }};background:transparent;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px">
-      <span style="width:16px;height:1.5px;background:{{ hdr.fg }}"></span><span style="width:16px;height:1.5px;background:{{ hdr.fg }}"></span>
-    </button>
-  </sc-if>
 </header>
 <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;top:72px;left:0;right:0;bottom:0;z-index:49;background:#fbfaf7;padding:24px 20px;display:flex;flex-direction:column;gap:4px">
@@ -157,15 +154,16 @@ input,textarea,select{font-family:inherit;font-size:15px}
 </sc-if>
 <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
   <section data-screen-label="Kategorija" style="display:grid;grid-template-columns:{{ ixCols }};background:#0b2655;color:#ffffff">
-    <div style="position:{{ ixPos }};top:{{ ixTop }};z-index:2;height:{{ ixH }};overflow:hidden;background:#1d3a6b">
+    <div onTouchStart="{{ swStart }}" onTouchEnd="{{ ixSwEnd }}" style="position:{{ ixPos }};top:{{ ixTop }};z-index:2;height:{{ ixH }};overflow:hidden;background:#1d3a6b;touch-action:pan-y">
       <sc-for list="{{ ixSlides }}" as="sl" hint-placeholder-count="1">
         <div role="img" aria-label="{{ ixAct.name }}" style="position:absolute;inset:0;background-color:#1d3a6b;background-image:{{ sl.bgi }};background-size:cover;background-position:center;opacity:{{ sl.op }};transform:scale({{ sl.sc }});transition:opacity .8s ease,transform 5s ease-out"></div>
       </sc-for>
       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,14,34,0.55) 0%,rgba(4,14,34,0) 22%,rgba(4,14,34,0) 50%,rgba(4,14,34,0.88) 100%)"></div>
       <div style="position:absolute;left:clamp(20px,3.4vw,56px);right:clamp(20px,3.4vw,56px);bottom:clamp(24px,4vw,56px);display:flex;flex-direction:column;gap:12px;max-width:560px">
-        <sc-if value="{{ ixAct.hot }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;display:flex;align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:999px;background:#f5c400;color:#0b2655;font-size:12px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span></sc-if>
-        <span style="font-size:clamp(48px,6.4vw,104px);font-weight:800;letter-spacing:-0.04em;line-height:0.86">{{ ixAct.name }}</span>
-        <span style="font-size:15px;line-height:1.55;color:#e8ecf4;max-width:440px;text-wrap:pretty">{{ ixAct.desc }}</span>
+        <sc-if value="{{ ixHotOn }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;display:flex;align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:999px;background:#f5c400;color:#0b2655;font-size:12px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span></sc-if>
+        <sc-if value="{{ ixCntOn }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#f5c400">{{ ixCnt }}</span></sc-if>
+        <span style="font-size:{{ ixImgNameFs }};font-weight:800;letter-spacing:-0.04em;line-height:0.86">{{ ixAct.name }}</span>
+        <span style="font-size:{{ ixImgDescFs }};line-height:1.5;color:#e8ecf4;max-width:440px;text-wrap:pretty;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:{{ ixDescLines }};overflow:hidden">{{ ixAct.desc }}</span>
       </div>
       <sc-if value="{{ ixDotsOn }}" hint-placeholder-val="{{ false }}">
         <div role="tablist" style="position:absolute;right:clamp(20px,3.4vw,56px);bottom:clamp(28px,4.2vw,60px);display:flex;align-items:center;gap:6px">
@@ -176,7 +174,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
       </sc-if>
     </div>
     <div style="padding:{{ ixPad }};display:flex;flex-direction:column;gap:{{ ixGap }};min-width:0">
-      <div ref="{{ catTitleRef }}" style="display:flex;flex-direction:column;gap:18px">
+      <div ref="{{ catTitleRef }}" style="display:{{ ixTitleDisp }};flex-direction:column;gap:18px">
         <h1 style="margin:0;font-size:{{ ixH1Fs }};line-height:0.86;font-weight:800;letter-spacing:-0.045em;opacity:{{ catH1Op }};transform:{{ catH1Tf }};transform-origin:left bottom;will-change:transform,opacity">{{ catTitle }}</h1>
         <p style="margin:0;font-size:16px;line-height:1.6;color:#cfd7e6;max-width:480px;text-wrap:pretty;opacity:{{ catH1Op }};transform:{{ catH1Tf }};transform-origin:left top">{{ catDesc }}</p>
       </div>
@@ -202,37 +200,83 @@ input,textarea,select{font-family:inherit;font-size:15px}
         </sc-for>
         <div style="border-top:1px solid rgba(255,255,255,0.14)"></div>
       </div>
+      <sc-if value="{{ ixEndOn }}" hint-placeholder-val="{{ false }}">
+        <div style="min-height:{{ ixEndH }};display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:14px;padding:8px 0 28px">
+          <span style="font-size:24px;font-weight:800;letter-spacing:-0.025em;line-height:1.1">{{ ixEnd.t }}</span>
+          <span style="font-size:14.5px;line-height:1.55;color:#a9b6cf;max-width:320px;text-wrap:pretty">{{ ixEnd.d }}</span>
+          <button onClick="{{ goContact }}" style="margin-top:6px;height:46px;padding:0 20px;border-radius:999px;border:1px solid rgba(255,255,255,0.28);background:transparent;color:#ffffff;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px">{{ ixEnd.c }} <span style="color:#f5c400">→</span></button>
+        </div>
+      </sc-if>
     </div>
+    <sc-if value="{{ hintOn }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ hintTap }}" aria-label="{{ ixEnd.more }}" style="position:fixed;left:50%;bottom:calc(52px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;height:40px;padding:0 16px 0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.16);background:rgba(11,38,85,0.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#ffffff;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;opacity:{{ hintOp }};pointer-events:{{ hintPe }};transition:opacity .35s">{{ hintIcon }}{{ ixEnd.more }}</button>
+    </sc-if>
   </section>
 </sc-if>
 <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
   <section ref="{{ cfgRef }}" data-screen-label="Advance konfigurator" style="display:grid;grid-template-columns:{{ pCols }};background:#0b2655;color:#ffffff">
-    <div style="position:{{ pStagePos }};top:0;height:{{ pStageH }};overflow:hidden;background:radial-gradient(80% 70% at 50% 48%,#fdfcf9 0%,#f3efe8 48%,#e5dfd3 100%)">
-      <div style="position:absolute;left:0;right:0;top:{{ pStageTop }};bottom:0">
+    <div style="position:{{ stPos }};top:0;left:{{ stL }};width:{{ stW }};z-index:{{ stZ }};height:{{ stH }};overflow:hidden;touch-action:{{ pTouch }};background:radial-gradient(80% 70% at 50% 48%,#fdfcf9 0%,#f3efe8 48%,#e5dfd3 100%)">
+      <div onTouchStart="{{ swStart }}" onTouchEnd="{{ phSwEnd }}" onTouchMove="{{ phTouchMove }}" style="position:absolute;left:0;right:0;top:{{ stInTop }};bottom:0">
         <sc-if value="{{ show3d }}" hint-placeholder-val="{{ true }}">
-          <x-import component-from-global-scope="umbrella-view" from="./umbrella-3d.js" shape="{{ u.shape }}" size="{{ u.size }}" canopy="{{ u.canopy }}" frame="{{ u.frame }}" vent="{{ u.vent }}" look="{{ u.look }}" brandtext="{{ u.brandtext }}" brandimg="{{ u.brandimg }}" base="{{ u.base }}" mech="{{ u.mech }}" cam="{{ camMode }}" zoom="{{ camZoom }}" autorotate="{{ autoRot }}" env="{{ envMode }}" person="{{ personOn }}" furniture="{{ furnOn }}" focus="{{ focusMode }}" nudge="{{ nudgeVal }}" dims="{{ dimsOn }}" wlabel="{{ wLabel }}" hlabel="{{ hLabel }}" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
+          <div style="position:absolute;inset:-60px;top:-132px;background-image:url({{ photoSrc }});background-size:cover;background-position:center;filter:blur(44px) saturate(1.1);opacity:0.45"></div>
+          <x-import component-from-global-scope="umbrella-view" from="./umbrella-3d.js" count="{{ cntAttr }}" shape="{{ u.shape }}" size="{{ u.size }}" canopy="{{ u.canopy }}" frame="{{ u.frame }}" vent="{{ u.vent }}" look="{{ u.look }}" brandtext="{{ u.brandtext }}" brandimg="{{ u.brandimg }}" base="{{ u.base }}" mech="{{ u.mech }}" cam="{{ camMode }}" zoom="{{ camZoom }}" autorotate="{{ autoRot }}" env="{{ envMode }}" person="{{ personOn }}" furniture="{{ furnOn }}" focus="{{ focusMode }}" nudge="{{ nudgeVal }}" dims="{{ dimsOn }}" wlabel="{{ wLabel }}" hlabel="{{ hLabel }}" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
         </sc-if>
         <sc-if value="{{ showPhoto }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;inset:-60px;background-image:url({{ photoSrc }});background-size:cover;background-position:center;filter:blur(44px) saturate(1.1);opacity:0.5"></div>
-          <div style="position:absolute;left:clamp(20px,3.4vw,56px);right:clamp(20px,3.4vw,56px);top:64px;bottom:96px;background-image:url({{ photoSrc }});background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 24px 48px rgba(11,38,85,0.25))"></div>
+          <div style="position:absolute;inset:-60px;background-image:url({{ photoSrc }});background-size:cover;background-position:center;filter:blur(44px) saturate(1.1);opacity:0.45"></div>
+          <div style="position:absolute;left:clamp(16px,3.4vw,56px);right:clamp(16px,3.4vw,56px);top:{{ phIT }};bottom:{{ phIB }};overflow:hidden">
+            <div onClick="{{ phZoomTog }}" onMouseMove="{{ phZoomMove }}" style="position:absolute;inset:0;background-image:url({{ photoSrc }});background-size:contain;background-repeat:no-repeat;background-position:center;cursor:{{ phCursor }};transform:scale({{ phZ }});transform-origin:{{ phO }};transition:transform .35s cubic-bezier(.2,.7,.2,1)"></div>
+          </div>
         </sc-if>
       </div>
 
-      <div role="tablist" aria-label="Prikaz" style="position:absolute;left:clamp(20px,3.4vw,56px);top:{{ pTabsTop }};display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(11,38,85,0.07);z-index:4">
-        <sc-for list="{{ modeTabs }}" as="mt" hint-placeholder-count="2">
-          <button role="tab" onClick="{{ mt.onClick }}" aria-selected="{{ mt.on }}" style="height:34px;padding:0 16px;border:0;border-radius:999px;background:{{ mt.pbg }};color:{{ mt.pfg }};cursor:pointer;font-size:13.5px;font-weight:600;transition:background .2s,color .2s">{{ mt.label }}</button>
-        </sc-for>
+      <div style="position:absolute;left:clamp(18px,3.4vw,56px);right:clamp(18px,3.4vw,56px);top:{{ stBarTop }};display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:4;pointer-events:none">
+        <div role="tablist" aria-label="Prikaz" style="display:flex;gap:22px;pointer-events:auto">
+          <sc-for list="{{ modeTabs }}" as="mt" hint-placeholder-count="2">
+            <button role="tab" onClick="{{ mt.onClick }}" aria-selected="{{ mt.on }}" style="height:34px;padding:0;border:0;border-bottom:2px solid {{ mt.tUl }};border-radius:0;background:transparent;color:{{ mt.tFg }};cursor:pointer;font:500 12px 'IBM Plex Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;transition:color .2s,border-color .2s" style-hover="color:#0b2655">{{ mt.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;pointer-events:auto">
+        <sc-if value="{{ show3d }}" hint-placeholder-val="{{ true }}">
+          <div role="group" aria-label="{{ cntLbl }}" title="{{ cntLbl }}" style="height:40px;display:flex;align-items:center;gap:2px;padding:3px;border-radius:999px;border:1px solid rgba(11,38,85,0.16);background:rgba(255,255,255,0.55)">
+            <sc-for list="{{ cntOpts }}" as="co" hint-placeholder-count="3">
+              <button onClick="{{ co.onClick }}" aria-pressed="{{ co.on }}" aria-label="{{ co.aria }}" style="height:32px;min-width:32px;padding:0 9px;border:0;border-radius:999px;background:{{ co.bg }};color:{{ co.fg }};cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font:500 12px 'IBM Plex Mono',monospace;transition:background .2s,color .2s">{{ co.n }}<span style="font-size:10px;opacity:0.7">×</span></button>
+            </sc-for>
+          </div>
+          <div style="position:relative;display:flex">
+          <button onClick="{{ toggleFurn }}" title="{{ furnLbl2 }}" aria-label="{{ furnLbl2 }}" aria-pressed="{{ furnPressed }}" style="height:40px;padding:0 14px 0 12px;border-radius:999px;border:1px solid {{ furnBd }};background:{{ furnBg }};color:{{ furnFg }};cursor:pointer;display:flex;align-items:center;gap:8px;font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;transition:background .2s,color .2s,border-color .2s">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"></path><path d="M12 9v11"></path><path d="M9 20h6"></path><path d="M3 11v9M3 15h3v5"></path><path d="M21 11v9M21 15h-3v5"></path></svg>
+            <sc-if value="{{ furnTxtOn }}" hint-placeholder-val="{{ true }}"><span style="white-space:nowrap">{{ furnLbl2 }}</span></sc-if>
+          </button>
+            <sc-if value="{{ furnPop }}" hint-placeholder-val="{{ false }}">
+              <div role="menu" style="position:absolute;top:48px;right:0;min-width:220px;background:#fbfaf7;border:1px solid #dcd6ca;border-radius:10px;box-shadow:0 16px 40px rgba(11,38,85,0.14);padding:6px;display:flex;flex-direction:column;gap:2px;z-index:8">
+                <sc-for list="{{ furnOpts }}" as="fo" hint-placeholder-count="4">
+                  <button role="menuitemradio" aria-checked="{{ fo.on }}" onClick="{{ fo.onClick }}" style="height:42px;padding:0 12px;border:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;background:{{ fo.bg }};color:#0f1a2c;font-size:14px;font-weight:{{ fo.fw }}" style-hover="background:#ece8e0"><span>{{ fo.label }}</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:#5b6272">{{ fo.sub }}</span></button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <button onClick="{{ toggleExpand }}" title="{{ expLbl }}" aria-label="{{ expLbl }}" style="pointer-events:auto;width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.16);background:rgba(255,255,255,0.55);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:rgba(11,38,85,0.4)">
+          <sc-if value="{{ expandOn }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+          <sc-if value="{{ expandOff }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></sc-if>
+        </button>
+        </div>
       </div>
       <sc-if value="{{ resetOn }}" hint-placeholder-val="{{ true }}">
-        <button onClick="{{ resetView }}" title="{{ resetLbl }}" aria-label="{{ resetLbl }}" style="position:absolute;right:clamp(20px,3.4vw,56px);bottom:clamp(20px,3vw,40px);width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.22);background:rgba(255,255,255,0.6);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:#0b2655"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button onClick="{{ resetView }}" title="{{ resetLbl }}" aria-label="{{ resetLbl }}" style="position:absolute;right:clamp(18px,3.4vw,56px);bottom:clamp(18px,3vw,36px);width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.16);background:rgba(255,255,255,0.55);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:rgba(11,38,85,0.4)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg></button>
       </sc-if>
       <sc-if value="{{ showPhoto }}" hint-placeholder-val="{{ false }}">
-        <div role="group" aria-label="{{ rvLblPh }}" style="position:absolute;left:50%;bottom:clamp(20px,3vw,40px);transform:translateX(-50%);display:flex;align-items:center;gap:10px">
-          <button onClick="{{ photoPrev }}" aria-label="‹" style="width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.22);background:rgba(255,255,255,0.6);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:#0b2655"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>
-          <sc-for list="{{ stripThumbs }}" as="st" hint-placeholder-count="3">
-            <button onClick="{{ st.onClick }}" aria-label="{{ st.n }}" aria-current="{{ st.on }}" style="width:{{ thW }};height:{{ thH }};padding:0;border:0;outline:none;border-radius:4px;cursor:pointer;background-color:rgba(11,38,85,0.1);background-image:url({{ st.src }});background-size:cover;background-position:center;box-shadow:{{ st.ring }};opacity:{{ st.op }};transition:opacity .2s,box-shadow .2s" style-hover="opacity:1"></button>
-          </sc-for>
-          <button onClick="{{ photoNext }}" aria-label="›" style="width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.22);background:rgba(255,255,255,0.6);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:#0b2655"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+        <div role="group" aria-label="{{ rvLblPh }}" style="position:absolute;left:clamp(18px,3.4vw,56px);right:clamp(18px,3.4vw,56px);bottom:clamp(18px,3vw,36px);display:flex;align-items:center;gap:16px">
+          <span style="font:500 12px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#0b2655;white-space:nowrap">{{ photoCount }}</span>
+          <div style="flex:1;display:flex;gap:4px;min-width:0">
+            <sc-for list="{{ phSegs }}" as="sg" hint-placeholder-count="5">
+              <button onClick="{{ sg.onClick }}" aria-label="{{ sg.n }}" aria-current="{{ sg.on }}" style="flex:1;height:18px;padding:0;border:0;background:transparent;cursor:pointer;display:flex;align-items:center"><span style="width:100%;height:2px;border-radius:2px;background:{{ sg.bg }};transition:background .25s"></span></button>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ photoPrev }}" aria-label="‹" style="width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.16);background:rgba(255,255,255,0.55);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:rgba(11,38,85,0.4)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>
+            <button onClick="{{ photoNext }}" aria-label="›" style="width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(11,38,85,0.16);background:rgba(255,255,255,0.55);color:#0b2655;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s,border-color .2s" style-hover="background:#ffffff;border-color:rgba(11,38,85,0.4)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+          </div>
         </div>
       </sc-if>
       <sc-if value="{{ capOn }}" hint-placeholder-val="{{ false }}">
@@ -247,9 +291,12 @@ input,textarea,select{font-family:inherit;font-size:15px}
     <div ref="{{ pPanelRef }}" style="position:relative;min-width:0;display:flex;flex-direction:column;height:{{ pPanelH }};overflow-y:{{ pPanelOv }};scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent">
       <div style="padding:{{ pPad }};display:flex;flex-direction:column;gap:clamp(20px,2.4vw,30px);flex:1 0 auto;position:relative;z-index:0;isolation:isolate">
         <div style="display:flex;flex-direction:column;gap:12px">
-          <span style="align-self:flex-start;display:flex;align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:999px;background:#f5c400;color:#0b2655;font-size:12px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span>
-          <h1 style="margin:0;font-size:{{ pH1 }};line-height:0.86;font-weight:800;letter-spacing:-0.045em">Advance</h1>
-          <div style="display:grid;grid-template-columns:{{ pSpecCols }};gap:10px 24px;padding-top:4px">
+          <span style="align-self:flex-start;display:{{ pDeskDisp }};align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:999px;background:#f5c400;color:#0b2655;font-size:12px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span>
+          <div style="display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap">
+            <h1 style="margin:0;font-size:{{ pH1 }};line-height:0.86;font-weight:800;letter-spacing:-0.045em">Advance</h1>
+            <sc-if value="{{ pMobMeta }}" hint-placeholder-val="{{ false }}"><span style="font:600 13px 'IBM Plex Mono',monospace;color:#f5c400">{{ modelTag }}</span><span style="font-size:13px;color:#a9b6cf">{{ pSizeTxt }}</span></sc-if>
+          </div>
+          <div style="display:{{ pSpecDisp }};grid-template-columns:{{ pSpecCols }};gap:10px 24px;padding-top:4px">
             <span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;color:#a9b6cf">{{ modelLbl }}</span><span style="font:600 15px 'IBM Plex Mono',monospace;color:#f5c400">{{ modelTag }}</span></span>
             <sc-for list="{{ pSpecs }}" as="sr" hint-placeholder-count="3">
               <span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;color:#a9b6cf">{{ sr.k }}</span><span style="font-size:15px;font-weight:600">{{ sr.v }}</span></span>
@@ -281,7 +328,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
                 <sc-if value="{{ sh.isCards }}" hint-placeholder-val="{{ false }}">
                   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax({{ sh.min }},1fr));gap:10px">
                     <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="4">
-                      <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="position:relative;height:{{ sh.h }};padding:12px 14px;border-radius:10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:{{ o.bg }};color:#ffffff;transition:background .15s,border-color .15s" style-hover="border-color:{{ o.hbd }};background:rgba(255,255,255,0.05)">
+                      <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" aria-disabled="{{ o.dis }}" style="position:relative;height:{{ sh.h }};padding:12px 14px;border-radius:10px;cursor:{{ o.cur }};opacity:{{ o.op }};text-align:left;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:{{ o.bg }};color:#ffffff;transition:background .15s,border-color .15s" style-hover="border-color:{{ o.hbd }};background:rgba(255,255,255,0.05)">
                         <span style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
                           <span style="font:600 {{ sh.codeFs }} 'IBM Plex Mono',monospace;letter-spacing:-0.02em;line-height:1;color:{{ o.codeFg }}">{{ o.code }}</span>
                           <span style="width:16px;height:16px;border-radius:50%;flex:0 0 auto;box-sizing:border-box;border:1px solid {{ o.rbd }};background:{{ o.rbg }};box-shadow:inset 0 0 0 3px #0b2655"></span>
@@ -301,7 +348,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
                     <div style="position:absolute;left:0;right:0;top:58px;height:2px;background:rgba(255,255,255,0.16);border-radius:2px"></div>
                     <div style="position:absolute;left:{{ ruler.fromP }};width:{{ ruler.fillP }};top:57px;height:4px;background:#f2c36b;border-radius:4px;transition:width .35s cubic-bezier(.2,.8,.2,1)"></div>
                     <sc-for list="{{ ruler.stops }}" as="rs" hint-placeholder-count="5">
-                      <button onClick="{{ rs.onClick }}" aria-pressed="{{ rs.on }}" style="position:absolute;left:{{ rs.left }};top:0;transform:translateX(-50%);height:112px;width:64px;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:0">
+                      <button onClick="{{ rs.onClick }}" aria-pressed="{{ rs.on }}" style="position:absolute;left:{{ rs.left }};top:0;transform:translateX(-50%);height:112px;width:64px;border:0;background:transparent;cursor:{{ rs.cur }};opacity:{{ rs.op }};display:flex;flex-direction:column;align-items:center;padding:0">
                         <span style="height:34px;display:flex;align-items:flex-end;padding-bottom:8px"><span style="font:600 11px 'IBM Plex Mono',monospace;color:#0b2655;background:#f5c400;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:{{ rs.tipOp }};transform:translateY({{ rs.tipY }});transition:opacity .2s,transform .2s">{{ rs.full }}</span></span>
                         <span style="width:{{ rs.dot }};height:{{ rs.dot }};margin-top:{{ rs.dotM }};border-radius:50%;background:{{ rs.dotBg }};border:2px solid #ffffff;box-shadow:{{ rs.dotSh }};transition:all .2s"></span>
                         <span style="margin-top:22px;font:600 13px 'IBM Plex Mono',monospace;color:{{ rs.fg }}">{{ rs.label }}</span>
@@ -394,7 +441,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
               <sc-if value="{{ sh.isCards }}" hint-placeholder-val="{{ false }}">
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax({{ sh.min }},1fr));gap:10px">
                   <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="4">
-                    <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="position:relative;height:{{ sh.h }};padding:12px 14px;border-radius:10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:{{ o.bg }};color:#ffffff;transition:background .15s,border-color .15s" style-hover="border-color:{{ o.hbd }};background:rgba(255,255,255,0.05)">
+                    <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" aria-disabled="{{ o.dis }}" style="position:relative;height:{{ sh.h }};padding:12px 14px;border-radius:10px;cursor:{{ o.cur }};opacity:{{ o.op }};text-align:left;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:{{ o.bg }};color:#ffffff;transition:background .15s,border-color .15s" style-hover="border-color:{{ o.hbd }};background:rgba(255,255,255,0.05)">
                       <span style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
                         <span style="font:600 {{ sh.codeFs }} 'IBM Plex Mono',monospace;letter-spacing:-0.02em;line-height:1;color:{{ o.codeFg }}">{{ o.code }}</span>
                         <span style="width:16px;height:16px;border-radius:50%;flex:0 0 auto;box-sizing:border-box;border:1px solid {{ o.rbd }};background:{{ o.rbg }};box-shadow:inset 0 0 0 3px #0b2655"></span>
@@ -414,7 +461,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
                   <div style="position:absolute;left:0;right:0;top:58px;height:2px;background:rgba(255,255,255,0.16);border-radius:2px"></div>
                   <div style="position:absolute;left:{{ ruler.fromP }};width:{{ ruler.fillP }};top:57px;height:4px;background:#f2c36b;border-radius:4px;transition:width .35s cubic-bezier(.2,.8,.2,1)"></div>
                   <sc-for list="{{ ruler.stops }}" as="rs" hint-placeholder-count="5">
-                    <button onClick="{{ rs.onClick }}" aria-pressed="{{ rs.on }}" style="position:absolute;left:{{ rs.left }};top:0;transform:translateX(-50%);height:112px;width:64px;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:0">
+                    <button onClick="{{ rs.onClick }}" aria-pressed="{{ rs.on }}" style="position:absolute;left:{{ rs.left }};top:0;transform:translateX(-50%);height:112px;width:64px;border:0;background:transparent;cursor:{{ rs.cur }};opacity:{{ rs.op }};display:flex;flex-direction:column;align-items:center;padding:0">
                       <span style="height:34px;display:flex;align-items:flex-end;padding-bottom:8px"><span style="font:600 11px 'IBM Plex Mono',monospace;color:#0b2655;background:#f5c400;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:{{ rs.tipOp }};transform:translateY({{ rs.tipY }});transition:opacity .2s,transform .2s">{{ rs.full }}</span></span>
                       <span style="width:{{ rs.dot }};height:{{ rs.dot }};margin-top:{{ rs.dotM }};border-radius:50%;background:{{ rs.dotBg }};border:2px solid #ffffff;box-shadow:{{ rs.dotSh }};transition:all .2s"></span>
                       <span style="margin-top:22px;font:600 13px 'IBM Plex Mono',monospace;color:{{ rs.fg }}">{{ rs.label }}</span>
@@ -494,7 +541,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
         </sc-if>
       </div>
       <div style="position:sticky;bottom:{{ pFootBot }};z-index:20;background:#0b2655;box-shadow:0 -18px 24px -8px #0b2655;border-top:1px solid rgba(255,255,255,0.14);padding:{{ pFootPad }};display:flex;flex-wrap:wrap;align-items:center;gap:12px">
-        <div role="group" aria-label="{{ t.o_qty }}" style="height:48px;display:flex;align-items:center;padding:0 4px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;flex:0 0 auto">
+        <div role="group" aria-label="{{ t.o_qty }}" style="height:{{ pQtyH }};display:flex;align-items:center;padding:0 4px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;flex:0 0 auto">
           <button onClick="{{ qtyDown }}" aria-label="−" style="width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#ffffff;font-size:18px;cursor:pointer;opacity:{{ qtyDownOp }}" style-hover="background:rgba(255,255,255,0.1)">−</button>
           <input type="text" inputmode="numeric" pattern="[0-9]*" aria-label="{{ t.o_qty }}" value="{{ qtyInput }}" onChange="{{ onQtyInput }}" onBlur="{{ onQtyBlur }}" onKeyDown="{{ onQtyKey }}" onFocus="{{ onQtyFocus }}" style="width:{{ qtyW }};height:30px;padding:0;border:0;border-radius:4px;background:transparent;text-align:center;font:600 16px 'IBM Plex Mono',monospace;color:#ffffff;outline:none;box-shadow:0 0 0 1.5px {{ qtyLine }}">
           <button onClick="{{ qtyUp }}" aria-label="+" style="width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#ffffff;font-size:18px;cursor:pointer" style-hover="background:rgba(255,255,255,0.1)">+</button>
@@ -503,7 +550,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
           <span style="font-size:{{ pTotFs }};font-weight:800;letter-spacing:-0.03em;line-height:1;white-space:nowrap">{{ totalKM }}</span>
           <span style="font-size:12.5px;color:#a9b6cf;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis">{{ totalEUR }} · <span style="color:#f5c400;font-weight:600;border-bottom:1px solid rgba(245,196,0,0.5)">{{ sumLbl }}</span></span>
         </button>
-        <button onClick="{{ addToCart }}" style="height:{{ pAddH }};padding:0 22px;border-radius:999px;border:0;background:{{ addBg }};color:{{ addFg }};font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:10px;flex:{{ pAddFlex }};justify-content:center;transition:background .15s" style-hover="background:{{ addHov }}">{{ addLabel }} <span>→</span></button>
+        <button onClick="{{ addToCart }}" style="height:{{ pAddH }};padding:0 22px;border-radius:999px;border:0;background:{{ addBg }};color:{{ addFg }};font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:10px;flex:{{ pAddFlex }};justify-content:center;transition:background .15s" style-hover="background:{{ addHov }}">{{ pAddLbl }} <span style="display:{{ pArrowDisp }}">→</span></button>
       </div>
     </div>
   </section>
@@ -797,13 +844,15 @@ input,textarea,select{font-family:inherit;font-size:15px}
 
 <footer style="position:fixed;left:0;right:0;bottom:0;z-index:45;height:{{ fbH }};box-sizing:border-box;background:rgba(7,26,59,0.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,0.08);color:#8fa0bf;font-size:12px;display:flex;align-items:center;gap:20px;padding:0 clamp(16px,3vw,40px) env(safe-area-inset-bottom)">
   <span style="white-space:nowrap">© 2026 SUMAN d.o.o. Gračanica</span>
-  <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}"><span style="white-space:nowrap">Gračanica · Sarajevo · BiH</span></sc-if>
+  <sc-if value="{{ fbWide }}" hint-placeholder-val="{{ true }}"><span style="white-space:nowrap">Gračanica · Sarajevo · BiH</span></sc-if>
   <div style="flex:1"></div>
   <nav style="display:flex;align-items:center;gap:18px">
     <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
       <a href="mailto:info@suman.ba" style="color:#cfd7e6;cursor:pointer;white-space:nowrap" style-hover="color:#ffffff">info@suman.ba</a>
       <a href="https://www.suman.ba" style="color:#cfd7e6;cursor:pointer;white-space:nowrap" style-hover="color:#ffffff">suman.ba</a>
       <a href="https://www.suman.hr" style="color:#cfd7e6;cursor:pointer;white-space:nowrap" style-hover="color:#ffffff">suman.hr</a>
+    </sc-if>
+    <sc-if value="{{ fbWide }}" hint-placeholder-val="{{ true }}">
       <span style="white-space:nowrap">{{ t.foot_terms }}</span>
       <span style="white-space:nowrap">{{ t.foot_cookies }}</span>
     </sc-if>
@@ -880,7 +929,7 @@ class Component extends DCLogic {
     this.onScrollY = (y) => { const sc = y > 40; if (sc !== this.state.scrolled) this.setState({ scrolled: sc });
       let p = Math.min(1, Math.max(0, (y - 24) / 150));
       if (this.state.screen === 'catalog' && (this.state.w || 1280) < 860) {
-        const ih = window.innerHeight || 800, imgB = 72 + ih * 0.42, tl = this.catTitleRef.current, Ls = this.ixListRef.current;
+        const ih = window.innerHeight || 800, imgB = ih * 0.43, tl = this.catTitleRef.current, Ls = this.ixListRef.current;
         p = 0; if (tl) { const r = tl.getBoundingClientRect(); p = Math.min(1, Math.max(0, (imgB + 8 - r.top) / Math.max(60, r.height))); }
         if (Ls) { const line = imgB + (ih - imgB) * 0.3; let best = 0, bd = 1e9; [...Ls.children].filter((b) => b.tagName === 'BUTTON').forEach((b, i) => { const r = b.getBoundingClientRect(), d = Math.abs((r.top + r.bottom) / 2 - line); if (d < bd) { bd = d; best = i; } });
           if (best !== (this.state.ixHover || 0)) { this.setState({ ixHover: best, ixSlide: 0 }); this._ixT = Date.now(); } }
@@ -888,7 +937,11 @@ class Component extends DCLogic {
       p = Math.round(p * 50) / 50; if (p !== (this.state.catP || 0)) this.setState({ catP: p }); this.spy(true); };
     this.onScroll = () => { if ((this.state.w || 1280) < 860) this.onScrollY(window.scrollY || 0); };
     window.addEventListener('scroll', this.onScroll, { passive: true });
+    try { window.history.replaceState({ suman: 1, screen: this.state.screen, extra: { cat: this.state.cat } }, ''); } catch (e) {}
+    this.onPop = (e) => { const st = e.state; if (st && st.suman) this.go(st.screen, st.extra || {}, true); else this.go('home', {}, true); };
+    window.addEventListener('popstate', this.onPop);
     this.onKey = (e) => {
+      if (e.key === 'Escape' && this.state.expand) { this.setState({ expand: false, phZoom: false }); return; }
       if (this.state.screen !== 'product' || this.state.view !== '3d') return;
       const tg = e.target && e.target.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA') return;
       const s = this.state, k = e.key.toLowerCase();
@@ -910,14 +963,17 @@ class Component extends DCLogic {
     const wait = () => { if (window.SUMAN && window.SUMAN_CATS && window.SUMAN_I18N && window.SUMAN_I18N.de && window.SUMAN_I18N.bs) this.setState({ ready: true }); else this._w = setTimeout(wait, 40); };
     wait();
   }
-  componentWillUnmount() { clearInterval(this._ixI); window.removeEventListener('resize', this.onResize); if (this._ro) this._ro.disconnect(); document.documentElement.style.overflow = ''; clearTimeout(this._w); clearTimeout(this._t); }
+  componentWillUnmount() { window.removeEventListener('popstate', this.onPop); window.removeEventListener('scroll', this.onScroll); clearInterval(this._ixI); window.removeEventListener('resize', this.onResize); if (this._ro) this._ro.disconnect(); document.documentElement.style.overflow = ''; clearTimeout(this._w); clearTimeout(this._t); }
   persist() {
     const { lang, screen, b2b, orderNo, cart, cat } = this.state;
     try { localStorage.setItem('suman_ui', JSON.stringify({ lang, screen, b2b, orderNo, cart, cat })); } catch (e) {}
   }
   save(p) { this.setState(p, () => this.persist()); }
-  go(screen, extra) { this.save(Object.assign({ screen, menu: false, hover: null, ixHover: 0, catP: 0, scrolled: false }, extra || {})); try { window.scrollTo(0, 0); if (this.mainRef.current) this.mainRef.current.scrollTop = 0; } catch (e) {} }
+  go(screen, extra, fromPop) {
+    if (!fromPop) { try { let ex = {}; try { ex = JSON.parse(JSON.stringify(extra || {})); } catch (e) {} const cat = ex.cat || (screen === 'catalog' ? this.state.cat : ''); window.history.pushState({ suman: 1, screen, extra: ex }, '', '#' + screen + (screen === 'catalog' && cat ? '/' + cat : '')); } catch (e) {} }
+    this.save(Object.assign({ screen, menu: false, hover: null, ixHover: 0, catP: 0, scrolled: false, langOpen: false, sheet: null, expand: false, phZoom: false }, extra || {})); try { window.scrollTo(0, 0); if (this.mainRef.current) this.mainRef.current.scrollTop = 0; } catch (e) {} }
   flash(msg) { clearTimeout(this._t); this.setState({ toast: msg }); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  swDir(e) { const s0 = this._sw, p = e.changedTouches && e.changedTouches[0]; this._sw = null; if (!s0 || !p) return 0; const dx = p.clientX - s0.x, dy = p.clientY - s0.y; if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.3) return 0; return dx < 0 ? 1 : -1; }
   toFooter() { this.go('contact'); }
   contactVals(mobile) {
     const s = this.state, lg = s.lang || 'bs', cf = s.cform || { name: '', email: '', msg: '', prod: '' }, t = window.SUMAN_I18N[lg] || window.SUMAN_I18N.bs;
@@ -986,7 +1042,7 @@ class Component extends DCLogic {
     }
 
     return {
-      t, mobile, desktop: !mobile, menuOpen: mobile && s.menu,
+      t, mobile, desktop: !mobile, menuOpen: false, hdrTools: true, langPad: mobile ? '0 7px' : '0 10px 0 7px', b2bPad: mobile ? '0 9px' : '0 12px 0 10px',
       toggleMenu: () => this.setState({ menu: !s.menu }),
       navItems, langs, b2bShort: s.b2b ? D.partner.company.split(' ')[0] : ({ bs: 'Partneri', hr: 'Partneri', en: 'Partners', de: 'Partner' })[s.lang], cartBadge: s.cart.length ? 'block' : 'none', showNav: false, curLang: langs.find((l) => l.code === s.lang.toUpperCase()), langOpen: !!s.langOpen, langRot: s.langOpen ? '180deg' : '0deg',
       toggleLang: () => this.setState({ langOpen: !s.langOpen }),
@@ -1000,18 +1056,21 @@ class Component extends DCLogic {
       hubBadge: (this.props.hubStyle ?? 'badge') === 'badge', hubLogoOn: !mobile && this.props.hubStyle === 'logo', hubDot: this.props.hubStyle === 'dot', hubCap: !mobile && (this.props.hubStyle ?? 'cap') === 'cap', hubLogoOn: !mobile && this.props.hubStyle === 'logo', leave: () => this.setState({ hover: null }),
       advFrom: this.km(D.models[1].from),
       stageNames: [0, 1, 2, 3, 4].map((i) => ({ n: '0' + (i + 1), label: t['st' + i] })),
-      toast: s.toast, fbH: mobile ? '36px' : '34px', mainRef: this.mainRef, catTitleRef: this.catTitleRef, ixListRef: this.ixListRef,
-      mainH: mobile ? 'auto' : (s.h || 800) + 'px', mainFlex: mobile ? '1 0 auto' : '0 0 auto', mainOv: mobile ? 'visible' : 'auto', onMainScroll: (e) => { if (!mobile) this.onScrollY(e.currentTarget.scrollTop); }, mainPadB: scr === 'home' || (scr === 'product' && !mobile) ? '0px' : (mobile ? '36px' : '34px'),
+      swStart: (e) => { const p = e.touches && e.touches[0]; this._sw = p ? { x: p.clientX, y: p.clientY } : null; },
+      ixSwEnd: (e) => { const d = this.swDir(e); if (!d) return; const n = this._ixN || 1; this._ixT = Date.now(); this.setState((st) => ({ ixSlide: (((st.ixSlide || 0) + d) % n + n) % n })); },
+      phSwEnd: (e) => { if (this.state.view !== 'photo' || this.state.phZoom) return; const d = this.swDir(e); if (!d) return; const n = window.SUMAN.gallery.length; this.setState((st) => ({ photo: (((st.photo || 0) + d) % n + n) % n })); },
+      toast: s.toast, fbWide: (s.w || 1280) >= 1180, fbH: mobile ? 'calc(36px + env(safe-area-inset-bottom))' : '34px', mainRef: this.mainRef, catTitleRef: this.catTitleRef, ixListRef: this.ixListRef,
+      mainH: mobile && scr !== 'product' ? 'auto' : (s.h || 800) + 'px', mainFlex: mobile && scr !== 'product' ? '1 0 auto' : '0 0 auto', mainOv: mobile ? (scr === 'product' ? 'hidden' : 'visible') : 'auto', onMainScroll: (e) => { if (!mobile) this.onScrollY(e.currentTarget.scrollTop); }, mainPadB: scr === 'home' || (scr === 'product' && !mobile) ? '0px' : (mobile ? 'calc(36px + env(safe-area-inset-bottom))' : '34px'),
       ...this.contactVals(mobile),
-      mainPad: scr === 'home' || (scr === 'catalog' && !mobile) || scr === 'product' ? '0px' : '72px',
+      mainPad: scr === 'home' || scr === 'catalog' || scr === 'product' ? '0px' : '72px',
       backOn: false,
       backLbl: scr === 'product' ? t.nav_umb : scr === 'order' ? t.d_back : t.home,
       goBack: () => (scr === 'product' ? this.go('catalog', { cat: 'umb' }) : scr === 'order' ? this.go('orders') : this.go('home')),
       logoH: scr === 'catalog' ? 'CATLOGO' : scr === 'home' ? '84px' : '56px',
       ...(() => { const p = scr === 'catalog' ? (s.catP || 0) : 0, e = p * p * (3 - 2 * p);
-        return { ctxOn: scr === 'catalog', ctxDescOn: !mobile, ctxOp: e.toFixed(3), ctxY: ((1 - e) * 18).toFixed(1) + 'px', ctxPe: e > 0.6 ? 'auto' : 'none',
+        return { ctxOn: scr === 'catalog' && !mobile, ctxDescOn: !mobile, ctxOp: (mobile ? 1 : e).toFixed(3), ctxY: (mobile ? 0 : (1 - e) * 18).toFixed(1) + 'px', ctxPe: mobile || e > 0.6 ? 'auto' : 'none',
           catH1Op: Math.max(0, 1 - e * 1.25).toFixed(3), catH1Tf: 'translateY(' + (-e * 28).toFixed(1) + 'px) scale(' + (1 - e * 0.22).toFixed(3) + ')',
-          catLogoH: '84px', catHdrBg: mobile ? '#0b2655' : 'linear-gradient(180deg,rgba(4,14,34,' + (0.62 * (1 - e)).toFixed(3) + ') 0%,rgba(4,14,34,' + (0.28 * (1 - e)).toFixed(3) + ') 60%,rgba(4,14,34,0) 100%),rgba(11,38,85,' + (0.96 * e).toFixed(3) + ')' }; })(),
+          catLogoH: '84px', catHdrBg: mobile ? 'linear-gradient(180deg,rgba(4,14,34,0.6) 0%,rgba(4,14,34,0.25) 65%,rgba(4,14,34,0) 100%)' : 'linear-gradient(180deg,rgba(4,14,34,' + (0.62 * (1 - e)).toFixed(3) + ') 0%,rgba(4,14,34,' + (0.28 * (1 - e)).toFixed(3) + ') 60%,rgba(4,14,34,0) 100%),rgba(11,38,85,' + (0.96 * e).toFixed(3) + ')' }; })(),
       hdr: scr === 'catalog'
         ? { barSh: 'none', hov: 'rgba(255,255,255,0.12)', dotRing: '#0b2655', badgeBg: '#0b2655', badgeFg: '#f5c400', pos: 'fixed', blur: 'none', bg: 'CATBG', bd: 'transparent', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.06)', btnBd: 'rgba(255,255,255,0.16)', cartBg: '#f5c400', cartFg: '#0b2655' }
         : scr === 'home' || (scr === 'catalog' && !s.scrolled)
@@ -1019,7 +1078,7 @@ class Component extends DCLogic {
         : { hov: '#ece8e0', dotRing: '#ffffff', badgeBg: '#f5c400', badgeFg: '#0b2655', blur: s.scrolled ? 'blur(12px)' : 'none', bg: !s.scrolled ? 'transparent' : scr === 'product' ? 'rgba(11,38,85,0.94)' : 'rgba(244,240,234,0.92)', bd: 'transparent', barSh: '0 1px 2px rgba(11,38,85,0.04),0 12px 32px rgba(11,38,85,0.10)', fg: '#0f1a2c', muted: '#5b6272', btnBg: 'rgba(255,255,255,0.88)', btnBd: 'rgba(11,38,85,0.08)', cartBg: '#0b2655', cartFg: '#ffffff', pos: 'fixed' }
     };
   }
-  fixHdr(o) { if (o.hdr && o.hdr.bg === 'CATBG') o.hdr = Object.assign({}, o.hdr, { bg: o.catHdrBg }); if (o.logoH === 'CATLOGO') o.logoH = o.catLogoH; return o; }
+  fixHdr(o) { if (o.stH === 'STAGEH') o.stH = o.pStageH; if (o.hdr) o.hdr = Object.assign({}, o.hdr, { hov: 'rgba(255,255,255,0.12)', dotRing: '#13305f', badgeBg: '#ffffff', badgeFg: '#0b2655', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(11,38,85,0.74)', btnBd: 'rgba(255,255,255,0.16)', cartBg: '#f5c400', cartFg: '#0b2655', barSh: 'none' }); if (o.pAddLbl === 'ADDLBL' || o.pAddLbl === undefined) o.pAddLbl = o.addLabel; if (o.hdr && o.hdr.bg === 'CATBG') o.hdr = Object.assign({}, o.hdr, { bg: o.catHdrBg }); if (o.logoH === 'CATLOGO') o.logoH = o.catLogoH; return o; }
   setCfg(k, v) {
     this.setState((s) => {
       const D = window.SUMAN, c = Object.assign({}, s.cfg, { [k]: v });
@@ -1062,24 +1121,24 @@ class Component extends DCLogic {
       return { k, n: String(i + 1), label, upper: label.toUpperCase(), value: gsum[k], sub: gsub[k], on, onClick: (e) => { const el = e.currentTarget.parentElement, wasOn = on; open(k)(); if (wasOn) return;
           setTimeout(() => { const p = this.pPanelRef.current; if (!el) return;
             if ((this.state.w || 1280) >= 860) { if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'smooth' }); if (p && p.scrollHeight > p.clientHeight + 4) p.scrollTo({ top: Math.max(0, el.offsetTop - 16), behavior: 'smooth' }); }
-            else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth' }); }, 60); },
+            else if (p) p.scrollTo({ top: Math.max(0, el.offsetTop - 8), behavior: 'smooth' }); }, 60); },
         sw: k === 'g2' ? curHex : k === 'g1' ? frame.hex : k === 'g3' && br.canopy ? br.canopy : '', swRing: on ? 'rgba(255,255,255,0.6)' : '#ffffff',
         bg: on ? 'rgba(255,255,255,0.1)' : 'transparent', hbg: on ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)', kFg: '#ffffff', nameFg: on ? '#f5c400' : '#ffffff', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', abd: on ? '#f5c400' : 'rgba(255,255,255,0.28)', arot: on ? '180deg' : '0deg', vFg: '#a9b6cf', nBg: 'transparent', nFg: '#6b7180', rot: on ? '0deg' : '180deg' };
     });
-    const card = (key, list, code, name, sub) => list.map((o) => { const on = c[key] === o.id, sv = sub(o);
-      return { code: code(o), label: name(o), sub: sv, on, bd: on ? '#f2c36b' : 'rgba(255,255,255,0.14)', ibd: on ? '#f2c36b' : 'transparent', hbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', bg: on ? 'rgba(242,195,107,0.08)' : 'rgba(255,255,255,0.03)', fg: '#ffffff', codeFg: on ? '#f2c36b' : '#ffffff', rbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', rbg: on ? '#f2c36b' : '#0b2655', subFg: '#a9b6cf', onClick: () => this.setCfg(key, o.id) }; });
+    const card = (key, list, code, name, sub, disF) => list.map((o) => { const on = c[key] === o.id, dis = !on && disF ? disF(o) : '', sv = dis || sub(o);
+      return { code: code(o), label: name(o), sub: sv, on, op: dis ? 0.4 : 1, cur: dis ? 'not-allowed' : 'pointer', dis: !!dis, bd: on ? '#f2c36b' : 'rgba(255,255,255,0.14)', ibd: on ? '#f2c36b' : 'transparent', hbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', bg: on ? 'rgba(242,195,107,0.08)' : 'rgba(255,255,255,0.03)', fg: '#ffffff', codeFg: on ? '#f2c36b' : '#ffffff', rbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', rbg: on ? '#f2c36b' : '#0b2655', subFg: '#a9b6cf', onClick: () => { if (!dis) this.setCfg(key, o.id); } }; });
     const shapeIc = { LS: '▢', LO: '◯', LR: '▭' };
     const baseCode = { none: '—', concrete: 'Ø600', m854: '854', m860: '860', fold880: '880', embed: 'Ø58' };
     let ruler = { stops: [], tick: '10px', fromP: '0%', fillP: '0%' };
     const mk = (sheet) => {
     let sh = { isCards: false, isRuler: false, isFan: false, isFrame: false, isVal: false, isQty: false, isSum: false, note: '', min: '130px', h: '84px', codeFs: '17px', opts: [] };
     if (sheet === 'shape') sh = Object.assign(sh, { isCards: true, codeFs: '20px', opts: card('shape', [{ id: 'LS' }, { id: 'LO' }, { id: 'LR' }], (o) => shapeIc[o.id], (o) => t['sh_' + o.id], (o) => o.id) });
-    if (sheet === 'mech') sh = Object.assign(sh, { isCards: true, opts: card('mech', D.mech, (o) => o.id, (o) => t['mech_' + o.id], (o) => addLbl(o.add)), note: t.mech_T3 + ': ' + (({ bs: 'dostupan od 300 cm', hr: 'dostupan od 300 cm', en: 'available from 300 cm', de: 'ab 300 cm erhältlich' })[lg]) });
+    if (sheet === 'mech') sh = Object.assign(sh, { isCards: true, opts: card('mech', D.mech, (o) => o.id, (o) => t['mech_' + o.id], (o) => addLbl(o.add), (o) => (D.sizes[o.id === 'T3' ? 'tele' : 'classic'][c.shape].includes(c.size) ? '' : (({ bs: 'Nije dostupno za ', hr: 'Nije dostupno za ', en: 'Not available for ', de: 'Nicht verfügbar für ' })[lg]) + D.sizeLabel[c.shape](c.size))) });
     if (sheet === 'look') sh = Object.assign(sh, { isCards: true, min: '170px', opts: card('look', D.looks, (o) => (o.id === 'std' ? 'STD' : 'CL®'), (o) => t['look_' + o.id], (o) => addLbl(o.add)) });
     if (sheet === 'vent') sh = Object.assign(sh, { isCards: true, opts: card('vent', D.vents, (o) => (o.id === 'none' ? '—' : o.id), (o) => t['vent_' + o.id], (o) => addLbl(o.add)) });
     if (sheet === 'fabric') sh = Object.assign(sh, { isCards: true, min: '170px', note: t.fab_note, opts: card('fabric', D.fabrics, (o) => o.id, (o) => t['fab_' + o.id], (o) => (o.pct ? '+ ' + Math.round(o.pct * 100) + ' %' : t.incl)) });
     if (sheet === 'base') sh = Object.assign(sh, { isCards: true, opts: card('base', D.bases, (o) => baseCode[o.id], (o) => t['base_' + o.id], (o) => addLbl(o.add)) });
-    if (sheet === 'color') sh = Object.assign(sh, { isFan: true, note: t.fab_note, opts: fab.colors.map(([id, hex], i) => { const on = c.color === id; return { label: id, hex, on, ink: lum(hex) > 0.55 ? '#0b2655' : '#ffffff', y: on ? '-18px' : '0px', rot: on ? '0deg' : ((i % 2 ? 1 : -1) * 1.5) + 'deg', z: on ? 5 : 1, sh: on ? '0 12px 24px rgba(0,0,0,0.35),0 0 0 2px #0b2655,0 0 0 4px #f2c36b' : '0 2px 6px rgba(0,0,0,0.25)', onClick: () => this.setCfg('color', id) }; }) });
+    if (sheet === 'color') sh = Object.assign(sh, { isFan: true, opts: fab.colors.map(([id, hex], i) => { const on = c.color === id; return { label: id, hex, on, ink: lum(hex) > 0.55 ? '#0b2655' : '#ffffff', y: on ? '-18px' : '0px', rot: on ? '0deg' : ((i % 2 ? 1 : -1) * 1.5) + 'deg', z: on ? 5 : 1, sh: on ? '0 12px 24px rgba(0,0,0,0.35),0 0 0 2px #0b2655,0 0 0 4px #f2c36b' : '0 2px 6px rgba(0,0,0,0.25)', onClick: () => this.setCfg('color', id) }; }) });
     if (sheet === 'frame') sh = Object.assign(sh, { isFrame: true, opts: D.frames.map((o) => { const on = c.frame === o.id; return { label: t['fr_' + o.id], sub: addLbl(o.add), on, bd: on ? '#f2c36b' : 'rgba(255,255,255,0.14)', ibd: on ? '#f2c36b' : 'transparent', ring: '0px',
       fill: o.id === 'wood' ? 'repeating-linear-gradient(100deg,#7a4f2f 0 3px,#8b5e3c 3px 7px,#9c6c47 7px 9px)' : 'radial-gradient(circle at 32% 26%,#ffffff 0%,' + o.hex + ' 46%,' + this.shade(o.hex) + ' 100%)', onClick: () => this.setCfg('frame', o.id) }; }) });
     if (sheet === 'brand') sh = Object.assign(sh, { isVal: true, note: t.brand_note, opts: D.brands.map((b) => { const on = c.brand === b.id, none = b.id === 'none';
@@ -1096,9 +1155,9 @@ class Component extends DCLogic {
         stops: all.map((z) => { const on = c.size === z, ok = sizes.includes(z);
           return { left: P(first(z)).toFixed(2) + '%', on, label: c.shape === 'LR' ? z.slice(0, 2) + '0×' + z.slice(2) + '0' : z, full: D.sizeLabel[c.shape](z), tipOp: on ? 1 : 0, tipY: on ? '0px' : '6px',
             dot: on ? '22px' : '12px', dotM: on ? '13px' : '18px', dotBg: on ? '#f5c400' : ok ? '#0b2655' : 'rgba(255,255,255,0.15)', dotSh: on ? '0 0 0 5px rgba(245,196,0,0.25)' : 'none', fg: ok ? (on ? '#ffffff' : '#cfd7e6') : 'rgba(255,255,255,0.35)',
-            price: ok ? ((this.state.w || 1280) < 860 ? this.fmt(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add).replace(/,00$/, '') : this.km(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add)) : (D.sizes.classic[c.shape].includes(z) ? 'CR · CS' : 'T3'),
-            onClick: () => { if (!ok) this.setCfg('mech', D.sizes.classic[c.shape].includes(z) ? 'CR' : 'T3'); this.setCfg('size', z); } }; }) };
-      sh.isRuler = true; sh.note = t.mech_T3 + ' (T3) · CR · CS';
+            op: ok ? 1 : 0.35, cur: ok ? 'pointer' : 'not-allowed', price: !ok ? '—' : ((this.state.w || 1280) < 860 ? this.fmt(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add).replace(/,00$/, '') : this.km(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add)),
+            onClick: () => { if (ok) this.setCfg('size', z); } }; }) };
+      sh.isRuler = true; sh.note = all.some((z) => !sizes.includes(z)) ? (({ bs: 'Zatamnjene dimenzije nisu dostupne uz način otvaranja ', hr: 'Zatamnjene dimenzije nisu dostupne uz način otvaranja ', en: 'Greyed-out sizes are not available with opening type ', de: 'Ausgegraute Größen sind mit dieser Öffnungsart nicht verfügbar: ' })[lg]) + t['mech_' + c.mech] + ' (' + c.mech + ').' : '';
     }
     return sh;
     };
@@ -1118,10 +1177,19 @@ class Component extends DCLogic {
     const specRowsP = [[t.o_size, D.sizeLabel[c.shape](c.size).replace('×', ' × ')], [({ bs: 'Visina H1', hr: 'Visina H1', en: 'Height H1', de: 'Höhe H1' })[lg], spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg']].map(([k, v]) => ({ k, v }));
     return {
       cfgH: s.h ? s.h + 'px' : '100vh', narrowCfg: !wide,
-      pCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.3fr) minmax(460px,1fr)', pSpecs: specRowsP.slice(0, 3), pAddH2: 0, pPanelRef: this.pPanelRef || (this.pPanelRef = React.createRef()), pStagePos: mob ? 'relative' : 'sticky', pStageH: mob ? '64vh' : (s.h ? (s.h - 34) + 'px' : 'calc(100vh - 34px)'), pStageTop: '72px',
-      pTabsTop: mob ? '84px' : '96px', pPanelH: mob ? 'auto' : (s.h ? (s.h - 34) + 'px' : 'calc(100vh - 34px)'), pPanelOv: mob ? 'visible' : 'auto',
-      pPad: mob ? '32px 18px 8px' : (short ? '96px' : '112px') + ' clamp(24px,3vw,52px) 16px', pRowPad: mob ? '14px 0' : '16px 0', pFootBot: mob ? '36px' : '0px', fWrap: mob ? 'nowrap' : 'wrap', odAlign: mob ? 'flex-start' : 'flex-end', odValFs: mob ? '22px' : '26px', fBleed: mob ? '-16px' : '0px', fBleedP: mob ? '16px' : '0px', pRowCols: mob ? '22px minmax(0,1fr) 32px' : '28px minmax(0,1fr) auto 32px', pSubOn: !mob, pValSub: mob, pPillDisp: mob ? 'none' : 'flex', pOptPad: mob ? '4px 0 22px' : '6px 0 24px 40px', pSpecCols: mob ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,auto)', pRowFs: mob ? '18px' : '19px', pSubPl: mob ? '0px' : '34px',
-      pH1: mob ? '52px' : short ? 'clamp(44px,4vw,60px)' : 'clamp(52px,4.6vw,76px)', pValMax: mob ? '120px' : '190px', pFootPad: mob ? '14px 18px calc(14px + env(safe-area-inset-bottom))' : (short ? '14px' : '18px') + ' clamp(24px,3.4vw,64px) ' + (short ? '16px' : '22px'), pAddFlex: mob || s.w < 1180 ? '1 1 100%' : '0 0 auto', pAddH: short ? '46px' : '52px', pTotFs: s.w < 1200 ? '21px' : '24px',
+      pCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.3fr) minmax(460px,1fr)', pSpecs: specRowsP.slice(0, 3), pAddH2: 0, pPanelRef: this.pPanelRef || (this.pPanelRef = React.createRef()), pStagePos: mob ? 'relative' : 'sticky', pTouch: mob ? 'none' : 'auto', ...(() => { const ex = !!s.expand, z = !!s.phZoom && ex && s.view === 'photo', n = D.gallery.length;
+        return { stPos: ex ? 'fixed' : (mob ? 'relative' : 'sticky'), stL: ex ? '0px' : 'auto', stW: ex ? '100vw' : 'auto', stZ: ex ? '90' : 'auto', stH: ex ? (s.h || 800) + 'px' : 'STAGEH', stInTop: ex ? '0px' : '72px', stBarTop: ex ? '20px' : (mob ? '84px' : '96px'),
+          expandOn: ex, expandOff: !ex, expLbl: ex ? ({ bs: 'Zatvori', hr: 'Zatvori', en: 'Close', de: 'Schließen' })[lg] : ({ bs: 'Uvećaj prikaz', hr: 'Povećaj prikaz', en: 'Enlarge view', de: 'Ansicht vergrößern' })[lg],
+          toggleExpand: () => this.setState({ expand: !ex, phZoom: false }),
+          phIT: ex ? '72px' : '64px', phIB: ex ? '84px' : '84px', phZ: z ? '2.2' : '1', phO: s.phO || '50% 50%', phCursor: ex ? (z ? 'zoom-out' : 'zoom-in') : 'pointer',
+          phZoomTog: (e) => { if (!ex) { this.setState({ expand: true, phZoom: false }); return; } const r = e.currentTarget.getBoundingClientRect(); this.setState({ phZoom: !z, phO: ((e.clientX - r.left) / r.width * 100).toFixed(1) + '% ' + ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%' }); },
+          phZoomMove: (e) => { if (!z) return; const r = e.currentTarget.getBoundingClientRect(); this.setState({ phO: ((e.clientX - r.left) / r.width * 100).toFixed(1) + '% ' + ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%' }); },
+          phTouchMove: (e) => { if (!z) return; const p = e.touches && e.touches[0]; if (!p) return; const r = e.currentTarget.getBoundingClientRect(); this.setState({ phO: Math.min(100, Math.max(0, (p.clientX - r.left) / r.width * 100)).toFixed(1) + '% ' + Math.min(100, Math.max(0, (p.clientY - r.top) / r.height * 100)).toFixed(1) + '%' }); },
+          phSegs: D.gallery.map((_, i) => ({ n: String(i + 1), on: i === s.photo, bg: i === s.photo ? '#0b2655' : 'rgba(11,38,85,0.18)', onClick: () => this.setState({ photo: i, phZoom: false }) })) }; })(), pStageH: mob ? Math.round(((s.h || 800) - 36) * 0.4) + 'px' : (s.h ? (s.h - 34) + 'px' : 'calc(100vh - 34px)'), pStageTop: '72px',
+      pTabsTop: mob ? '84px' : '96px', pPanelH: mob ? 'calc(' + Math.round((s.h || 800) - ((s.h || 800) - 36) * 0.4) + 'px - 36px - env(safe-area-inset-bottom))' : (s.h ? (s.h - 34) + 'px' : 'calc(100vh - 34px)'), pPanelOv: 'auto',
+      pPad: mob ? '16px 18px 8px' : (short ? '96px' : '112px') + ' clamp(24px,3vw,52px) 16px', pRowPad: mob ? '11px 0' : '16px 0', pFootBot: '0px', pDeskDisp: mob ? 'none' : 'flex', pMobMeta: mob, pSpecDisp: mob ? 'none' : 'grid', pSizeTxt: D.sizeLabel[c.shape](c.size).replace('×', ' × '), pQtyH: mob ? '42px' : '48px', pArrowDisp: mob ? 'none' : 'inline',
+      pAddLbl: mob ? (s.justAdded ? '✓' : ({ bs: 'Dodaj', hr: 'Dodaj', en: 'Add', de: 'Hinzufügen' })[lg]) : 'ADDLBL', fWrap: mob ? 'nowrap' : 'wrap', odAlign: mob ? 'flex-start' : 'flex-end', odValFs: mob ? '22px' : '26px', fBleed: mob ? '-16px' : '0px', fBleedP: mob ? '16px' : '0px', pRowCols: mob ? '22px minmax(0,1fr) 32px' : '28px minmax(0,1fr) auto 32px', pSubOn: !mob, pValSub: mob, pPillDisp: mob ? 'none' : 'flex', pOptPad: mob ? '4px 0 22px' : '6px 0 24px 40px', pSpecCols: mob ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,auto)', pRowFs: mob ? '17px' : '19px', pSubPl: mob ? '0px' : '34px',
+      pH1: mob ? '28px' : short ? 'clamp(44px,4vw,60px)' : 'clamp(52px,4.6vw,76px)', pValMax: mob ? '120px' : '190px', pFootPad: mob ? '10px 14px' : (short ? '14px' : '18px') + ' clamp(24px,3.4vw,64px) ' + (short ? '16px' : '22px'), pAddFlex: mob ? '0 0 auto' : s.w < 1180 ? '1 1 100%' : '0 0 auto', pAddH: mob ? '44px' : short ? '46px' : '52px', pTotFs: mob ? '18px' : s.w < 1200 ? '21px' : '24px',
       sumOn: sheet === 'sum',
       tabsDisp: sheetOn ? 'none' : 'flex', hdrTop: wide ? '112px' : '92px', eyebrow: t.nav_umb, codeFs: wide ? 'clamp(56px,5.6vw,84px)' : '40px', modelTag: c.shape + ' ' + c.size + ' ' + c.mech, sheetW: 'min(1120px,calc(100% - 24px))', addHov: s.justAdded ? '#1f6b3a' : '#ffd21f', specDisp: mob ? 'none' : 'grid',
       specRows: [[t.o_size, D.sizeLabel[c.shape](c.size).replace('×', ' × ')], [({ bs: 'Visina H1', hr: 'Visina H1', en: 'Height H1', de: 'Höhe H1' })[lg], spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg'], [t.sp_pole, 'Ø 58 mm']].map(([k, v]) => ({ k, v })),
@@ -1129,7 +1197,7 @@ class Component extends DCLogic {
       barBg: sheetOn ? '#fbfaf7' : 'transparent', barH: wide ? '120px' : '96px', pcsUp: t.pcs.toUpperCase().replace('.', ''), totalUp: t.total.toUpperCase(), stageTopOff: wide ? '72px' : '150px', modeTop: '0px',
       modeTabs: [['3d', ({ bs: '3D model', hr: '3D model', en: '3D model', de: '3D-Modell' })[lg], ({ bs: 'vaša konfiguracija', hr: 'vaša konfiguracija', en: 'your configuration', de: 'Ihre Konfiguration' })[lg]], ['photo', ({ bs: 'Fotografije', hr: 'Fotografije', en: 'Photos', de: 'Fotos' })[lg], ({ bs: 'referentni objekti', hr: 'referentni objekti', en: 'reference projects', de: 'Referenzen' })[lg]]].map(([id, label, sub]) => {
         const on = s.view === id;
-        return { label, is3d: id === '3d', isPh: id === 'photo', on, pbg: on ? '#0b2655' : 'transparent', pfg: on ? '#ffffff' : '#0b2655', fg: on ? '#0b2655' : '#5b6272', ul: on ? '#e2a33a' : 'transparent', onClick: () => this.setState({ view: id, sheet: id === 'photo' ? null : s.sheet, viewsOpen: false, detPop: false }) };
+        return { label, is3d: id === '3d', isPh: id === 'photo', on, tFg: on ? '#0b2655' : '#7d8496', tUl: on ? '#f5c400' : 'transparent', pbg: on ? '#0b2655' : 'transparent', pfg: on ? '#ffffff' : '#0b2655', fg: on ? '#0b2655' : '#5b6272', ul: on ? '#e2a33a' : 'transparent', onClick: () => this.setState({ view: id, sheet: id === 'photo' ? null : s.sheet, viewsOpen: false, detPop: false }) };
       }),
       cfgRef: this.cfgRef, toolsBottom: wide ? '110px' : '162px', menuB: wide ? '160px' : '212px', viewsMenuR: 'clamp(16px,2.6vw,40px)', detMenuR: 'clamp(16px,2.6vw,40px)',
       tbFg: '#8a8f9c', tbBg0: 'transparent', tbS: s.h && s.h < 720 ? '32px' : '36px',
@@ -1285,11 +1353,19 @@ class Component extends DCLogic {
         return Object.assign(x, { on, op: on ? 1 : 0, sc: on ? 1 : 1.06, fg: on ? '#ffffff' : 'rgba(255,255,255,0.55)', thRing: on ? '0 0 0 2px #f5c400' : 'none', thOp: on ? 1 : 0.6, abd: on ? '#f5c400' : 'rgba(255,255,255,0.24)', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', ax: on && !mob ? '4px' : '0px', enter: () => { if ((this.state.ixHover || 0) !== i) { this.setState({ ixHover: i, ixSlide: 0 }); this._ixT = Date.now(); } } }); });
       Object.assign(catExtra, { ixItems, ixAct: raw[act] || { name: '', desc: '', hot: false, cta: '', onClick: () => {} },
         ixSlides: cur.imgs.map((bgi, i) => ({ bgi, op: i === sl ? 1 : 0, sc: i === sl ? 1.04 : 1 })),
-        ixDotsOn: nImg > 1, ixDots: cur.imgs.map((_, i) => ({ n: String(i + 1), on: i === sl, w: i === sl ? '22px' : '8px', bg: i === sl ? '#ffffff' : 'rgba(255,255,255,0.45)', onClick: () => { this.setState({ ixSlide: i }); this._ixT = Date.now(); } })), ixCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.05fr) minmax(0,1fr)', ixPos: 'sticky', ixTop: mob ? '72px' : '0px', ixH: mob ? '42vh' : 'calc(100vh - 34px)', ...(() => {
+        ixDotsOn: nImg > 1, ixDots: cur.imgs.map((_, i) => ({ n: String(i + 1), on: i === sl, w: i === sl ? '22px' : '8px', bg: i === sl ? '#ffffff' : 'rgba(255,255,255,0.45)', onClick: () => { this.setState({ ixSlide: i }); this._ixT = Date.now(); } })), ixCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.05fr) minmax(0,1fr)', ixPos: 'sticky', ixTop: '0px', ixH: mob ? '43vh' : 'calc(100vh - 34px)', ...(() => {
           const n = Math.max(1, raw.length), Hh = (s.h || 800) - 34, h1 = Math.round(Math.min(s.w * 0.064, Hh * 0.1, 104)), nm = Math.round(Math.min(Math.max(28, s.w * 0.03), 44, Hh * 0.05));
           const rp = Math.max(8, Math.min(26, Math.floor((Hh - 112 - 32 - (h1 * 0.86 + 70 + 36) - n * (nm * 0.95 + 28)) / (2 * n))));
           return { ixH1Fs: mob ? '52px' : h1 + 'px', ixNameFs: mob ? '28px' : nm + 'px', ixGap: mob ? '28px' : '36px', ixDeskRp: rp + 'px 0' }; })(),
-        ixPad: mob ? '28px 18px 34vh' : '112px clamp(28px,4vw,72px) 32px', ixRow: mob ? '76px minmax(0,1fr) auto 28px' : 'minmax(0,1fr) auto 44px', ixAw: mob ? '28px' : '44px', ixAfs: mob ? '14px' : '18px', ixRowPad: mob ? '16px 0' : 'IXRP', ixThumb: mob, ixArrow: 'flex' });
+        ixTitleDisp: mob ? 'none' : 'flex', ixCntOn: mob && raw.length > 1, ixHotOn: !mob && !!(raw[act] || {}).hot, ixImgNameFs: mob ? '40px' : 'clamp(48px,6.4vw,104px)', ixImgDescFs: mob ? '14px' : '15px', ixDescLines: mob ? 2 : 6, ixCnt: String(act + 1).padStart(2, '0') + ' / ' + String(raw.length).padStart(2, '0'),
+        ixEndOn: mob, ixEndH: '30vh', hintOn: mob && raw.length > 2, hintOp: s.scrolled ? 0 : 1, hintPe: s.scrolled ? 'none' : 'auto',
+        hintTap: () => { try { window.scrollBy({ top: Math.round((window.innerHeight || 800) * 0.3), behavior: 'smooth' }); } catch (e) {} },
+        hintIcon: this._hintIcon || (this._hintIcon = React.createElement('span', { style: { display: 'flex', color: '#f5c400', animation: 'sumanNudge 1.6s ease-in-out infinite' } }, React.createElement('svg', { width: 14, height: 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' }, React.createElement('path', { d: 'M6 9l6 6 6-6' })))),
+        ixEnd: ({ bs: { t: 'Niste sigurni koji model odabrati?', d: 'Naš tim će vam pomoći pronaći rješenje za vaš prostor i namjenu.', c: 'Kontaktirajte nas', more: 'Više modela' },
+          hr: { t: 'Niste sigurni koji model odabrati?', d: 'Naš tim pomoći će vam pronaći rješenje za vaš prostor i namjenu.', c: 'Kontaktirajte nas', more: 'Više modela' },
+          en: { t: 'Not sure which model to choose?', d: 'Our team will help you find the right solution for your space and use.', c: 'Contact us', more: 'More models' },
+          de: { t: 'Unsicher, welches Modell passt?', d: 'Unser Team hilft Ihnen, die passende Lösung für Ihren Bereich zu finden.', c: 'Kontakt aufnehmen', more: 'Weitere Modelle' } })[s.lang] || {},
+        ixPad: mob ? '6px 18px 0' : '112px clamp(28px,4vw,72px) 32px', ixRow: mob ? '76px minmax(0,1fr) auto 28px' : 'minmax(0,1fr) auto 44px', ixAw: mob ? '28px' : '44px', ixAfs: mob ? '14px' : '18px', ixRowPad: mob ? '16px 0' : 'IXRP', ixThumb: mob, ixArrow: 'flex' });
     }
     if (catExtra.ixRowPad === 'IXRP') catExtra.ixRowPad = catExtra.ixDeskRp;
     const sizes = D.sizes[c.mech === 'T3' ? 'tele' : 'classic'][c.shape];
@@ -1385,8 +1461,8 @@ class Component extends DCLogic {
       u: { shape: c.shape, size: c.size, canopy: curHex, frame: D.frames.find((f) => f.id === c.frame).hex, vent: c.vent, look: c.look, brandtext: c.brand === 'none' ? '' : br.text, brandimg: c.brand === 'none' || (this.state.logoMiss || {})[c.brand] ? '' : (br.logo || ''), base: c.base, mech: c.mech },
       viewTabs: [['3d', t.v3d, '3D'], ['photo', t.vph, '▦']].map(([id, label, ic]) => ({ label, ic, bg: s.view === id ? '#0b2655' : 'transparent', fg: s.view === id ? '#fff' : '#0f1a2c', onClick: () => this.setState({ view: id }) })),
       photos: D.gallery.map((src, i) => ({ src, ring: s.photo === i ? '0 0 0 2px #ffffff, 0 0 0 4px #0b2655' : 'none', op: s.photo === i ? 1 : 0.62, onClick: () => this.setState({ view: 'photo', photo: i }) })),
-      photoPrev: () => this.setState({ photo: (s.photo - 1 + D.gallery.length) % D.gallery.length }),
-      photoNext: () => this.setState({ photo: (s.photo + 1) % D.gallery.length }),
+      photoPrev: () => this.setState({ photo: (s.photo - 1 + D.gallery.length) % D.gallery.length, phZoom: false }),
+      photoNext: () => this.setState({ photo: (s.photo + 1) % D.gallery.length, phZoom: false }),
       photoCount: String(s.photo + 1).padStart(2, '0') + ' / ' + String(D.gallery.length).padStart(2, '0'),
       phX: s.w >= 1024 ? '88px' : '64px', phTop: s.w >= 1024 ? '120px' : '88px', phBot: s.w >= 1024 ? '100px' : '96px',
       stripB: s.w >= 1024 ? '110px' : '162px', thW: s.w < 860 ? '64px' : '84px', thH: s.w < 860 ? '44px' : '56px',
@@ -1405,7 +1481,16 @@ class Component extends DCLogic {
       toggleRot: () => this.setState({ rot: s.rot === false }), hintDisp: s.w >= 1024 ? 'block' : 'none',
       dimsLine: D.sizeLabel[c.shape](c.size) + ' · H ' + spec[0] + ' cm',
       ...this.detVals(s), ...this.toolVals(s),
-      envMode: 'studio', personOn: 'false', furnOn: 'false',
+      envMode: 'studio', personOn: 'false', cntAttr: String(s.uCount || 1), cntLbl: ({ bs: 'Broj suncobrana u prikazu', hr: 'Broj suncobrana u prikazu', en: 'Umbrellas shown', de: 'Anzahl im Bild' })[s.lang],
+      cntOpts: [1, 2, 4].map((n) => { const on = (s.uCount || 1) === n; return { n: String(n), on, aria: String(n), bg: on ? '#0b2655' : 'transparent', fg: on ? '#ffffff' : '#0b2655', onClick: () => this.setState({ uCount: n }) }; }), ...(() => { const lg = s.lang, cur = s.furn || false;
+        const FO = [[false, { bs: 'Bez namještaja', hr: 'Bez namještaja', en: 'No furniture', de: 'Ohne Möbel' }, ''], ['bistro', { bs: 'Bistro stol', hr: 'Bistro stol', en: 'Bistro table', de: 'Bistrotisch' }, 'Ø70 · 3×'],
+          ['bar', { bs: 'Barski stol', hr: 'Barski stol', en: 'Bar table', de: 'Stehtisch' }, 'H 108 · 3×'], ['lounge', { bs: 'Lounge set', hr: 'Lounge set', en: 'Lounge set', de: 'Lounge-Set' }, '2×']];
+        const curO = FO.find((f) => f[0] === cur) || FO[0];
+        return { furnOn: cur ? String(cur) : 'false', furnPressed: !!cur, furnPop: !!s.furnPop, toggleFurn: () => this.setState({ furnPop: !s.furnPop }),
+          furnLbl2: cur ? curO[1][lg] : ({ bs: 'Namještaj', hr: 'Namještaj', en: 'Furniture', de: 'Möbel' })[lg],
+          furnOpts: FO.map(([id, lb, sub]) => { const on = id === cur; return { label: lb[lg], sub, on, bg: on ? '#e6ebf4' : 'transparent', fw: on ? 700 : 500, onClick: () => this.setState({ furn: id, furnPop: false }) }; }) }; })(),
+      furnTxtOn: (s.w || 1280) >= 1100,
+      furnBg: s.furn ? '#0b2655' : 'rgba(255,255,255,0.55)', furnFg: s.furn ? '#ffffff' : '#0b2655', furnBd: s.furn ? '#0b2655' : 'rgba(11,38,85,0.16)',
       dimsOn: s.dims ? 'true' : 'false', dimsPressed: !!s.dims, toggleDims: () => this.setState({ dims: !s.dims, show3dPop: null }),
       dimsBg: s.dims ? 'rgba(11,38,85,0.08)' : 'transparent', dimsFg: s.dims ? '#0b2655' : '#8a8f9c', dimsHbg: s.dims ? '#0b2655' : 'rgba(11,38,85,0.07)',
       dimsLbl: ({ bs: 'Mjere', hr: 'Mjere', en: 'Dimensions', de: 'Maße' })[s.lang],
@@ -1533,7 +1618,8 @@ class Component extends DCLogic {
   renderVals() {
     if (!this.state.ready) return { t: {}, curLang: { code: 'BS', name: 'Bosanski', flag: 'https://flagcdn.com/w80/ba.png' }, langRot: '0deg', hdr: { bg: '#0b2655', bd: '#0b2655', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.08)', btnBd: 'rgba(255,255,255,0.22)', cartBg: '#f5c400', cartFg: '#0b2655' }, logoImg: 'block', logoTxt: 'none', footDisp: 'none', isHome: true, sectors: [], seams: [], navItems: [], langs: [], stageNames: [], heroH: 700, desktop: this.state.w >= 860, footRef: this.footRef };
     const t = window.SUMAN_I18N[this.state.lang] || window.SUMAN_I18N.bs;
-    try { document.documentElement.style.overflow = (this.state.screen === 'home' || (this.state.w || 1280) >= 860) && !this.state.menu ? 'hidden' : ''; } catch (e) {}
+    try { const dk = ['home', 'catalog', 'product'].includes(this.state.screen) ? '#0b2655' : '#f3f0ea', de = document.documentElement; de.style.background = dk; document.body.style.background = dk; de.style.overscrollBehaviorY = 'none'; const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.setAttribute('content', dk); } catch (e) {}
+    try { document.documentElement.style.overflow = (this.state.screen === 'home' || this.state.screen === 'product' || (this.state.w || 1280) >= 860) && !this.state.menu ? 'hidden' : ''; } catch (e) {}
     const pv = this.productVals(t), c3 = this.state.screen === 'product' ? this.cfg3Vals(t) : {};
     if (pv.review) pv.review = pv.review.map((r, i) => Object.assign({}, r, { edit: () => this.setState({ sheet: ['shape', 'mech', 'size', 'frame', 'look', 'vent', 'fabric', 'brand', 'base', 'qty'][i] }) }));
     return this.fixHdr(Object.assign({}, this.baseVals(t), pv, c3, this.cartVals(t), this.b2bVals(t)));

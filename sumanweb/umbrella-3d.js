@@ -3,7 +3,7 @@
   const URL3 = 'https://unpkg.com/three@0.184.0/build/three.module.js';
   let p3;
   const load3 = () => p3 || (p3 = import(URL3));
-  const ATTRS = ['shape', 'size', 'canopy', 'frame', 'vent', 'look', 'brandtext', 'brandimg', 'base', 'mech', 'autorotate', 'cam', 'zoom', 'env', 'person', 'furniture', 'focus', 'dims', 'wlabel', 'hlabel', 'nudge'];
+  const ATTRS = ['count', 'shape', 'size', 'canopy', 'frame', 'vent', 'look', 'brandtext', 'brandimg', 'base', 'mech', 'autorotate', 'cam', 'zoom', 'env', 'person', 'furniture', 'focus', 'dims', 'wlabel', 'hlabel', 'nudge'];
 
   const lum = (hex) => {
     const h = (hex || '#000').replace('#', '');
@@ -42,7 +42,7 @@
         const d = v.endsWith('L') ? 1 : -1; o.tAz = (o.tAz !== undefined ? o.tAz : o.az) + d * Math.PI / 4; o.last = performance.now(); return;
       }
       if (n === 'cam' || n === 'zoom' || n === 'focus') { this._camPreset(); return; }
-      if ((n === 'env' || n === 'person' || n === 'furniture' || n === 'dims' || n === 'wlabel' || n === 'hlabel') && this._r && this._dims) { this._dims = Object.assign({}, this._dims, { R: this._R0 * 1.05 + 0.25 }); this._envBuild(); this._fit(); return; }
+      if ((n === 'env' || n === 'person' || n === 'furniture' || n === 'dims' || n === 'wlabel' || n === 'hlabel') && this._r && this._dims) { this._dims = Object.assign({}, this._dims, { R: this._baseR || this._R0 * 1.05 + 0.25 }); this._envBuild(); this._fit(); return; }
       this._q();
     }
     _camPreset() {
@@ -240,15 +240,36 @@
         const head = new T.Mesh(new T.SphereGeometry(0.11, 18, 14), ink); head.position.set(px, 1.64, pz); head.castShadow = true; eg.add(head);
         this._dims.R = Math.max(this._dims.R, R + 0.85);
       }
-      if (String(this._g('furniture', 'false')) === 'true') {
+      const fstyle = (() => { const v = String(this._g('furniture', 'false')); return v === 'true' ? 'bistro' : v; })();
+      if (fstyle !== 'false') {
         const wood = M({ name: 'namjestaj', color: 0x9a7552, roughness: 0.7 }), met = M({ name: 'namjestaj_metal', color: 0x2e3338, roughness: 0.45, metalness: 0.5 });
-        cyl(0.5, 0.5, 0.035, wood, 0, 0.74, 0, eg, 40);
-        [0, 1, 2, 3].forEach((k) => { const a = Math.PI / 4 + (k * Math.PI) / 2; cyl(0.015, 0.015, 0.72, met, Math.cos(a) * 0.36, 0.36, Math.sin(a) * 0.36, eg, 8); });
-        [0, 1, 2, 3].forEach((k) => {
-          const a = (k * Math.PI) / 2, cx = Math.cos(a) * 0.82, cz = Math.sin(a) * 0.82;
-          const ch = new T.Group(); ch.position.set(cx, 0, cz); ch.rotation.y = -a + Math.PI / 2; eg.add(ch);
-          box(0.44, 0.035, 0.42, wood, 0, 0.45, 0, ch); box(0.44, 0.38, 0.03, wood, 0, 0.66, 0.2, ch);
-          [[-0.19, -0.18], [0.19, -0.18], [-0.19, 0.18], [0.19, 0.18]].forEach(([x, z]) => box(0.025, 0.45, 0.025, met, x, 0.225, z, ch));
+        const A0 = this._A || R, alongX = (this._ab ? this._ab[0] >= this._ab[1] : true), d = Math.min(0.85, A0 * 0.55);
+        const chair = (x, z, tx, tz) => { const ch = new T.Group(); ch.position.set(x, 0, z); eg.add(ch); ch.lookAt(tx, 0, tz);
+          box(0.44, 0.035, 0.42, wood, 0, 0.45, 0, ch); box(0.44, 0.4, 0.03, wood, 0, 0.67, -0.2, ch);
+          [[-0.19, -0.18], [0.19, -0.18], [-0.19, 0.18], [0.19, 0.18]].forEach(([lx, lz]) => box(0.025, 0.45, 0.025, met, lx, 0.225, lz, ch)); };
+        const fab = M({ name: 'tapecirung', color: 0xd9d3c7, roughness: 0.95 });
+        const stool = (x, z) => { const g = new T.Group(); g.position.set(x, 0, z); eg.add(g);
+          cyl(0.19, 0.19, 0.05, wood, 0, 0.78, 0, g, 24); cyl(0.022, 0.022, 0.76, met, 0, 0.38, 0, g, 8); cyl(0.2, 0.2, 0.02, met, 0, 0.01, 0, g, 24);
+          const ring = new T.Mesh(new T.TorusGeometry(0.15, 0.01, 6, 24), met); ring.rotation.x = Math.PI / 2; ring.position.y = 0.3; g.add(ring); };
+        const lounge = (x, z, tx, tz) => { const g = new T.Group(); g.position.set(x, 0, z); eg.add(g); g.lookAt(tx, 0, tz);
+          box(0.78, 0.16, 0.7, fab, 0, 0.3, 0, g); box(0.78, 0.42, 0.14, fab, 0, 0.55, -0.3, g);
+          box(0.12, 0.28, 0.7, fab, -0.37, 0.48, 0, g); box(0.12, 0.28, 0.7, fab, 0.37, 0.48, 0, g);
+          [[-0.34, -0.3], [0.34, -0.3], [-0.34, 0.3], [0.34, 0.3]].forEach(([lx, lz]) => box(0.04, 0.22, 0.04, met, lx, 0.11, lz, g)); };
+        (this._offs || [[0, 0]]).forEach(([ox, oz]) => {
+          [-1, 1].forEach((sd) => {
+            const tx = ox + (alongX ? sd * d : 0), tz = oz + (alongX ? 0 : sd * d), tg = new T.Group(); tg.position.set(tx, 0, tz); eg.add(tg);
+            const P = (u, v) => (alongX ? [tx + u, tz + v] : [tx + v, tz + u]);
+            if (fstyle === 'bar') {
+              cyl(0.3, 0.3, 0.03, wood, 0, 1.08, 0, tg, 36); cyl(0.032, 0.032, 1.06, met, 0, 0.53, 0, tg, 10); cyl(0.24, 0.24, 0.02, met, 0, 0.01, 0, tg, 24);
+              [[0, -0.5], [0, 0.5], [sd * 0.5, 0]].forEach(([u, v]) => { const p = P(u, v); stool(p[0], p[1]); });
+            } else if (fstyle === 'lounge') {
+              box(0.5, 0.04, 0.5, wood, 0, 0.4, 0, tg); [[-0.22, -0.22], [0.22, -0.22], [-0.22, 0.22], [0.22, 0.22]].forEach(([lx, lz]) => box(0.03, 0.38, 0.03, met, lx, 0.19, lz, tg));
+              [[0, -0.72], [0, 0.72]].forEach(([u, v]) => { const p = P(u, v); lounge(p[0], p[1], tx, tz); });
+            } else {
+              cyl(0.35, 0.35, 0.03, wood, 0, 0.74, 0, tg, 40); cyl(0.028, 0.028, 0.7, met, 0, 0.37, 0, tg, 10); cyl(0.22, 0.22, 0.02, met, 0, 0.01, 0, tg, 24);
+              [[0, -0.58], [0, 0.58], [sd * 0.58, 0]].forEach(([u, v]) => { const p = P(u, v); chair(p[0], p[1], tx, tz); });
+            }
+          });
         });
       }
     }
@@ -303,7 +324,7 @@
       }
       bnd.push({ x: bnd[0].x, z: bnd[0].z, s: 1, k: 7 });
 
-      const yRel = (u, s, sc) => -drop * sc * (0.8 * u + 0.2 * u * u) - 0.05 * sc * R * u * u * Math.sin(Math.PI * s);
+      const yRel = (u, s, sc) => -drop * sc * (0.8 * u + 0.2 * u * u);
       const add = (geo, mat, name, shadow = true) => {
         const m = new T.Mesh(geo, mat); m.name = name; m.castShadow = shadow; m.receiveShadow = true; G.add(m); return m;
       };
@@ -521,9 +542,19 @@
         cyl(from, to, 0.0075, mFr, `potporni_krak_${k}`, 8);
       });
 
-      this._disc.scale.setScalar(R * 3 + 4);
-      this._dims = { R: R * 1.05 + 0.25, H: apex + 0.2 };
-      this._R0 = R; this._A = Math.max(a, b); this._apex = apex + 0.04;
+      const cnt = Math.max(1, Math.min(4, parseInt(this._g('count', '1'), 10) || 1)), dx = a + 0.15, dz = b + 0.15;
+      const offs = cnt === 2 ? [[-dx, 0], [dx, 0]] : cnt >= 3 ? [[-dx, -dz], [dx, -dz], [-dx, dz], [dx, dz]] : [[0, 0]];
+      this._offs = offs;
+      if (offs.length > 1) {
+        const P = new T.Group(); P.name = 'suncobrani'; this._s.remove(G); P.add(G); G.position.set(offs[0][0], 0, offs[0][1]);
+        offs.slice(1).forEach(([x, z], i) => { const cl = G.clone(); cl.name = 'suncobran_' + (i + 2); cl.position.set(x, 0, z); P.add(cl); });
+        this._s.add(P); this._grp = P;
+      }
+      const ext = offs.length === 2 ? dx : offs.length > 2 ? Math.hypot(dx, dz) : 0;
+      this._baseR = (R + ext) * 1.05 + 0.25;
+      this._disc.scale.setScalar((R + ext) * 3 + 4);
+      this._dims = { R: this._baseR, H: apex + 0.2 };
+      this._R0 = R; this._A = Math.max(a, b); this._ab = [a, b]; this._apex = apex + 0.04;
       const hy = mech === 'T3' ? 1.5 : mech === 'CS' ? 1.1 : 1.25;
       const ju = 0.62, jx = ribs[0][0] * ju, jy = apex + yRel(ju, 0, 1) - 0.05;
       this._pts = {
