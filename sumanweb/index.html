@@ -97,7 +97,8 @@ input,textarea,select{font-family:inherit;font-size:15px}
     <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
       <a onClick="{{ n.onClick }}" style="font-size:28px;font-weight:700;padding:14px 0;border-bottom:1px solid #dcd6ca;cursor:pointer;color:#0f1a2c">{{ n.label }}</a>
     </sc-for>
-    <a onClick="{{ goB2B }}" style="font-size:18px;font-weight:600;padding:18px 0;cursor:pointer;color:#0b2655">{{ b2bLabel }}</a>
+    <a onClick="{{ goB2B }}" style="font-size:18px;font-weight:600;padding:18px 0 6px;cursor:pointer;color:#0b2655">{{ b2bLabel }}</a>
+    <a onClick="{{ goContact }}" style="font-size:18px;font-weight:600;padding:6px 0 18px;cursor:pointer;color:#0b2655">{{ ct.title }}</a>
     <div style="display:flex;gap:8px;margin-top:auto">
       <sc-for list="{{ langs }}" as="l" hint-placeholder-count="4">
         <button onClick="{{ l.onClick }}" style="flex:1;height:56px;border:1.5px solid {{ l.bd }};border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:500 12px 'IBM Plex Mono',monospace;background:{{ l.rowBg }};color:#0f1a2c"><span style="width:22px;height:22px;border-radius:50%;background-image:url({{ l.flag }});background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(0,0,0,0.1)"></span>{{ l.code }}</button>
@@ -106,7 +107,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
   </div>
 </sc-if>
 
-<main style="flex:1;padding-top:{{ mainPad }}">
+<main ref="{{ mainRef }}" onScroll="{{ onMainScroll }}" style="flex:{{ mainFlex }};min-height:0;padding-top:{{ mainPad }};padding-bottom:{{ mainPadB }};height:{{ mainH }};overflow-y:{{ mainOv }};box-sizing:border-box;scrollbar-width:thin">
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
   <section data-screen-label="Početna" style="position:relative;height:{{ heroH }}px;overflow:hidden;background:#0b2655">
     <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="3">
@@ -156,7 +157,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
 </sc-if>
 <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
   <section data-screen-label="Kategorija" style="display:grid;grid-template-columns:{{ ixCols }};background:#0b2655;color:#ffffff">
-    <div style="position:{{ ixPos }};top:0;height:{{ ixH }};overflow:hidden;background:#1d3a6b">
+    <div style="position:{{ ixPos }};top:{{ ixTop }};z-index:2;height:{{ ixH }};overflow:hidden;background:#1d3a6b">
       <sc-for list="{{ ixSlides }}" as="sl" hint-placeholder-count="1">
         <div role="img" aria-label="{{ ixAct.name }}" style="position:absolute;inset:0;background-color:#1d3a6b;background-image:{{ sl.bgi }};background-size:cover;background-position:center;opacity:{{ sl.op }};transform:scale({{ sl.sc }});transition:opacity .8s ease,transform 5s ease-out"></div>
       </sc-for>
@@ -174,19 +175,19 @@ input,textarea,select{font-family:inherit;font-size:15px}
         </div>
       </sc-if>
     </div>
-    <div style="padding:{{ ixPad }};display:flex;flex-direction:column;gap:clamp(28px,4vw,48px);min-width:0">
-      <div style="display:flex;flex-direction:column;gap:18px">
-        <h1 style="margin:0;font-size:clamp(56px,6.4vw,104px);line-height:0.86;font-weight:800;letter-spacing:-0.045em;opacity:{{ catH1Op }};transform:{{ catH1Tf }};transform-origin:left bottom;will-change:transform,opacity">{{ catTitle }}</h1>
+    <div style="padding:{{ ixPad }};display:flex;flex-direction:column;gap:{{ ixGap }};min-width:0">
+      <div ref="{{ catTitleRef }}" style="display:flex;flex-direction:column;gap:18px">
+        <h1 style="margin:0;font-size:{{ ixH1Fs }};line-height:0.86;font-weight:800;letter-spacing:-0.045em;opacity:{{ catH1Op }};transform:{{ catH1Tf }};transform-origin:left bottom;will-change:transform,opacity">{{ catTitle }}</h1>
         <p style="margin:0;font-size:16px;line-height:1.6;color:#cfd7e6;max-width:480px;text-wrap:pretty;opacity:{{ catH1Op }};transform:{{ catH1Tf }};transform-origin:left top">{{ catDesc }}</p>
       </div>
-      <div style="display:flex;flex-direction:column">
+      <div ref="{{ ixListRef }}" style="display:flex;flex-direction:column">
         <sc-for list="{{ ixItems }}" as="it" hint-placeholder-count="5">
           <button onClick="{{ it.onClick }}" onMouseEnter="{{ it.enter }}" onFocus="{{ it.enter }}" style="display:grid;grid-template-columns:{{ ixRow }};align-items:center;gap:clamp(14px,2vw,24px);padding:{{ ixRowPad }};border:0;border-top:1px solid rgba(255,255,255,0.14);border-radius:0;background:transparent;color:#ffffff;text-align:left;cursor:pointer;width:100%">
             <sc-if value="{{ ixThumb }}" hint-placeholder-val="{{ false }}">
-              <span style="width:76px;height:96px;background-color:#1d3a6b;background-image:{{ it.bgi }};background-size:cover;background-position:center"></span>
+              <span style="width:76px;height:96px;background-color:#1d3a6b;background-image:{{ it.bgi }};background-size:cover;background-position:center;box-shadow:{{ it.thRing }};opacity:{{ it.thOp }};transition:box-shadow .25s,opacity .25s"></span>
             </sc-if>
             <span style="display:flex;flex-direction:column;gap:8px;min-width:0">
-              <span style="font-size:clamp(28px,3vw,44px);font-weight:800;letter-spacing:-0.035em;line-height:0.95;color:{{ it.fg }};transition:color .25s">{{ it.name }}</span>
+              <span style="font-size:{{ ixNameFs }};font-weight:800;letter-spacing:-0.035em;line-height:0.95;color:{{ it.fg }};transition:color .25s">{{ it.name }}</span>
               <span style="display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:#a9b6cf">
                 <sc-if value="{{ it.hot }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:5px;color:#f5c400;font-size:12.5px;font-weight:600"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span></sc-if>
                 <span>{{ it.seg }}</span>
@@ -492,7 +493,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
           </div>
         </sc-if>
       </div>
-      <div style="position:sticky;bottom:0;z-index:20;background:#0b2655;box-shadow:0 -18px 24px -8px #0b2655;border-top:1px solid rgba(255,255,255,0.14);padding:{{ pFootPad }};display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+      <div style="position:sticky;bottom:{{ pFootBot }};z-index:20;background:#0b2655;box-shadow:0 -18px 24px -8px #0b2655;border-top:1px solid rgba(255,255,255,0.14);padding:{{ pFootPad }};display:flex;flex-wrap:wrap;align-items:center;gap:12px">
         <div role="group" aria-label="{{ t.o_qty }}" style="height:48px;display:flex;align-items:center;padding:0 4px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;flex:0 0 auto">
           <button onClick="{{ qtyDown }}" aria-label="−" style="width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#ffffff;font-size:18px;cursor:pointer;opacity:{{ qtyDownOp }}" style-hover="background:rgba(255,255,255,0.1)">−</button>
           <input type="text" inputmode="numeric" pattern="[0-9]*" aria-label="{{ t.o_qty }}" value="{{ qtyInput }}" onChange="{{ onQtyInput }}" onBlur="{{ onQtyBlur }}" onKeyDown="{{ onQtyKey }}" onFocus="{{ onQtyFocus }}" style="width:{{ qtyW }};height:30px;padding:0;border:0;border-radius:4px;background:transparent;text-align:center;font:600 16px 'IBM Plex Mono',monospace;color:#ffffff;outline:none;box-shadow:0 0 0 1.5px {{ qtyLine }}">
@@ -757,38 +758,57 @@ input,textarea,select{font-family:inherit;font-size:15px}
     </div>
   </section>
 </sc-if>
+<sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Kontakt" style="max-width:1320px;margin:0 auto;padding:clamp(40px,6vw,88px) clamp(16px,4vw,56px) 80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(40px,6vw,96px);align-items:start">
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <h1 style="margin:0;font-size:clamp(48px,6vw,96px);line-height:0.88;font-weight:800;letter-spacing:-0.04em;color:#0b2655">{{ ct.title }}</h1>
+        <p style="margin:0;font-size:17px;line-height:1.6;color:#3a4152;max-width:460px;text-wrap:pretty">{{ ct.lead }}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;border-top:1.5px solid #0b2655">
+        <sc-for list="{{ ctRows }}" as="r" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;padding:16px 0;border-bottom:1px solid #dcd6ca;align-items:baseline">
+            <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#5b6272">{{ r.k }}</span>
+            <sc-if value="{{ r.link }}" hint-placeholder-val="{{ false }}"><a href="{{ r.href }}" onClick="{{ r.onClick }}" style="font-size:16px;font-weight:600;color:#0b2655;cursor:pointer" style-hover="color:#8a5a00">{{ r.v }}</a></sc-if>
+            <sc-if value="{{ r.plain }}" hint-placeholder-val="{{ true }}"><span style="font-size:16px;color:#0f1a2c;line-height:1.5">{{ r.v }}</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#ffffff;border:1px solid #e2ddd2;border-radius:16px;padding:clamp(22px,3vw,36px);display:flex;flex-direction:column;gap:18px;box-shadow:0 1px 2px rgba(11,38,85,0.04),0 18px 40px rgba(11,38,85,0.06)">
+      <h2 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.02em;color:#0b2655">{{ ct.form }}</h2>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:13px;font-weight:600;color:#3a4152">{{ ct.prod }}</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ ctProds }}" as="p" hint-placeholder-count="3">
+            <button onClick="{{ p.onClick }}" aria-pressed="{{ p.on }}" style="height:38px;padding:0 14px;border-radius:999px;border:1px solid {{ p.bd }};background:{{ p.bg }};color:{{ p.fg }};font-size:14px;font-weight:600;cursor:pointer">{{ p.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#3a4152">{{ ct.name }}</span><input value="{{ cf.name }}" onChange="{{ onCName }}" autocomplete="name" style="height:48px;padding:0 14px;border:1px solid #dcd6ca;border-radius:8px;background:#ffffff;font:inherit;font-size:15px;color:#0f1a2c;outline:none;box-sizing:border-box;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#3a4152">E-mail</span><input type="email" value="{{ cf.email }}" onChange="{{ onCEmail }}" autocomplete="email" style="height:48px;padding:0 14px;border:1px solid #dcd6ca;border-radius:8px;background:#ffffff;font:inherit;font-size:15px;color:#0f1a2c;outline:none;box-sizing:border-box;width:100%"></label>
+      <label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#3a4152">{{ ct.msg }}</span><textarea value="{{ cf.msg }}" onChange="{{ onCMsg }}" rows="5" style="height:48px;padding:0 14px;border:1px solid #dcd6ca;border-radius:8px;background:#ffffff;font:inherit;font-size:15px;color:#0f1a2c;outline:none;box-sizing:border-box;width:100%;height:auto;padding:12px 14px;resize:vertical;line-height:1.5"></textarea></label>
+      <sc-if value="{{ cfErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#b42318">{{ ct.err }}</span></sc-if>
+      <button onClick="{{ sendContact }}" style="height:52px;border-radius:999px;border:0;background:#0b2655;color:#ffffff;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#16346b">{{ ct.send }} <span>→</span></button>
+    </div>
+  </section>
+</sc-if>
 </main>
 
-<footer ref="{{ footRef }}" style="background:#071a3b;color:#cfd7e6;display:{{ footDisp }}">
-  <div style="max-width:1320px;margin:0 auto;padding:56px clamp(16px,4vw,56px) 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:36px">
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <span style="font-weight:800;letter-spacing:0.16em;font-size:18px;color:#fff">SUMAN</span>
-      <p style="margin:0;font-size:14px;line-height:1.6;max-width:280px">{{ t.foot_d }}</p>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
-      <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#8fa0bf;text-transform:uppercase">{{ t.nav_umb }} · {{ t.nav_awn }} · {{ t.nav_perg }}</span>
-      <a onClick="{{ goCatalog }}" style="color:#fff;cursor:pointer">{{ t.cat_t }}</a>
-      <a onClick="{{ goProduct }}" style="color:#fff;cursor:pointer">Advance – {{ t.configure }}</a>
-      <a href="mailto:info@suman.ba" style="color:#fff">{{ t.pie_cta_ask }}</a>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
-      <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#8fa0bf;text-transform:uppercase">{{ t.nav_contact }}</span>
-      <span style="color:#fff">SUMAN d.o.o. Gračanica</span>
-      <span>Gračanica · Sarajevo</span>
-      <span>Bosna i Hercegovina</span>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
-      <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#8fa0bf;text-transform:uppercase">Web</span>
-      <a href="https://www.suman.ba" style="color:#fff">suman.ba</a>
-      <a href="https://www.suman.hr" style="color:#fff">suman.hr</a>
-      <a onClick="{{ goB2B }}" style="color:#fff;cursor:pointer">{{ t.nav_b2b }}</a>
-    </div>
-  </div>
-  <div style="max-width:1320px;margin:0 auto;padding:20px clamp(16px,4vw,56px) 32px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-wrap:wrap;gap:12px 28px;font-size:13px;color:#8fa0bf">
-    <span>© 2026 SUMAN d.o.o. Gračanica</span>
-    <span>{{ t.foot_terms }}</span>
-    <span>{{ t.foot_cookies }}</span>
-  </div>
+<footer style="position:fixed;left:0;right:0;bottom:0;z-index:45;height:{{ fbH }};box-sizing:border-box;background:rgba(7,26,59,0.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,0.08);color:#8fa0bf;font-size:12px;display:flex;align-items:center;gap:20px;padding:0 clamp(16px,3vw,40px) env(safe-area-inset-bottom)">
+  <span style="white-space:nowrap">© 2026 SUMAN d.o.o. Gračanica</span>
+  <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}"><span style="white-space:nowrap">Gračanica · Sarajevo · BiH</span></sc-if>
+  <div style="flex:1"></div>
+  <nav style="display:flex;align-items:center;gap:18px">
+    <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+      <a href="mailto:info@suman.ba" style="color:#cfd7e6;cursor:pointer;white-space:nowrap" style-hover="color:#ffffff">info@suman.ba</a>
+      <a href="https://www.suman.ba" style="color:#cfd7e6;cursor:pointer;white-space:nowrap" style-hover="color:#ffffff">suman.ba</a>
+      <a href="https://www.suman.hr" style="color:#cfd7e6;cursor:pointer;white-space:nowrap" style-hover="color:#ffffff">suman.hr</a>
+      <span style="white-space:nowrap">{{ t.foot_terms }}</span>
+      <span style="white-space:nowrap">{{ t.foot_cookies }}</span>
+    </sc-if>
+    <a onClick="{{ goContact }}" style="color:#ffffff;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px" style-hover="color:#f5c400">{{ ct.title }}<span style="font-size:11px">→</span></a>
+  </nav>
 </footer>
 <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;background:#0f1a2c;color:#fff;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 12px 32px rgba(0,0,0,0.25)">{{ toast }}</div>
@@ -820,6 +840,7 @@ class Component extends DCLogic {
   }
   componentDidUpdate() { this.attachOrbit(); }
   secRefs = [0, 1, 2, 3, 4].map(() => React.createRef());
+  mainRef = React.createRef(); catTitleRef = React.createRef(); ixListRef = React.createRef();
   spy(fromWindow) {
     const wide = this.state.w >= 1024;
     if (this.state.screen !== 'product' || (fromWindow && wide)) return;
@@ -856,8 +877,16 @@ class Component extends DCLogic {
     requestAnimationFrame(this.onResize);
     setTimeout(this.onResize, 300);
     window.addEventListener('resize', this.onResize);
-    this.onScroll = () => { const y = window.scrollY || 0, sc = y > 40; if (sc !== this.state.scrolled) this.setState({ scrolled: sc });
-      const p = Math.round(Math.min(1, Math.max(0, (y - 24) / 150)) * 50) / 50; if (p !== (this.state.catP || 0)) this.setState({ catP: p }); this.spy(true); };
+    this.onScrollY = (y) => { const sc = y > 40; if (sc !== this.state.scrolled) this.setState({ scrolled: sc });
+      let p = Math.min(1, Math.max(0, (y - 24) / 150));
+      if (this.state.screen === 'catalog' && (this.state.w || 1280) < 860) {
+        const ih = window.innerHeight || 800, imgB = 72 + ih * 0.42, tl = this.catTitleRef.current, Ls = this.ixListRef.current;
+        p = 0; if (tl) { const r = tl.getBoundingClientRect(); p = Math.min(1, Math.max(0, (imgB + 8 - r.top) / Math.max(60, r.height))); }
+        if (Ls) { const line = imgB + (ih - imgB) * 0.3; let best = 0, bd = 1e9; [...Ls.children].filter((b) => b.tagName === 'BUTTON').forEach((b, i) => { const r = b.getBoundingClientRect(), d = Math.abs((r.top + r.bottom) / 2 - line); if (d < bd) { bd = d; best = i; } });
+          if (best !== (this.state.ixHover || 0)) { this.setState({ ixHover: best, ixSlide: 0 }); this._ixT = Date.now(); } }
+      }
+      p = Math.round(p * 50) / 50; if (p !== (this.state.catP || 0)) this.setState({ catP: p }); this.spy(true); };
+    this.onScroll = () => { if ((this.state.w || 1280) < 860) this.onScrollY(window.scrollY || 0); };
     window.addEventListener('scroll', this.onScroll, { passive: true });
     this.onKey = (e) => {
       if (this.state.screen !== 'product' || this.state.view !== '3d') return;
@@ -887,11 +916,26 @@ class Component extends DCLogic {
     try { localStorage.setItem('suman_ui', JSON.stringify({ lang, screen, b2b, orderNo, cart, cat })); } catch (e) {}
   }
   save(p) { this.setState(p, () => this.persist()); }
-  go(screen, extra) { this.save(Object.assign({ screen, menu: false, hover: null }, extra || {})); try { window.scrollTo(0, 0); } catch (e) {} }
+  go(screen, extra) { this.save(Object.assign({ screen, menu: false, hover: null, ixHover: 0, catP: 0, scrolled: false }, extra || {})); try { window.scrollTo(0, 0); if (this.mainRef.current) this.mainRef.current.scrollTop = 0; } catch (e) {} }
   flash(msg) { clearTimeout(this._t); this.setState({ toast: msg }); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
-  toFooter() {
-    const el = this.footRef.current;
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 64, behavior: 'smooth' });
+  toFooter() { this.go('contact'); }
+  contactVals(mobile) {
+    const s = this.state, lg = s.lang || 'bs', cf = s.cform || { name: '', email: '', msg: '', prod: '' }, t = window.SUMAN_I18N[lg] || window.SUMAN_I18N.bs;
+    const X = { bs: ['Kontakt', 'Za ponude, savjet pri odabiru ili servis javite se našem timu.', 'Pošaljite upit', 'Ime i prezime', 'Poruka', 'Proizvod', 'Pošalji upit', 'Unesite ime, e-mail i poruku.', 'Hvala, upit je zaprimljen.', ['Firma', 'Lokacije', 'E-mail', 'Web', 'Partneri']],
+      hr: ['Kontakt', 'Za ponude, savjet pri odabiru ili servis javite se našem timu.', 'Pošaljite upit', 'Ime i prezime', 'Poruka', 'Proizvod', 'Pošalji upit', 'Unesite ime, e-mail i poruku.', 'Hvala, upit je zaprimljen.', ['Tvrtka', 'Lokacije', 'E-mail', 'Web', 'Partneri']],
+      en: ['Contact', 'For quotes, product advice or service, get in touch with our team.', 'Send an enquiry', 'Full name', 'Message', 'Product', 'Send enquiry', 'Please enter your name, e-mail and message.', 'Thank you, your enquiry has been received.', ['Company', 'Locations', 'E-mail', 'Web', 'Partners']],
+      de: ['Kontakt', 'Für Angebote, Beratung oder Service erreichen Sie unser Team.', 'Anfrage senden', 'Vor- und Nachname', 'Nachricht', 'Produkt', 'Anfrage senden', 'Bitte Name, E-Mail und Nachricht angeben.', 'Danke, Ihre Anfrage ist eingegangen.', ['Firma', 'Standorte', 'E-Mail', 'Web', 'Partner']] }[lg];
+    const set = (k) => (e) => this.setState({ cform: Object.assign({}, cf, { [k]: e.target.value }), cfErr: false });
+    const row = (k, v, extra) => Object.assign({ k, v, link: false, plain: true, href: undefined, onClick: undefined }, extra || {});
+    return {
+      isContact: s.screen === 'contact', goContact: () => this.go('contact'),
+      ct: { title: X[0], lead: X[1], form: X[2], name: X[3], msg: X[4], prod: X[5], send: X[6], err: X[7] },
+      ctRows: [row(X[9][0], 'SUMAN d.o.o. Gračanica'), row(X[9][1], 'Gračanica · Sarajevo, Bosna i Hercegovina'), row(X[9][2], 'info@suman.ba', { link: true, plain: false, href: 'mailto:info@suman.ba' }),
+        row(X[9][3], 'suman.ba · suman.hr', { link: true, plain: false, href: 'https://www.suman.ba' }), row(X[9][4], t.nav_b2b, { link: true, plain: false, onClick: () => this.go('login') })],
+      ctProds: [['umb', t.nav_umb], ['awn', t.nav_awn], ['perg', t.nav_perg]].map(([id, label]) => { const on = cf.prod === id; return { label, on, bd: on ? '#0b2655' : '#dcd6ca', bg: on ? '#0b2655' : '#ffffff', fg: on ? '#ffffff' : '#0f1a2c', onClick: () => this.setState({ cform: Object.assign({}, cf, { prod: on ? '' : id }) }) }; }),
+      cf, cfErr: !!s.cfErr, onCName: set('name'), onCEmail: set('email'), onCMsg: set('msg'),
+      sendContact: () => { if (!cf.name.trim() || !/@/.test(cf.email) || !cf.msg.trim()) { this.setState({ cfErr: true }); return; } this.setState({ cform: { name: '', email: '', msg: '', prod: '' }, cfErr: false }); this.flash(X[8]); }
+    };
   }
   fmt(v) { return (Math.round(v * 100) / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   km(v) { return this.fmt(v) + ' KM'; }
@@ -910,7 +954,7 @@ class Component extends DCLogic {
     const langs = ['bs', 'hr', 'en', 'de'].map((c) => ({ code: c.toUpperCase(), name: LN[c][0], flag: 'https://flagcdn.com/w80/' + LN[c][1] + '.png', fw: s.lang === c ? 700 : 500, rowBg: s.lang === c ? '#e6ebf4' : 'transparent', bd: s.lang === c ? '#0b2655' : '#dcd6ca', onClick: () => this.save({ lang: c, menu: false, langOpen: false }) }));
 
     // pie geometry: three 120° sectors of equal area
-    const W = s.w || 1280, H = Math.max(360, s.h || 800);
+    const W = s.w || 1280, H = Math.max(360, (s.h || 800) - (mobile ? 36 : 34));
     const cx = W / 2, tan30 = Math.tan(Math.PI / 6);
     let cy = (2 * H / 3 + (W / 2) * tan30) / 2, e = 2 * H / 3 - cy;
     if (e < 0) { e = 0; cy = Math.min(H * 0.8, (W / 2) * tan30); }
@@ -956,8 +1000,10 @@ class Component extends DCLogic {
       hubBadge: (this.props.hubStyle ?? 'badge') === 'badge', hubLogoOn: !mobile && this.props.hubStyle === 'logo', hubDot: this.props.hubStyle === 'dot', hubCap: !mobile && (this.props.hubStyle ?? 'cap') === 'cap', hubLogoOn: !mobile && this.props.hubStyle === 'logo', leave: () => this.setState({ hover: null }),
       advFrom: this.km(D.models[1].from),
       stageNames: [0, 1, 2, 3, 4].map((i) => ({ n: '0' + (i + 1), label: t['st' + i] })),
-      footRef: this.footRef, toast: s.toast, footDisp: scr === 'home' || (scr === 'product' && (s.w || 1280) >= 860) ? 'none' : 'block',
-      mainPad: scr === 'home' || scr === 'catalog' || scr === 'product' ? '0px' : '72px',
+      toast: s.toast, fbH: mobile ? '36px' : '34px', mainRef: this.mainRef, catTitleRef: this.catTitleRef, ixListRef: this.ixListRef,
+      mainH: mobile ? 'auto' : (s.h || 800) + 'px', mainFlex: mobile ? '1 0 auto' : '0 0 auto', mainOv: mobile ? 'visible' : 'auto', onMainScroll: (e) => { if (!mobile) this.onScrollY(e.currentTarget.scrollTop); }, mainPadB: scr === 'home' || (scr === 'product' && !mobile) ? '0px' : (mobile ? '36px' : '34px'),
+      ...this.contactVals(mobile),
+      mainPad: scr === 'home' || (scr === 'catalog' && !mobile) || scr === 'product' ? '0px' : '72px',
       backOn: false,
       backLbl: scr === 'product' ? t.nav_umb : scr === 'order' ? t.d_back : t.home,
       goBack: () => (scr === 'product' ? this.go('catalog', { cat: 'umb' }) : scr === 'order' ? this.go('orders') : this.go('home')),
@@ -965,7 +1011,7 @@ class Component extends DCLogic {
       ...(() => { const p = scr === 'catalog' ? (s.catP || 0) : 0, e = p * p * (3 - 2 * p);
         return { ctxOn: scr === 'catalog', ctxDescOn: !mobile, ctxOp: e.toFixed(3), ctxY: ((1 - e) * 18).toFixed(1) + 'px', ctxPe: e > 0.6 ? 'auto' : 'none',
           catH1Op: Math.max(0, 1 - e * 1.25).toFixed(3), catH1Tf: 'translateY(' + (-e * 28).toFixed(1) + 'px) scale(' + (1 - e * 0.22).toFixed(3) + ')',
-          catLogoH: '84px', catHdrBg: 'linear-gradient(180deg,rgba(4,14,34,' + (0.62 * (1 - e)).toFixed(3) + ') 0%,rgba(4,14,34,' + (0.28 * (1 - e)).toFixed(3) + ') 60%,rgba(4,14,34,0) 100%),rgba(11,38,85,' + (0.96 * e).toFixed(3) + ')' }; })(),
+          catLogoH: '84px', catHdrBg: mobile ? '#0b2655' : 'linear-gradient(180deg,rgba(4,14,34,' + (0.62 * (1 - e)).toFixed(3) + ') 0%,rgba(4,14,34,' + (0.28 * (1 - e)).toFixed(3) + ') 60%,rgba(4,14,34,0) 100%),rgba(11,38,85,' + (0.96 * e).toFixed(3) + ')' }; })(),
       hdr: scr === 'catalog'
         ? { barSh: 'none', hov: 'rgba(255,255,255,0.12)', dotRing: '#0b2655', badgeBg: '#0b2655', badgeFg: '#f5c400', pos: 'fixed', blur: 'none', bg: 'CATBG', bd: 'transparent', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.06)', btnBd: 'rgba(255,255,255,0.16)', cartBg: '#f5c400', cartFg: '#0b2655' }
         : scr === 'home' || (scr === 'catalog' && !s.scrolled)
@@ -1072,9 +1118,9 @@ class Component extends DCLogic {
     const specRowsP = [[t.o_size, D.sizeLabel[c.shape](c.size).replace('×', ' × ')], [({ bs: 'Visina H1', hr: 'Visina H1', en: 'Height H1', de: 'Höhe H1' })[lg], spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg']].map(([k, v]) => ({ k, v }));
     return {
       cfgH: s.h ? s.h + 'px' : '100vh', narrowCfg: !wide,
-      pCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.3fr) minmax(460px,1fr)', pSpecs: specRowsP.slice(0, 3), pAddH2: 0, pPanelRef: this.pPanelRef || (this.pPanelRef = React.createRef()), pStagePos: mob ? 'relative' : 'sticky', pStageH: mob ? '64vh' : (s.h ? s.h + 'px' : '100vh'), pStageTop: '72px',
-      pTabsTop: mob ? '84px' : '96px', pPanelH: mob ? 'auto' : (s.h ? s.h + 'px' : '100vh'), pPanelOv: mob ? 'visible' : 'auto',
-      pPad: mob ? '32px 18px 8px' : (short ? '96px' : '112px') + ' clamp(24px,3vw,52px) 16px', pRowPad: mob ? '14px 0' : '16px 0', fWrap: mob ? 'nowrap' : 'wrap', odAlign: mob ? 'flex-start' : 'flex-end', odValFs: mob ? '22px' : '26px', fBleed: mob ? '-16px' : '0px', fBleedP: mob ? '16px' : '0px', pRowCols: mob ? '22px minmax(0,1fr) 32px' : '28px minmax(0,1fr) auto 32px', pSubOn: !mob, pValSub: mob, pPillDisp: mob ? 'none' : 'flex', pOptPad: mob ? '4px 0 22px' : '6px 0 24px 40px', pSpecCols: mob ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,auto)', pRowFs: mob ? '18px' : '19px', pSubPl: mob ? '0px' : '34px',
+      pCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.3fr) minmax(460px,1fr)', pSpecs: specRowsP.slice(0, 3), pAddH2: 0, pPanelRef: this.pPanelRef || (this.pPanelRef = React.createRef()), pStagePos: mob ? 'relative' : 'sticky', pStageH: mob ? '64vh' : (s.h ? (s.h - 34) + 'px' : 'calc(100vh - 34px)'), pStageTop: '72px',
+      pTabsTop: mob ? '84px' : '96px', pPanelH: mob ? 'auto' : (s.h ? (s.h - 34) + 'px' : 'calc(100vh - 34px)'), pPanelOv: mob ? 'visible' : 'auto',
+      pPad: mob ? '32px 18px 8px' : (short ? '96px' : '112px') + ' clamp(24px,3vw,52px) 16px', pRowPad: mob ? '14px 0' : '16px 0', pFootBot: mob ? '36px' : '0px', fWrap: mob ? 'nowrap' : 'wrap', odAlign: mob ? 'flex-start' : 'flex-end', odValFs: mob ? '22px' : '26px', fBleed: mob ? '-16px' : '0px', fBleedP: mob ? '16px' : '0px', pRowCols: mob ? '22px minmax(0,1fr) 32px' : '28px minmax(0,1fr) auto 32px', pSubOn: !mob, pValSub: mob, pPillDisp: mob ? 'none' : 'flex', pOptPad: mob ? '4px 0 22px' : '6px 0 24px 40px', pSpecCols: mob ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,auto)', pRowFs: mob ? '18px' : '19px', pSubPl: mob ? '0px' : '34px',
       pH1: mob ? '52px' : short ? 'clamp(44px,4vw,60px)' : 'clamp(52px,4.6vw,76px)', pValMax: mob ? '120px' : '190px', pFootPad: mob ? '14px 18px calc(14px + env(safe-area-inset-bottom))' : (short ? '14px' : '18px') + ' clamp(24px,3.4vw,64px) ' + (short ? '16px' : '22px'), pAddFlex: mob || s.w < 1180 ? '1 1 100%' : '0 0 auto', pAddH: short ? '46px' : '52px', pTotFs: s.w < 1200 ? '21px' : '24px',
       sumOn: sheet === 'sum',
       tabsDisp: sheetOn ? 'none' : 'flex', hdrTop: wide ? '112px' : '92px', eyebrow: t.nav_umb, codeFs: wide ? 'clamp(56px,5.6vw,84px)' : '40px', modelTag: c.shape + ' ' + c.size + ' ' + c.mech, sheetW: 'min(1120px,calc(100% - 24px))', addHov: s.justAdded ? '#1f6b3a' : '#ffd21f', specDisp: mob ? 'none' : 'grid',
@@ -1236,12 +1282,16 @@ class Component extends DCLogic {
       const cur = raw[act] || { imgs: ['none'] }, nImg = cur.imgs.length, sl = (s.ixSlide || 0) % nImg;
       this._ixN = nImg;
       const ixItems = raw.map((x, i) => { const on = i === act;
-        return Object.assign(x, { on, op: on ? 1 : 0, sc: on ? 1 : 1.06, fg: on || mob ? '#ffffff' : 'rgba(255,255,255,0.55)', abd: on ? '#f5c400' : 'rgba(255,255,255,0.24)', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', ax: on && !mob ? '4px' : '0px', enter: () => { if ((this.state.ixHover || 0) !== i) { this.setState({ ixHover: i, ixSlide: 0 }); this._ixT = Date.now(); } } }); });
+        return Object.assign(x, { on, op: on ? 1 : 0, sc: on ? 1 : 1.06, fg: on ? '#ffffff' : 'rgba(255,255,255,0.55)', thRing: on ? '0 0 0 2px #f5c400' : 'none', thOp: on ? 1 : 0.6, abd: on ? '#f5c400' : 'rgba(255,255,255,0.24)', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', ax: on && !mob ? '4px' : '0px', enter: () => { if ((this.state.ixHover || 0) !== i) { this.setState({ ixHover: i, ixSlide: 0 }); this._ixT = Date.now(); } } }); });
       Object.assign(catExtra, { ixItems, ixAct: raw[act] || { name: '', desc: '', hot: false, cta: '', onClick: () => {} },
         ixSlides: cur.imgs.map((bgi, i) => ({ bgi, op: i === sl ? 1 : 0, sc: i === sl ? 1.04 : 1 })),
-        ixDotsOn: nImg > 1, ixDots: cur.imgs.map((_, i) => ({ n: String(i + 1), on: i === sl, w: i === sl ? '22px' : '8px', bg: i === sl ? '#ffffff' : 'rgba(255,255,255,0.45)', onClick: () => { this.setState({ ixSlide: i }); this._ixT = Date.now(); } })), ixCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.05fr) minmax(0,1fr)', ixPos: mob ? 'relative' : 'sticky', ixH: mob ? '58vh' : '100vh',
-        ixPad: mob ? '32px 18px 72px' : '128px clamp(28px,4vw,72px) 96px', ixRow: mob ? '76px minmax(0,1fr) auto 28px' : 'minmax(0,1fr) auto 44px', ixAw: mob ? '28px' : '44px', ixAfs: mob ? '14px' : '18px', ixRowPad: mob ? '16px 0' : '26px 0', ixThumb: mob, ixArrow: 'flex' });
+        ixDotsOn: nImg > 1, ixDots: cur.imgs.map((_, i) => ({ n: String(i + 1), on: i === sl, w: i === sl ? '22px' : '8px', bg: i === sl ? '#ffffff' : 'rgba(255,255,255,0.45)', onClick: () => { this.setState({ ixSlide: i }); this._ixT = Date.now(); } })), ixCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.05fr) minmax(0,1fr)', ixPos: 'sticky', ixTop: mob ? '72px' : '0px', ixH: mob ? '42vh' : 'calc(100vh - 34px)', ...(() => {
+          const n = Math.max(1, raw.length), Hh = (s.h || 800) - 34, h1 = Math.round(Math.min(s.w * 0.064, Hh * 0.1, 104)), nm = Math.round(Math.min(Math.max(28, s.w * 0.03), 44, Hh * 0.05));
+          const rp = Math.max(8, Math.min(26, Math.floor((Hh - 112 - 32 - (h1 * 0.86 + 70 + 36) - n * (nm * 0.95 + 28)) / (2 * n))));
+          return { ixH1Fs: mob ? '52px' : h1 + 'px', ixNameFs: mob ? '28px' : nm + 'px', ixGap: mob ? '28px' : '36px', ixDeskRp: rp + 'px 0' }; })(),
+        ixPad: mob ? '28px 18px 34vh' : '112px clamp(28px,4vw,72px) 32px', ixRow: mob ? '76px minmax(0,1fr) auto 28px' : 'minmax(0,1fr) auto 44px', ixAw: mob ? '28px' : '44px', ixAfs: mob ? '14px' : '18px', ixRowPad: mob ? '16px 0' : 'IXRP', ixThumb: mob, ixArrow: 'flex' });
     }
+    if (catExtra.ixRowPad === 'IXRP') catExtra.ixRowPad = catExtra.ixDeskRp;
     const sizes = D.sizes[c.mech === 'T3' ? 'tele' : 'classic'][c.shape];
     const fab = D.fabrics.find((f) => f.id === c.fabric);
     const unitBase = this.unitPrice(c);
@@ -1483,7 +1533,7 @@ class Component extends DCLogic {
   renderVals() {
     if (!this.state.ready) return { t: {}, curLang: { code: 'BS', name: 'Bosanski', flag: 'https://flagcdn.com/w80/ba.png' }, langRot: '0deg', hdr: { bg: '#0b2655', bd: '#0b2655', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.08)', btnBd: 'rgba(255,255,255,0.22)', cartBg: '#f5c400', cartFg: '#0b2655' }, logoImg: 'block', logoTxt: 'none', footDisp: 'none', isHome: true, sectors: [], seams: [], navItems: [], langs: [], stageNames: [], heroH: 700, desktop: this.state.w >= 860, footRef: this.footRef };
     const t = window.SUMAN_I18N[this.state.lang] || window.SUMAN_I18N.bs;
-    try { document.documentElement.style.overflow = (this.state.screen === 'home' || (this.state.screen === 'product' && (this.state.w || 1280) >= 860)) && !this.state.menu ? 'hidden' : ''; } catch (e) {}
+    try { document.documentElement.style.overflow = (this.state.screen === 'home' || (this.state.w || 1280) >= 860) && !this.state.menu ? 'hidden' : ''; } catch (e) {}
     const pv = this.productVals(t), c3 = this.state.screen === 'product' ? this.cfg3Vals(t) : {};
     if (pv.review) pv.review = pv.review.map((r, i) => Object.assign({}, r, { edit: () => this.setState({ sheet: ['shape', 'mech', 'size', 'frame', 'look', 'vent', 'fabric', 'brand', 'base', 'qty'][i] }) }));
     return this.fixHdr(Object.assign({}, this.baseVals(t), pv, c3, this.cartVals(t), this.b2bVals(t)));
