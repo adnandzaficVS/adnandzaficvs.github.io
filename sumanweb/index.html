@@ -9,6 +9,7 @@
 <x-dc>
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://wsrv.nl" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="./suman-data.js"></script>
 <script src="./i18n-bs-hr.js"></script>
@@ -113,7 +114,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
         <div style="position:absolute;left:{{ s.il }};top:{{ s.it }};width:{{ s.iw }};height:{{ s.ih }};background-image:url({{ s.img }});background-size:cover;background-position:{{ s.pos }};transform:scale({{ s.scale }});transition:transform 0.9s cubic-bezier(.2,.7,.2,1)"></div>
         <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,22,50,0.55) 0%,rgba(7,22,50,0.85) 100%);opacity:{{ s.dim }};transition:opacity 0.4s"></div>
         <div style="position:absolute;left:{{ s.l }};right:{{ s.r }};top:{{ s.t }};bottom:{{ s.b }};max-width:{{ s.mw }};display:flex;flex-direction:column;gap:12px;align-items:{{ s.ai }};text-align:{{ s.al }};color:#fff">
-          <h2 style="margin:0;font-size:clamp(24px,5.2vw,76px);line-height:0.95;font-weight:800;letter-spacing:-0.025em">{{ s.title }}</h2>
+          <h2 style="margin:0;font-size:{{ s.fs }};line-height:0.95;font-weight:800;letter-spacing:-0.025em">{{ s.title }}</h2>
           <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
             <p style="margin:0;font-size:16px;line-height:1.5;max-width:340px;color:#e8ecf4;text-wrap:pretty">{{ s.desc }}</p>
           </sc-if>
@@ -195,7 +196,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
               <span style="font-size:12px;color:#a9b6cf">{{ it.fromLbl }}</span>
               <span style="font-size:17px;font-weight:700">{{ it.price }}</span>
             </span>
-            <span style="width:44px;height:44px;border-radius:50%;display:{{ ixArrow }};align-items:center;justify-content:center;font-size:18px;border:1px solid {{ it.abd }};background:{{ it.abg }};color:{{ it.afg }};transform:translateX({{ it.ax }});transition:all .3s cubic-bezier(.2,.7,.2,1)">→</span>
+            <span style="width:{{ ixAw }};height:{{ ixAw }};border-radius:50%;display:{{ ixArrow }};align-items:center;justify-content:center;font-size:{{ ixAfs }};border:1px solid {{ it.abd }};background:{{ it.abg }};color:{{ it.afg }};transform:translateX({{ it.ax }});transition:all .3s cubic-bezier(.2,.7,.2,1)">→</span>
           </button>
         </sc-for>
         <div style="border-top:1px solid rgba(255,255,255,0.14)"></div>
@@ -208,7 +209,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
     <div style="position:{{ pStagePos }};top:0;height:{{ pStageH }};overflow:hidden;background:radial-gradient(80% 70% at 50% 48%,#fdfcf9 0%,#f3efe8 48%,#e5dfd3 100%)">
       <div style="position:absolute;left:0;right:0;top:{{ pStageTop }};bottom:0">
         <sc-if value="{{ show3d }}" hint-placeholder-val="{{ true }}">
-          <x-import component-from-global-scope="umbrella-view" from="./umbrella-3d.js" shape="{{ u.shape }}" size="{{ u.size }}" canopy="{{ u.canopy }}" frame="{{ u.frame }}" vent="{{ u.vent }}" look="{{ u.look }}" brandtext="{{ u.brandtext }}" base="{{ u.base }}" mech="{{ u.mech }}" cam="{{ camMode }}" zoom="{{ camZoom }}" autorotate="{{ autoRot }}" env="{{ envMode }}" person="{{ personOn }}" furniture="{{ furnOn }}" focus="{{ focusMode }}" nudge="{{ nudgeVal }}" dims="{{ dimsOn }}" wlabel="{{ wLabel }}" hlabel="{{ hLabel }}" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
+          <x-import component-from-global-scope="umbrella-view" from="./umbrella-3d.js" shape="{{ u.shape }}" size="{{ u.size }}" canopy="{{ u.canopy }}" frame="{{ u.frame }}" vent="{{ u.vent }}" look="{{ u.look }}" brandtext="{{ u.brandtext }}" brandimg="{{ u.brandimg }}" base="{{ u.base }}" mech="{{ u.mech }}" cam="{{ camMode }}" zoom="{{ camZoom }}" autorotate="{{ autoRot }}" env="{{ envMode }}" person="{{ personOn }}" furniture="{{ furnOn }}" focus="{{ focusMode }}" nudge="{{ nudgeVal }}" dims="{{ dimsOn }}" wlabel="{{ wLabel }}" hlabel="{{ hLabel }}" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
         </sc-if>
         <sc-if value="{{ showPhoto }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute;inset:-60px;background-image:url({{ photoSrc }});background-size:cover;background-position:center;filter:blur(44px) saturate(1.1);opacity:0.5"></div>
@@ -243,11 +244,11 @@ input,textarea,select{font-family:inherit;font-size:15px}
     </div>
 
     <div ref="{{ pPanelRef }}" style="position:relative;min-width:0;display:flex;flex-direction:column;height:{{ pPanelH }};overflow-y:{{ pPanelOv }};scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent">
-      <div style="padding:{{ pPad }};display:flex;flex-direction:column;gap:clamp(28px,3.4vw,44px);flex:1 0 auto">
-        <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="padding:{{ pPad }};display:flex;flex-direction:column;gap:clamp(20px,2.4vw,30px);flex:1 0 auto;position:relative;z-index:0;isolation:isolate">
+        <div style="display:flex;flex-direction:column;gap:12px">
           <span style="align-self:flex-start;display:flex;align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:999px;background:#f5c400;color:#0b2655;font-size:12px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.5L12 17.3 6.1 20.5l1.3-6.5L2.5 9.4l6.6-.8z"></path></svg>{{ t.best }}</span>
           <h1 style="margin:0;font-size:{{ pH1 }};line-height:0.86;font-weight:800;letter-spacing:-0.045em">Advance</h1>
-          <div style="display:flex;flex-wrap:wrap;gap:12px 28px;padding-top:6px">
+          <div style="display:grid;grid-template-columns:{{ pSpecCols }};gap:10px 24px;padding-top:4px">
             <span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;color:#a9b6cf">{{ modelLbl }}</span><span style="font:600 15px 'IBM Plex Mono',monospace;color:#f5c400">{{ modelTag }}</span></span>
             <sc-for list="{{ pSpecs }}" as="sr" hint-placeholder-count="3">
               <span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;color:#a9b6cf">{{ sr.k }}</span><span style="font-size:15px;font-weight:600">{{ sr.v }}</span></span>
@@ -256,19 +257,21 @@ input,textarea,select{font-family:inherit;font-size:15px}
         </div>
         <div style="display:flex;flex-direction:column">
           <sc-for list="{{ tiles }}" as="ti" hint-placeholder-count="4">
-            <div style="border-top:1px solid rgba(255,255,255,0.14)">
-              <button onClick="{{ ti.onClick }}" aria-expanded="{{ ti.on }}" style="width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 44px;align-items:center;gap:clamp(12px,1.8vw,22px);padding:{{ pRowPad }};border:0;border-radius:0;background:transparent;color:#ffffff;text-align:left;cursor:pointer">
-                <span style="display:flex;flex-direction:column;gap:8px;min-width:0">
-                  <span style="display:flex;align-items:baseline;gap:12px"><span style="font:500 12px 'IBM Plex Mono',monospace;color:#f5c400">0{{ ti.n }}</span><span style="font-size:{{ pRowFs }};font-weight:800;letter-spacing:-0.035em;line-height:0.95;color:{{ ti.nameFg }};transition:color .25s">{{ ti.label }}</span></span>
-                  <span style="font-size:13px;color:#a9b6cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:{{ pSubPl }}">{{ ti.sub }}</span>
+            <div style="border-top:1px solid rgba(255,255,255,0.12)">
+              <button onClick="{{ ti.onClick }}" aria-expanded="{{ ti.on }}" style="width:100%;display:grid;grid-template-columns:{{ pRowCols }};align-items:center;gap:12px;padding:{{ pRowPad }};border:0;border-radius:0;background:transparent;color:#ffffff;text-align:left;cursor:pointer" style-hover="background:rgba(255,255,255,0.03)">
+                <span style="font:500 12px 'IBM Plex Mono',monospace;color:#f5c400">0{{ ti.n }}</span>
+                <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                  <span style="font-size:{{ pRowFs }};font-weight:700;letter-spacing:-0.02em;line-height:1.1;color:{{ ti.nameFg }};transition:color .25s">{{ ti.label }}</span>
+                  <sc-if value="{{ pSubOn }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px;color:#8fa0bf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ti.sub }}</span></sc-if>
+                  <sc-if value="{{ pValSub }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:7px;min-width:0;font-size:13px;color:#cfd7e6;white-space:nowrap"><sc-if value="{{ ti.sw }}" hint-placeholder-val="{{ false }}"><span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:{{ ti.sw }};box-shadow:0 0 0 1.5px rgba(255,255,255,0.5)"></span></sc-if><span style="overflow:hidden;text-overflow:ellipsis">{{ ti.value }}</span></span></sc-if>
                 </span>
-                <span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;white-space:nowrap;max-width:{{ pValMax }};overflow:hidden;text-overflow:ellipsis">
-                  <sc-if value="{{ ti.sw }}" hint-placeholder-val="{{ false }}"><span style="width:14px;height:14px;border-radius:50%;flex:0 0 auto;background:{{ ti.sw }};box-shadow:0 0 0 1.5px rgba(255,255,255,0.5)"></span></sc-if>{{ ti.value }}
+                <span style="display:{{ pPillDisp }};align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,0.07);font-size:13px;font-weight:600;white-space:nowrap;max-width:{{ pValMax }};overflow:hidden;text-overflow:ellipsis">
+                  <sc-if value="{{ ti.sw }}" hint-placeholder-val="{{ false }}"><span style="width:12px;height:12px;border-radius:50%;flex:0 0 auto;background:{{ ti.sw }};box-shadow:0 0 0 1.5px rgba(255,255,255,0.5)"></span></sc-if>{{ ti.value }}
                 </span>
-                <span style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid {{ ti.abd }};background:{{ ti.abg }};color:{{ ti.afg }};transform:rotate({{ ti.arot }});transition:all .3s cubic-bezier(.2,.7,.2,1)">→</span>
+                <span style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid {{ ti.abd }};background:{{ ti.abg }};color:{{ ti.afg }};transform:rotate({{ ti.arot }});transition:all .3s cubic-bezier(.2,.7,.2,1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
               </button>
               <sc-if value="{{ ti.on }}" hint-placeholder-val="{{ false }}">
-                <div style="padding:4px 0 32px;display:flex;flex-direction:column;gap:24px">
+                <div style="padding:{{ pOptPad }};display:flex;flex-direction:column;gap:18px">
                 <sc-for list="{{ shs }}" as="sh" hint-placeholder-count="1">
                 <div style="display:flex;flex-direction:column;gap:14px;padding-top:{{ sh.padT }};border-top:{{ sh.bt }}">
                 <sc-if value="{{ sh.headOn }}" hint-placeholder-val="{{ false }}">
@@ -308,7 +311,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
                 </sc-if>
 
                 <sc-if value="{{ sh.isFan }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex;align-items:flex-end;flex-wrap:wrap;row-gap:40px;padding:40px 4px 6px 14px">
+                  <div style="display:flex;align-items:flex-end;flex-wrap:wrap;row-gap:28px;padding:28px 4px 4px 14px">
                     <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="10">
                       <button onClick="{{ o.onClick }}" title="{{ o.label }}" aria-label="{{ o.label }}" aria-pressed="{{ o.on }}" style="flex:0 0 auto;width:{{ fanW }};height:{{ fanH }};margin-left:-10px;border:0;border-radius:8px 8px 6px 6px;cursor:pointer;background:{{ o.hex }};box-shadow:{{ o.sh }};transform:translateY({{ o.y }}) rotate({{ o.rot }});transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;position:relative;z-index:{{ o.z }}" style-hover="transform:translateY(-10px) rotate(0deg)">
                         <span style="writing-mode:vertical-rl;transform:rotate(180deg);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:{{ o.ink }}">{{ o.label }}</span>
@@ -318,9 +321,9 @@ input,textarea,select{font-family:inherit;font-size:15px}
                 </sc-if>
 
                 <sc-if value="{{ sh.isFrame }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
                     <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="3">
-                      <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="padding:18px 10px 14px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:rgba(255,255,255,0.03);transition:border-color .15s,background .15s" style-hover="background:rgba(255,255,255,0.06)">
+                      <button onClick="{{ o.onClick }}" aria-pressed="{{ o.on }}" style="padding:14px 8px 12px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid {{ o.bd }};box-shadow:inset 0 0 0 1px {{ o.ibd }},0 1px 2px rgba(15,26,44,0.05);background:rgba(255,255,255,0.03);transition:border-color .15s,background .15s" style-hover="background:rgba(255,255,255,0.06)">
                         <span style="width:{{ frameD }};height:{{ frameD }};border-radius:50%;background:{{ o.fill }};box-shadow:inset 0 -6px 12px rgba(0,0,0,0.18),0 6px 14px rgba(11,38,85,0.18),0 0 0 {{ o.ring }} #0b2655"></span>
                         <span style="display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center"><span style="font-size:13.5px;font-weight:600;color:#ffffff">{{ o.label }}</span><span style="font-size:12px;color:#a9b6cf">{{ o.sub }}</span></span>
                       </button>
@@ -421,7 +424,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
               </sc-if>
 
               <sc-if value="{{ sh.isFan }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;align-items:flex-end;flex-wrap:wrap;row-gap:40px;padding:40px 4px 6px 14px">
+                <div style="display:flex;align-items:flex-end;flex-wrap:wrap;row-gap:28px;padding:28px 4px 4px 14px">
                   <sc-for list="{{ sh.opts }}" as="o" hint-placeholder-count="10">
                     <button onClick="{{ o.onClick }}" title="{{ o.label }}" aria-label="{{ o.label }}" aria-pressed="{{ o.on }}" style="flex:0 0 auto;width:{{ fanW }};height:{{ fanH }};margin-left:-10px;border:0;border-radius:8px 8px 6px 6px;cursor:pointer;background:{{ o.hex }};box-shadow:{{ o.sh }};transform:translateY({{ o.y }}) rotate({{ o.rot }});transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;position:relative;z-index:{{ o.z }}" style-hover="transform:translateY(-10px) rotate(0deg)">
                       <span style="writing-mode:vertical-rl;transform:rotate(180deg);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:{{ o.ink }}">{{ o.label }}</span>
@@ -489,7 +492,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
           </div>
         </sc-if>
       </div>
-      <div style="position:sticky;bottom:0;z-index:3;background:#0b2655;border-top:1px solid rgba(255,255,255,0.14);padding:{{ pFootPad }};display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+      <div style="position:sticky;bottom:0;z-index:20;background:#0b2655;box-shadow:0 -18px 24px -8px #0b2655;border-top:1px solid rgba(255,255,255,0.14);padding:{{ pFootPad }};display:flex;flex-wrap:wrap;align-items:center;gap:12px">
         <div role="group" aria-label="{{ t.o_qty }}" style="height:48px;display:flex;align-items:center;padding:0 4px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;flex:0 0 auto">
           <button onClick="{{ qtyDown }}" aria-label="−" style="width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#ffffff;font-size:18px;cursor:pointer;opacity:{{ qtyDownOp }}" style-hover="background:rgba(255,255,255,0.1)">−</button>
           <input type="text" inputmode="numeric" pattern="[0-9]*" aria-label="{{ t.o_qty }}" value="{{ qtyInput }}" onChange="{{ onQtyInput }}" onBlur="{{ onQtyBlur }}" onKeyDown="{{ onQtyKey }}" onFocus="{{ onQtyFocus }}" style="width:{{ qtyW }};height:30px;padding:0;border:0;border-radius:4px;background:transparent;text-align:center;font:600 16px 'IBM Plex Mono',monospace;color:#ffffff;outline:none;box-shadow:0 0 0 1.5px {{ qtyLine }}">
@@ -639,9 +642,9 @@ input,textarea,select{font-family:inherit;font-size:15px}
         <button onClick="{{ doLogout }}" style="height:46px;padding:0 20px;border-radius:999px;border:1.5px solid #dcd6ca;background:transparent;color:#0f1a2c;font-size:15px;font-weight:600;cursor:pointer">{{ t.o_logout }}</button>
       </div>
     </div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <div style="display:flex;gap:6px;flex-wrap:{{ fWrap }};overflow-x:auto;scrollbar-width:none;margin:0 {{ fBleed }};padding:0 {{ fBleedP }}">
       <sc-for list="{{ oFilters }}" as="f" hint-placeholder-count="6">
-        <button onClick="{{ f.onClick }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }};font-size:14px;font-weight:500;cursor:pointer;display:flex;gap:8px;align-items:center">{{ f.label }}<span style="font:500 12px 'IBM Plex Mono',monospace;opacity:0.7">{{ f.count }}</span></button>
+        <button onClick="{{ f.onClick }}" style="flex:0 0 auto;white-space:nowrap;height:40px;padding:0 14px;border-radius:999px;border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }};font-size:14px;font-weight:500;cursor:pointer;display:flex;gap:8px;align-items:center">{{ f.label }}<span style="font:500 12px 'IBM Plex Mono',monospace;opacity:0.7">{{ f.count }}</span></button>
       </sc-for>
     </div>
     <div style="display:flex;flex-direction:column;border-top:1.5px solid #0b2655">
@@ -669,8 +672,8 @@ input,textarea,select{font-family:inherit;font-size:15px}
             <div style="display:flex;justify-content:space-between;gap:12px"><span style="font:500 14px 'IBM Plex Mono',monospace;color:#0b2655">{{ o.no }}</span><span style="font-weight:600">{{ o.value }}</span></div>
             <span style="font-size:16px;font-weight:600">{{ o.ref }}</span>
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-              <span style="font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:{{ o.sbg }};color:{{ o.sfg }}">{{ o.status }}</span>
-              <span style="font-size:13px;color:#5b6272">{{ t.c_eta }}: {{ o.eta }}</span>
+              <span style="flex:0 0 auto;white-space:nowrap;font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:{{ o.sbg }};color:{{ o.sfg }}">{{ o.status }}</span>
+              <span style="font-size:13px;color:#5b6272;white-space:nowrap">{{ o.eta }}</span>
             </div>
             <span style="display:flex;gap:3px"><sc-for list="{{ o.segs }}" as="g" hint-placeholder-count="5"><span style="flex:1;height:4px;border-radius:2px;background:{{ g.bg }}"></span></sc-for></span>
           </div>
@@ -687,8 +690,8 @@ input,textarea,select{font-family:inherit;font-size:15px}
         <span style="font:500 14px 'IBM Plex Mono',monospace;color:#8a5a00">{{ od.no }} · {{ od.date }}</span>
         <h1 style="margin:0;font-size:clamp(34px,4.6vw,64px);line-height:0.95;font-weight:800;letter-spacing:-0.025em;color:#0b2655">{{ od.ref }}</h1>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-        <span style="font-size:14px;font-weight:600;padding:6px 14px;border-radius:999px;background:{{ od.sbg }};color:{{ od.sfg }}">{{ od.status }}</span>
+      <div style="display:flex;flex-direction:column;align-items:{{ odAlign }};gap:8px">
+        <span style="font-size:14px;font-weight:600;padding:6px 14px;border-radius:999px;white-space:nowrap;background:{{ od.sbg }};color:{{ od.sfg }}">{{ od.status }}</span>
         <span style="font-size:14px;color:#5b6272">{{ t.c_eta }}: <strong style="color:#0f1a2c">{{ od.eta }}</strong></span>
       </div>
     </div>
@@ -725,7 +728,7 @@ input,textarea,select{font-family:inherit;font-size:15px}
         </div>
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:6px">
           <span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700">{{ t.d_value }}</span><span style="font-size:13px;color:#5b6272">{{ t.d_net }}</span></span>
-          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-size:26px;font-weight:800;color:#0b2655">{{ od.value }}</span><span style="font:500 13px 'IBM Plex Mono',monospace;color:#5b6272">{{ od.valueEUR }}</span></span>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-size:{{ odValFs }};font-weight:800;color:#0b2655;white-space:nowrap">{{ od.value }}</span><span style="font:500 13px 'IBM Plex Mono',monospace;color:#5b6272">{{ od.valueEUR }}</span></span>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:28px">
@@ -921,12 +924,22 @@ class Component extends DCLogic {
     const sectors = [
       { k: 'awn', num: '02', title: t.nav_awn, desc: t.pie_awn_d, cta: vm, img: this.tendeSrc(), pos: this.props.tendePos ?? 'center 45%', il: '0px', it: '0px', iw: W + 'px', ih: cy + 'px', base: '#1d3a6b',
         clip: P([[0, 0], [W, 0], [W, e], [cx, cy], [0, e]]), l: '0px', r: '0px', t: Math.max(28, cy * 0.14) + 'px', b: 'auto', mw: 'none', ai: 'center', al: 'center', onClick: () => this.go('catalog', { cat: 'awn' }) },
-      { k: 'umb', num: '01', title: t.nav_umb, desc: t.pie_umb_d, cta: t.pie_cta_umb, img: 'https://suman.ba/assets/photos/homebox/original/1552311171-suncobran-1.jpg', pos: 'center 35%', il: '0px', it: e + 'px', iw: cx + 'px', ih: (H - e) + 'px', base: '#0b2655',
+      { k: 'umb', num: '01', title: t.nav_umb, desc: t.pie_umb_d, cta: t.pie_cta_umb, img: 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/homebox/original/1552311171-suncobran-1.jpg', pos: 'center 35%', il: '0px', it: e + 'px', iw: cx + 'px', ih: (H - e) + 'px', base: '#0b2655',
         clip: P([[0, e], [cx, cy], [cx, H], [0, H]]), l: pad + 'px', r: 'auto', t: 'auto', b: pad + 'px', mw: Math.min(420, cx - pad - 24) + 'px', ai: 'flex-start', al: 'left', onClick: () => this.go('catalog', { cat: 'umb' }) },
-      { k: 'perg', num: '03', title: t.nav_perg, desc: t.pie_perg_d, cta: vm, img: 'https://suman.ba/assets/photos/gallery/original/21-palmiye-056-1603960604.jpg', pos: 'center', il: cx + 'px', it: e + 'px', iw: cx + 'px', ih: (H - e) + 'px', base: '#2c4f8c',
+      { k: 'perg', num: '03', title: t.nav_perg, desc: t.pie_perg_d, cta: vm, img: 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/gallery/original/21-palmiye-056-1603960604.jpg', pos: 'center', il: cx + 'px', it: e + 'px', iw: cx + 'px', ih: (H - e) + 'px', base: '#2c4f8c',
         clip: P([[W, e], [W, H], [cx, H], [cx, cy]]), l: 'auto', r: pad + 'px', t: 'auto', b: pad + 'px', mw: Math.min(420, cx - pad - 24) + 'px', ai: 'flex-end', al: 'right', onClick: () => this.go('catalog', { cat: 'perg' }) }
     ].map((x) => Object.assign(x, { dim: dim(x.k), scale: sc(x.k), enter: () => { if (!mobile) this.setState({ hover: x.k }); } }));
-    const seams = [{ x1: cx, y1: cy, x2: cx, y2: H }, { x1: cx, y1: cy, x2: 0, y2: e }, { x1: cx, y1: cy, x2: W, y2: e }];
+    let seams = [{ x1: cx, y1: cy, x2: cx, y2: H }, { x1: cx, y1: cy, x2: 0, y2: e }, { x1: cx, y1: cy, x2: W, y2: e }];
+    sectors.forEach((x) => { x.fs = 'clamp(24px,5.2vw,76px)'; });
+    if (mobile) {
+      const top = 72, b1 = top + (H - top) / 3, b2 = top + 2 * (H - top) / 3, d = Math.min(28, W * 0.07);
+      const M = { umb: { clip: P([[0, 0], [W, 0], [W, b1 + d], [0, b1 - d]]), it: '0px', ih: (b1 + d) + 'px', b: (H - (b1 - d) + 16) + 'px', side: 'l' },
+        awn: { clip: P([[0, b1 - d], [W, b1 + d], [W, b2 - d], [0, b2 + d]]), it: (b1 - d) + 'px', ih: (b2 - b1 + 2 * d) + 'px', b: (H - (b2 - d) + 16) + 'px', side: 'r' },
+        perg: { clip: P([[0, b2 + d], [W, b2 - d], [W, H], [0, H]]), it: (b2 - d) + 'px', ih: (H - b2 + d) + 'px', b: pad + 'px', side: 'l' } };
+      ['umb', 'awn', 'perg'].forEach((k) => { const x = sectors.find((z) => z.k === k), m = M[k];
+        Object.assign(x, { clip: m.clip, il: '0px', it: m.it, iw: W + 'px', ih: m.ih, t: 'auto', b: m.b, l: m.side === 'l' ? pad + 'px' : 'auto', r: m.side === 'r' ? pad + 'px' : 'auto', mw: 'none', ai: m.side === 'l' ? 'flex-start' : 'flex-end', al: m.side === 'l' ? 'left' : 'right', fs: '40px', pos: k === 'awn' ? 'center 40%' : x.pos }); });
+      seams = [{ x1: 0, y1: b1 - d, x2: W, y2: b1 + d }, { x1: 0, y1: b2 + d, x2: W, y2: b2 - d }];
+    }
 
     return {
       t, mobile, desktop: !mobile, menuOpen: mobile && s.menu,
@@ -940,10 +953,10 @@ class Component extends DCLogic {
       cartCount: s.cart.reduce((a, c) => a + c.qty, 0),
       isHome: scr === 'home', heroH: H, sectors, seams, seamBox: '0 0 ' + W + ' ' + H,
       hubX: cx, hubY: cy, hubD: mobile ? 96 : 132, hubLogo: mobile ? 40 : 54, hubFs: mobile ? 22 : 30, hubBar: mobile ? 52 : 72,
-      hubBadge: (this.props.hubStyle ?? 'badge') === 'badge', hubLogoOn: this.props.hubStyle === 'logo', hubDot: this.props.hubStyle === 'dot', hubCap: (this.props.hubStyle ?? 'cap') === 'cap', hubLogoOn: this.props.hubStyle === 'logo', leave: () => this.setState({ hover: null }),
+      hubBadge: (this.props.hubStyle ?? 'badge') === 'badge', hubLogoOn: !mobile && this.props.hubStyle === 'logo', hubDot: this.props.hubStyle === 'dot', hubCap: !mobile && (this.props.hubStyle ?? 'cap') === 'cap', hubLogoOn: !mobile && this.props.hubStyle === 'logo', leave: () => this.setState({ hover: null }),
       advFrom: this.km(D.models[1].from),
       stageNames: [0, 1, 2, 3, 4].map((i) => ({ n: '0' + (i + 1), label: t['st' + i] })),
-      footRef: this.footRef, toast: s.toast, footDisp: scr === 'home' ? 'none' : 'block',
+      footRef: this.footRef, toast: s.toast, footDisp: scr === 'home' || (scr === 'product' && (s.w || 1280) >= 860) ? 'none' : 'block',
       mainPad: scr === 'home' || scr === 'catalog' || scr === 'product' ? '0px' : '72px',
       backOn: false,
       backLbl: scr === 'product' ? t.nav_umb : scr === 'order' ? t.d_back : t.home,
@@ -957,7 +970,7 @@ class Component extends DCLogic {
         ? { barSh: 'none', hov: 'rgba(255,255,255,0.12)', dotRing: '#0b2655', badgeBg: '#0b2655', badgeFg: '#f5c400', pos: 'fixed', blur: 'none', bg: 'CATBG', bd: 'transparent', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.06)', btnBd: 'rgba(255,255,255,0.16)', cartBg: '#f5c400', cartFg: '#0b2655' }
         : scr === 'home' || (scr === 'catalog' && !s.scrolled)
         ? { barSh: 'none', hov: 'rgba(255,255,255,0.14)', dotRing: '#1b2f55', badgeBg: '#0b2655', badgeFg: '#f5c400', pos: 'fixed', blur: 'none', bg: 'linear-gradient(180deg,rgba(4,14,34,0.62) 0%,rgba(4,14,34,0.28) 60%,rgba(4,14,34,0) 100%)', bd: 'transparent', fg: '#ffffff', muted: '#dfe5f0', btnBg: 'rgba(8,20,44,0.35)', btnBd: 'rgba(255,255,255,0.28)', cartBg: '#f5c400', cartFg: '#0b2655' }
-        : { hov: '#ece8e0', dotRing: '#ffffff', badgeBg: '#f5c400', badgeFg: '#0b2655', blur: 'none', bg: 'transparent', bd: 'transparent', barSh: '0 1px 2px rgba(11,38,85,0.04),0 12px 32px rgba(11,38,85,0.10)', fg: '#0f1a2c', muted: '#5b6272', btnBg: 'rgba(255,255,255,0.88)', btnBd: 'rgba(11,38,85,0.08)', cartBg: '#0b2655', cartFg: '#ffffff', pos: 'fixed' }
+        : { hov: '#ece8e0', dotRing: '#ffffff', badgeBg: '#f5c400', badgeFg: '#0b2655', blur: s.scrolled ? 'blur(12px)' : 'none', bg: !s.scrolled ? 'transparent' : scr === 'product' ? 'rgba(11,38,85,0.94)' : 'rgba(244,240,234,0.92)', bd: 'transparent', barSh: '0 1px 2px rgba(11,38,85,0.04),0 12px 32px rgba(11,38,85,0.10)', fg: '#0f1a2c', muted: '#5b6272', btnBg: 'rgba(255,255,255,0.88)', btnBd: 'rgba(11,38,85,0.08)', cartBg: '#0b2655', cartFg: '#ffffff', pos: 'fixed' }
     };
   }
   fixHdr(o) { if (o.hdr && o.hdr.bg === 'CATBG') o.hdr = Object.assign({}, o.hdr, { bg: o.catHdrBg }); if (o.logoH === 'CATLOGO') o.logoH = o.catLogoH; return o; }
@@ -1001,9 +1014,11 @@ class Component extends DCLogic {
     const tiles = GRP.map(([k, label], i) => {
       const on = sheet === k;
       return { k, n: String(i + 1), label, upper: label.toUpperCase(), value: gsum[k], sub: gsub[k], on, onClick: (e) => { const el = e.currentTarget.parentElement, wasOn = on; open(k)(); if (wasOn) return;
-          setTimeout(() => { const p = this.pPanelRef.current; if (!el) return; if (p && p.scrollHeight > p.clientHeight + 4) p.scrollTo({ top: el.offsetTop - 16, behavior: 'smooth' }); else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth' }); }, 60); },
+          setTimeout(() => { const p = this.pPanelRef.current; if (!el) return;
+            if ((this.state.w || 1280) >= 860) { if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'smooth' }); if (p && p.scrollHeight > p.clientHeight + 4) p.scrollTo({ top: Math.max(0, el.offsetTop - 16), behavior: 'smooth' }); }
+            else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth' }); }, 60); },
         sw: k === 'g2' ? curHex : k === 'g1' ? frame.hex : k === 'g3' && br.canopy ? br.canopy : '', swRing: on ? 'rgba(255,255,255,0.6)' : '#ffffff',
-        bg: on ? 'rgba(255,255,255,0.1)' : 'transparent', hbg: on ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)', kFg: '#ffffff', nameFg: on ? '#f5c400' : '#ffffff', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', abd: on ? '#f5c400' : 'rgba(255,255,255,0.28)', arot: on ? '90deg' : '0deg', vFg: '#a9b6cf', nBg: 'transparent', nFg: '#6b7180', rot: on ? '0deg' : '180deg' };
+        bg: on ? 'rgba(255,255,255,0.1)' : 'transparent', hbg: on ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)', kFg: '#ffffff', nameFg: on ? '#f5c400' : '#ffffff', abg: on ? '#f5c400' : 'transparent', afg: on ? '#0b2655' : '#ffffff', abd: on ? '#f5c400' : 'rgba(255,255,255,0.28)', arot: on ? '180deg' : '0deg', vFg: '#a9b6cf', nBg: 'transparent', nFg: '#6b7180', rot: on ? '0deg' : '180deg' };
     });
     const card = (key, list, code, name, sub) => list.map((o) => { const on = c[key] === o.id, sv = sub(o);
       return { code: code(o), label: name(o), sub: sv, on, bd: on ? '#f2c36b' : 'rgba(255,255,255,0.14)', ibd: on ? '#f2c36b' : 'transparent', hbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', bg: on ? 'rgba(242,195,107,0.08)' : 'rgba(255,255,255,0.03)', fg: '#ffffff', codeFg: on ? '#f2c36b' : '#ffffff', rbd: on ? '#f2c36b' : 'rgba(255,255,255,0.32)', rbg: on ? '#f2c36b' : '#0b2655', subFg: '#a9b6cf', onClick: () => this.setCfg(key, o.id) }; });
@@ -1011,12 +1026,12 @@ class Component extends DCLogic {
     const baseCode = { none: '—', concrete: 'Ø600', m854: '854', m860: '860', fold880: '880', embed: 'Ø58' };
     let ruler = { stops: [], tick: '10px', fromP: '0%', fillP: '0%' };
     const mk = (sheet) => {
-    let sh = { isCards: false, isRuler: false, isFan: false, isFrame: false, isVal: false, isQty: false, isSum: false, note: '', min: '150px', h: '104px', codeFs: '20px', opts: [] };
-    if (sheet === 'shape') sh = Object.assign(sh, { isCards: true, codeFs: '26px', opts: card('shape', [{ id: 'LS' }, { id: 'LO' }, { id: 'LR' }], (o) => shapeIc[o.id], (o) => t['sh_' + o.id], (o) => o.id) });
+    let sh = { isCards: false, isRuler: false, isFan: false, isFrame: false, isVal: false, isQty: false, isSum: false, note: '', min: '130px', h: '84px', codeFs: '17px', opts: [] };
+    if (sheet === 'shape') sh = Object.assign(sh, { isCards: true, codeFs: '20px', opts: card('shape', [{ id: 'LS' }, { id: 'LO' }, { id: 'LR' }], (o) => shapeIc[o.id], (o) => t['sh_' + o.id], (o) => o.id) });
     if (sheet === 'mech') sh = Object.assign(sh, { isCards: true, opts: card('mech', D.mech, (o) => o.id, (o) => t['mech_' + o.id], (o) => addLbl(o.add)), note: t.mech_T3 + ': ' + (({ bs: 'dostupan od 300 cm', hr: 'dostupan od 300 cm', en: 'available from 300 cm', de: 'ab 300 cm erhältlich' })[lg]) });
-    if (sheet === 'look') sh = Object.assign(sh, { isCards: true, min: '200px', opts: card('look', D.looks, (o) => (o.id === 'std' ? 'STD' : 'CL®'), (o) => t['look_' + o.id], (o) => addLbl(o.add)) });
+    if (sheet === 'look') sh = Object.assign(sh, { isCards: true, min: '170px', opts: card('look', D.looks, (o) => (o.id === 'std' ? 'STD' : 'CL®'), (o) => t['look_' + o.id], (o) => addLbl(o.add)) });
     if (sheet === 'vent') sh = Object.assign(sh, { isCards: true, opts: card('vent', D.vents, (o) => (o.id === 'none' ? '—' : o.id), (o) => t['vent_' + o.id], (o) => addLbl(o.add)) });
-    if (sheet === 'fabric') sh = Object.assign(sh, { isCards: true, min: '200px', note: t.fab_note, opts: card('fabric', D.fabrics, (o) => o.id, (o) => t['fab_' + o.id], (o) => (o.pct ? '+ ' + Math.round(o.pct * 100) + ' %' : t.incl)) });
+    if (sheet === 'fabric') sh = Object.assign(sh, { isCards: true, min: '170px', note: t.fab_note, opts: card('fabric', D.fabrics, (o) => o.id, (o) => t['fab_' + o.id], (o) => (o.pct ? '+ ' + Math.round(o.pct * 100) + ' %' : t.incl)) });
     if (sheet === 'base') sh = Object.assign(sh, { isCards: true, opts: card('base', D.bases, (o) => baseCode[o.id], (o) => t['base_' + o.id], (o) => addLbl(o.add)) });
     if (sheet === 'color') sh = Object.assign(sh, { isFan: true, note: t.fab_note, opts: fab.colors.map(([id, hex], i) => { const on = c.color === id; return { label: id, hex, on, ink: lum(hex) > 0.55 ? '#0b2655' : '#ffffff', y: on ? '-18px' : '0px', rot: on ? '0deg' : ((i % 2 ? 1 : -1) * 1.5) + 'deg', z: on ? 5 : 1, sh: on ? '0 12px 24px rgba(0,0,0,0.35),0 0 0 2px #0b2655,0 0 0 4px #f2c36b' : '0 2px 6px rgba(0,0,0,0.25)', onClick: () => this.setCfg('color', id) }; }) });
     if (sheet === 'frame') sh = Object.assign(sh, { isFrame: true, opts: D.frames.map((o) => { const on = c.frame === o.id; return { label: t['fr_' + o.id], sub: addLbl(o.add), on, bd: on ? '#f2c36b' : 'rgba(255,255,255,0.14)', ibd: on ? '#f2c36b' : 'transparent', ring: '0px',
@@ -1035,7 +1050,7 @@ class Component extends DCLogic {
         stops: all.map((z) => { const on = c.size === z, ok = sizes.includes(z);
           return { left: P(first(z)).toFixed(2) + '%', on, label: c.shape === 'LR' ? z.slice(0, 2) + '0×' + z.slice(2) + '0' : z, full: D.sizeLabel[c.shape](z), tipOp: on ? 1 : 0, tipY: on ? '0px' : '6px',
             dot: on ? '22px' : '12px', dotM: on ? '13px' : '18px', dotBg: on ? '#f5c400' : ok ? '#0b2655' : 'rgba(255,255,255,0.15)', dotSh: on ? '0 0 0 5px rgba(245,196,0,0.25)' : 'none', fg: ok ? (on ? '#ffffff' : '#cfd7e6') : 'rgba(255,255,255,0.35)',
-            price: ok ? this.km(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add) : (D.sizes.classic[c.shape].includes(z) ? 'CR · CS' : 'T3'),
+            price: ok ? ((this.state.w || 1280) < 860 ? this.fmt(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add).replace(/,00$/, '') : this.km(D.basePrice[c.shape + z] + D.mech.find((m) => m.id === c.mech).add)) : (D.sizes.classic[c.shape].includes(z) ? 'CR · CS' : 'T3'),
             onClick: () => { if (!ok) this.setCfg('mech', D.sizes.classic[c.shape].includes(z) ? 'CR' : 'T3'); this.setCfg('size', z); } }; }) };
       sh.isRuler = true; sh.note = t.mech_T3 + ' (T3) · CR · CS';
     }
@@ -1057,10 +1072,10 @@ class Component extends DCLogic {
     const specRowsP = [[t.o_size, D.sizeLabel[c.shape](c.size).replace('×', ' × ')], [({ bs: 'Visina H1', hr: 'Visina H1', en: 'Height H1', de: 'Höhe H1' })[lg], spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg']].map(([k, v]) => ({ k, v }));
     return {
       cfgH: s.h ? s.h + 'px' : '100vh', narrowCfg: !wide,
-      pCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.3fr) minmax(460px,1fr)', pSpecs: specRowsP.slice(0, 3), pPanelRef: this.pPanelRef || (this.pPanelRef = React.createRef()), pStagePos: mob ? 'relative' : 'sticky', pStageH: mob ? '64vh' : (s.h ? s.h + 'px' : '100vh'), pStageTop: '72px',
+      pCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.3fr) minmax(460px,1fr)', pSpecs: specRowsP.slice(0, 3), pAddH2: 0, pPanelRef: this.pPanelRef || (this.pPanelRef = React.createRef()), pStagePos: mob ? 'relative' : 'sticky', pStageH: mob ? '64vh' : (s.h ? s.h + 'px' : '100vh'), pStageTop: '72px',
       pTabsTop: mob ? '84px' : '96px', pPanelH: mob ? 'auto' : (s.h ? s.h + 'px' : '100vh'), pPanelOv: mob ? 'visible' : 'auto',
-      pPad: mob ? '32px 18px 8px' : (short ? '100px' : '124px') + ' clamp(24px,3.4vw,64px) 16px', pRowPad: mob ? '18px 0' : '24px 0', pRowFs: mob ? '26px' : 'clamp(26px,2.4vw,36px)', pSubPl: mob ? '0px' : '34px',
-      pH1: mob ? '64px' : short ? 'clamp(52px,5vw,72px)' : 'clamp(64px,6.4vw,104px)', pValMax: mob ? '130px' : '200px', pFootPad: mob ? '14px 18px calc(14px + env(safe-area-inset-bottom))' : (short ? '14px' : '18px') + ' clamp(24px,3.4vw,64px) ' + (short ? '16px' : '22px'), pAddFlex: mob || s.w < 1180 ? '1 1 100%' : '0 0 auto', pAddH: short ? '46px' : '52px', pTotFs: s.w < 1200 ? '21px' : '24px',
+      pPad: mob ? '32px 18px 8px' : (short ? '96px' : '112px') + ' clamp(24px,3vw,52px) 16px', pRowPad: mob ? '14px 0' : '16px 0', fWrap: mob ? 'nowrap' : 'wrap', odAlign: mob ? 'flex-start' : 'flex-end', odValFs: mob ? '22px' : '26px', fBleed: mob ? '-16px' : '0px', fBleedP: mob ? '16px' : '0px', pRowCols: mob ? '22px minmax(0,1fr) 32px' : '28px minmax(0,1fr) auto 32px', pSubOn: !mob, pValSub: mob, pPillDisp: mob ? 'none' : 'flex', pOptPad: mob ? '4px 0 22px' : '6px 0 24px 40px', pSpecCols: mob ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,auto)', pRowFs: mob ? '18px' : '19px', pSubPl: mob ? '0px' : '34px',
+      pH1: mob ? '52px' : short ? 'clamp(44px,4vw,60px)' : 'clamp(52px,4.6vw,76px)', pValMax: mob ? '120px' : '190px', pFootPad: mob ? '14px 18px calc(14px + env(safe-area-inset-bottom))' : (short ? '14px' : '18px') + ' clamp(24px,3.4vw,64px) ' + (short ? '16px' : '22px'), pAddFlex: mob || s.w < 1180 ? '1 1 100%' : '0 0 auto', pAddH: short ? '46px' : '52px', pTotFs: s.w < 1200 ? '21px' : '24px',
       sumOn: sheet === 'sum',
       tabsDisp: sheetOn ? 'none' : 'flex', hdrTop: wide ? '112px' : '92px', eyebrow: t.nav_umb, codeFs: wide ? 'clamp(56px,5.6vw,84px)' : '40px', modelTag: c.shape + ' ' + c.size + ' ' + c.mech, sheetW: 'min(1120px,calc(100% - 24px))', addHov: s.justAdded ? '#1f6b3a' : '#ffd21f', specDisp: mob ? 'none' : 'grid',
       specRows: [[t.o_size, D.sizeLabel[c.shape](c.size).replace('×', ' × ')], [({ bs: 'Visina H1', hr: 'Visina H1', en: 'Height H1', de: 'Höhe H1' })[lg], spec[0] + ' cm'], [t.sp_weight, String(spec[1]).replace('.', ',') + ' kg'], [t.sp_pole, 'Ø 58 mm']].map(([k, v]) => ({ k, v })),
@@ -1114,7 +1129,7 @@ class Component extends DCLogic {
       tiles, sheetOn, shs, gp, ruler, qtyPresets, openSum: open('sum'), sumLbl: SUM,
       sheetPad: mob ? '16px' : '18px 20px 20px', sheetMaxH: 'max(220px, calc(100vh - ' + (wide ? 72 : 150) + 'px - ' + (wide ? 120 : 176) + 'px - 150px))',
       sheetPrev: () => this.setState({ sheet: GRP[((gi < 0 ? 0 : gi) - 1 + GRP.length) % GRP.length][0] }), sheetNext: () => this.setState({ sheet: GRP[((gi < 0 ? -1 : gi) + 1) % GRP.length][0] }), sheetClose: () => this.setState({ sheet: null }), navOn: sheet !== 'sum',
-      fanW: mob ? '44px' : '58px', fanH: mob ? '96px' : '124px', frameD: mob ? '52px' : '72px'
+      fanW: mob ? '40px' : '48px', fanH: mob ? '84px' : '100px', frameD: mob ? '44px' : '56px'
     };
   }
   toolVals(s) {
@@ -1166,7 +1181,7 @@ class Component extends DCLogic {
     };
   }
   tendeSrc() {
-    const g = 'https://suman.ba/assets/photos/', L = {
+    const g = 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/', L = {
       '1': 'products/original/1557488985-ravna-tenda.jpg', '2': 'gallery/original/15-fotografija-0079-1636623526.jpg', '3': 'gallery/original/15-ravna-tenda-sarajevski-kiseljak-bosna-1636623434.jpg',
       '4': 'gallery/original/15-1629708957258-1636623065.jpg', '5': 'gallery/original/15-ravna-tenda-metropolis-old-town-2-1557488973.jpg', '6': 'gallery/original/15-vremeplov-1636623215.jpg'
     };
@@ -1202,9 +1217,9 @@ class Component extends DCLogic {
     };
     {
       const mob = s.w < 860, raw = [];
-      if (featOn) raw.push({ name: 'Advance', bgi: 'url(https://suman.ba/assets/photos/products/original/1557424992-advance.jpg)', desc: t.feat_d, seg: '', fromLbl: t.from, price: this.km(D.models[1].from), hot: true, cta: t.configure, onClick: () => this.go('product') });
+      if (featOn) raw.push({ name: 'Advance', bgi: 'url(https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/products/original/1557424992-advance.jpg)', desc: t.feat_d, seg: '', fromLbl: t.from, price: this.km(D.models[1].from), hot: true, cta: t.configure, onClick: () => this.go('product') });
       models.forEach((m) => raw.push({ name: m.name, bgi: m.bgi, desc: m.desc, seg: cat === 'umb' ? '' : (m.fact || ''), fromLbl: m.fromLbl, price: m.price, hot: false, cta: m.cta, onClick: m.onClick }));
-      const P = 'https://suman.ba/assets/photos/', G = P + 'gallery/original/', PO = P + 'products/original/';
+      const P = 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/', G = P + 'gallery/original/', PO = P + 'products/original/';
       const IMG = {
         Beach: [PO + '1557471741-beach.jpg', G + '10-beach-01-1557471730.jpg', G + '10-beach-03-1557471732.jpg'],
         Advance: [PO + '1557424992-advance.jpg', G + '1-suman-suncobran-advance-1-1700829309.jpg', G + '1-suman-suncobran-advance-2-1700829502.jpg'],
@@ -1225,7 +1240,7 @@ class Component extends DCLogic {
       Object.assign(catExtra, { ixItems, ixAct: raw[act] || { name: '', desc: '', hot: false, cta: '', onClick: () => {} },
         ixSlides: cur.imgs.map((bgi, i) => ({ bgi, op: i === sl ? 1 : 0, sc: i === sl ? 1.04 : 1 })),
         ixDotsOn: nImg > 1, ixDots: cur.imgs.map((_, i) => ({ n: String(i + 1), on: i === sl, w: i === sl ? '22px' : '8px', bg: i === sl ? '#ffffff' : 'rgba(255,255,255,0.45)', onClick: () => { this.setState({ ixSlide: i }); this._ixT = Date.now(); } })), ixCols: mob ? 'minmax(0,1fr)' : 'minmax(0,1.05fr) minmax(0,1fr)', ixPos: mob ? 'relative' : 'sticky', ixH: mob ? '58vh' : '100vh',
-        ixPad: mob ? '32px 18px 72px' : '128px clamp(28px,4vw,72px) 96px', ixRow: mob ? '76px minmax(0,1fr) auto' : 'minmax(0,1fr) auto 44px', ixRowPad: mob ? '16px 0' : '26px 0', ixThumb: mob, ixArrow: mob ? 'none' : 'flex' });
+        ixPad: mob ? '32px 18px 72px' : '128px clamp(28px,4vw,72px) 96px', ixRow: mob ? '76px minmax(0,1fr) auto 28px' : 'minmax(0,1fr) auto 44px', ixAw: mob ? '28px' : '44px', ixAfs: mob ? '14px' : '18px', ixRowPad: mob ? '16px 0' : '26px 0', ixThumb: mob, ixArrow: 'flex' });
     }
     const sizes = D.sizes[c.mech === 'T3' ? 'tele' : 'classic'][c.shape];
     const fab = D.fabrics.find((f) => f.id === c.fabric);
@@ -1317,7 +1332,7 @@ class Component extends DCLogic {
       isProduct: s.screen === 'product',
       prodCols: mobile ? 'minmax(0,1fr)' : 'minmax(0,1.35fr) minmax(360px,1fr)', viewerPos: mobile ? 'relative' : 'sticky', viewerH: vh,
       show3d: s.view === '3d', showPhoto: s.view === 'photo', photoSrc: D.gallery[s.photo],
-      u: { shape: c.shape, size: c.size, canopy: curHex, frame: D.frames.find((f) => f.id === c.frame).hex, vent: c.vent, look: c.look, brandtext: c.brand === 'none' ? '' : br.text, base: c.base, mech: c.mech },
+      u: { shape: c.shape, size: c.size, canopy: curHex, frame: D.frames.find((f) => f.id === c.frame).hex, vent: c.vent, look: c.look, brandtext: c.brand === 'none' ? '' : br.text, brandimg: c.brand === 'none' || (this.state.logoMiss || {})[c.brand] ? '' : (br.logo || ''), base: c.base, mech: c.mech },
       viewTabs: [['3d', t.v3d, '3D'], ['photo', t.vph, '▦']].map(([id, label, ic]) => ({ label, ic, bg: s.view === id ? '#0b2655' : 'transparent', fg: s.view === id ? '#fff' : '#0f1a2c', onClick: () => this.setState({ view: id }) })),
       photos: D.gallery.map((src, i) => ({ src, ring: s.photo === i ? '0 0 0 2px #ffffff, 0 0 0 4px #0b2655' : 'none', op: s.photo === i ? 1 : 0.62, onClick: () => this.setState({ view: 'photo', photo: i }) })),
       photoPrev: () => this.setState({ photo: (s.photo - 1 + D.gallery.length) % D.gallery.length }),
@@ -1468,7 +1483,7 @@ class Component extends DCLogic {
   renderVals() {
     if (!this.state.ready) return { t: {}, curLang: { code: 'BS', name: 'Bosanski', flag: 'https://flagcdn.com/w80/ba.png' }, langRot: '0deg', hdr: { bg: '#0b2655', bd: '#0b2655', fg: '#ffffff', muted: '#a9b6cf', btnBg: 'rgba(255,255,255,0.08)', btnBd: 'rgba(255,255,255,0.22)', cartBg: '#f5c400', cartFg: '#0b2655' }, logoImg: 'block', logoTxt: 'none', footDisp: 'none', isHome: true, sectors: [], seams: [], navItems: [], langs: [], stageNames: [], heroH: 700, desktop: this.state.w >= 860, footRef: this.footRef };
     const t = window.SUMAN_I18N[this.state.lang] || window.SUMAN_I18N.bs;
-    try { document.documentElement.style.overflow = (this.state.screen === 'home' || this.state.screen === 'product') && !this.state.menu ? 'hidden' : ''; } catch (e) {}
+    try { document.documentElement.style.overflow = (this.state.screen === 'home' || (this.state.screen === 'product' && (this.state.w || 1280) >= 860)) && !this.state.menu ? 'hidden' : ''; } catch (e) {}
     const pv = this.productVals(t), c3 = this.state.screen === 'product' ? this.cfg3Vals(t) : {};
     if (pv.review) pv.review = pv.review.map((r, i) => Object.assign({}, r, { edit: () => this.setState({ sheet: ['shape', 'mech', 'size', 'frame', 'look', 'vent', 'fabric', 'brand', 'base', 'qty'][i] }) }));
     return this.fixHdr(Object.assign({}, this.baseVals(t), pv, c3, this.cartVals(t), this.b2bVals(t)));

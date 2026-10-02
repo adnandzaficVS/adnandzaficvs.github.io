@@ -2,19 +2,19 @@ window.SUMAN = {
   EUR: 1.95583,
   B2B_DISCOUNT: 0.18,
   models: [
-    { id: 'beach', name: 'Beach', seg: 'home', from: 185, img: 'https://suman.ba/assets/photos/products/original/1557471741-beach.jpg' },
-    { id: 'advance', name: 'Advance', seg: 'both', from: 420, best: true, img: 'https://suman.ba/assets/photos/products/original/1557424992-advance.jpg' },
-    { id: 'prestige', name: 'Prestige', seg: 'pro', from: 1150, img: 'https://suman.ba/assets/photos/products/original/1557416077-prestige.jpg' },
-    { id: 'magnum', name: 'Magnum', seg: 'pro', from: 1890, img: 'https://suman.ba/assets/photos/products/original/1557425199-magnum.jpg' },
-    { id: 'console', name: 'Console', seg: 'pro', from: 2450, img: 'https://suman.ba/assets/photos/gallery/original/11-konzolni-suncobran-job-13-1557425292.jpg' }
+    { id: 'beach', name: 'Beach', seg: 'home', from: 185, img: 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/products/original/1557471741-beach.jpg' },
+    { id: 'advance', name: 'Advance', seg: 'both', from: 420, best: true, img: 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/products/original/1557424992-advance.jpg' },
+    { id: 'prestige', name: 'Prestige', seg: 'pro', from: 1150, img: 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/products/original/1557416077-prestige.jpg' },
+    { id: 'magnum', name: 'Magnum', seg: 'pro', from: 1890, img: 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/products/original/1557425199-magnum.jpg' },
+    { id: 'console', name: 'Console', seg: 'pro', from: 2450, img: 'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/gallery/original/11-konzolni-suncobran-job-13-1557425292.jpg' }
   ],
   gallery: [
-    'https://suman.ba/assets/photos/products/original/1557424992-advance.jpg',
-    'https://suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-1-1700829309.jpg',
-    'https://suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-2-1700829502.jpg',
-    'https://suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-6-1700829502.jpg',
-    'https://suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-9-1700829502.jpg',
-    'https://suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-5-1700829502.jpg'
+    'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/products/original/1557424992-advance.jpg',
+    'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-1-1700829309.jpg',
+    'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-2-1700829502.jpg',
+    'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-6-1700829502.jpg',
+    'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-9-1700829502.jpg',
+    'https://wsrv.nl/?w=1600&q=74&output=webp&url=suman.ba/assets/photos/gallery/original/1-suman-suncobran-advance-5-1700829502.jpg'
   ],
   sizes: {
     classic: { LS: ['200', '250', '300', '350', '400'], LO: ['200', '250', '300', '350', '400'], LR: ['3022', '3526', '4030'] },
@@ -36,12 +36,12 @@ window.SUMAN = {
   ],
   brands: [
     { id: 'none', name: '', canopy: null },
-    { id: 'cocacola', name: 'Coca-Cola', canopy: '#E4002B', text: 'Coca-Cola' },
-    { id: 'lasko', name: 'Laško', canopy: '#006341', text: 'LAŠKO' },
-    { id: 'karlovacko', name: 'Karlovačko', canopy: '#E4002B', text: 'KARLOVAČKO' },
-    { id: 'ozujsko', name: 'Ožujsko', canopy: '#862633', text: 'OŽUJSKO' },
-    { id: 'sarajevsko', name: 'Sarajevsko', canopy: '#154734', text: 'SARAJEVSKO' },
-    { id: 'heineken', name: 'Heineken', canopy: '#00843D', text: 'Heineken' }
+    { id: 'cocacola', logo: 'brands/cocacola.png', name: 'Coca-Cola', canopy: '#E4002B', text: 'Coca-Cola' },
+    { id: 'lasko', logo: 'brands/lasko.png', name: 'Laško', canopy: '#006341', text: 'LAŠKO' },
+    { id: 'karlovacko', logo: 'brands/karlovacko.png', name: 'Karlovačko', canopy: '#E4002B', text: 'KARLOVAČKO' },
+    { id: 'ozujsko', logo: 'brands/ozujsko.png', name: 'Ožujsko', canopy: '#862633', text: 'OŽUJSKO' },
+    { id: 'sarajevsko', logo: 'brands/sarajevsko.png', name: 'Sarajevsko', canopy: '#154734', text: 'SARAJEVSKO' },
+    { id: 'heineken', logo: 'brands/heineken.png', name: 'Heineken', canopy: '#00843D', text: 'Heineken' }
   ],
   brandAdd: 140,
   bases: [{ id: 'none', add: 0 }, { id: 'concrete', add: 95 }, { id: 'm854', add: 185 }, { id: 'm860', add: 210 }, { id: 'fold880', add: 160 }, { id: 'embed', add: 45 }],

@@ -326,7 +326,7 @@
         for (let j = 0; j < n; j++) {
           const p = bnd[j], yt = y0 + yRel(u, p.s, sc) + yOff, ux = (p.k + p.s + 1) / 2;
           pos.push(p.x * u * sc, yt, p.z * u * sc, p.x * u * sc, yt - h, p.z * u * sc);
-          uv.push(ux, 1, ux, 0);
+          uv.push(-ux, 1, -ux, 0);
         }
         for (let j = 0; j < n - 1; j++) { const A = j * 2, B = A + 1, C = A + 2, D = A + 3; idx.push(A, B, C, C, B, D); }
         const g = new T.BufferGeometry();
@@ -352,12 +352,14 @@
         const dx = dc.getContext('2d');
         const dt = new T.CanvasTexture(dc); dt.colorSpace = T.SRGBColorSpace; dt.anisotropy = 8;
         const fitText = (ctx, txt, max, fs) => { ctx.font = `800 ${fs}px ${FONT}`; while (ctx.measureText(txt).width > max && fs > 30) { fs -= 8; ctx.font = `800 ${fs}px ${FONT}`; } };
+        const grain = (ctx, w, h, a) => { ctx.save(); ctx.globalCompositeOperation = 'destination-out'; for (let i = 0; i < (w * h) / 90; i++) { ctx.fillStyle = 'rgba(0,0,0,' + (a * Math.random()).toFixed(3) + ')'; ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2); } ctx.restore(); };
+        const weave = (ctx, w, h) => { ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.05)'; for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1); ctx.fillStyle = 'rgba(255,255,255,0.03)'; for (let x = 0; x < w; x += 3) ctx.fillRect(x, 0, 1, h); ctx.fillStyle = 'rgba(0,0,0,0.10)'; ctx.fillRect(0, 0, w, 3); ctx.fillRect(0, h - 5, w, 5); ctx.restore(); };
         const draw = (img) => {
           cx.fillStyle = canopyHex; cx.fillRect(0, 0, W, H);
           dx.clearRect(0, 0, 1024, 300);
           if (img) {
             const iw0 = img.naturalWidth || img.width || 300, ih0 = img.naturalHeight || img.height || 100;
-            let ih = H * 0.72, iw = (iw0 * ih) / ih0;
+            let ih = H * 0.62, iw = (iw0 * ih) / ih0;
             if (iw > W * 0.8) { iw = W * 0.8; ih = (ih0 * iw) / iw0; }
             cx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
             let dw = 980, dh = (ih0 * dw) / iw0;
@@ -365,16 +367,17 @@
             dx.drawImage(img, (1024 - dw) / 2, (300 - dh) / 2, dw, dh);
           } else if (btxt) {
             cx.fillStyle = ink; cx.textAlign = 'center'; cx.textBaseline = 'middle';
-            fitText(cx, btxt, W * 0.7, 96); cx.fillText(btxt, W / 2, H / 2 + 4);
+            fitText(cx, btxt, W * 0.62, 84); cx.fillText(btxt, W / 2, H / 2 + 2);
             dx.fillStyle = ink; dx.textAlign = 'center'; dx.textBaseline = 'middle';
             fitText(dx, btxt, 960, 200); dx.fillText(btxt, 512, 158);
           }
+          grain(dx, 1024, 300, 0.35); weave(cx, W, H);
           vt.needsUpdate = true; dt.needsUpdate = true;
         };
         draw(null);
-        if (bimg) { const im = new Image(); im.onload = () => draw(im); im.src = bimg; }
+        if (bimg) { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => draw(im); im.src = bimg; }
         valMat = new T.MeshStandardMaterial({ name: 'volan_stampa', map: vt, roughness: 0.9, side: T.DoubleSide });
-        decalMat = new T.MeshStandardMaterial({ name: 'stampa_platno', map: dt, transparent: true, depthWrite: false, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -4, side: T.DoubleSide });
+        decalMat = new T.MeshStandardMaterial({ name: 'stampa_platno', map: dt, transparent: true, opacity: 0.94, depthWrite: false, roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -4, side: T.DoubleSide });
       }
 
       // canopy
